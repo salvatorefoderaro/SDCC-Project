@@ -1,0 +1,14 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: ssdp
+spec:
+  selector:
+    app: ssdp
+  ports:
+  # Porta accessibile all'interno del cluster dagli altri Pod
+  - targetPort: 9001
+    
+    # Porta accessibile all'esterno
+    port: 9001
+  type: LoadBalancer

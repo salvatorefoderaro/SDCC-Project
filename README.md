@@ -49,3 +49,5 @@ https://stackoverflow.com/questions/20212894/how-do-i-get-flask-to-run-on-port-8
 https://stackoverflow.com/questions/41322541/rebuild-docker-container-on-file-changes
 
 https://stackoverflow.com/questions/48077931/delete-all-the-contents-from-a-kubernetes-node
+
+https://kubernetes.io/docs/tasks/run-application/run-single-instance-stateful-application/

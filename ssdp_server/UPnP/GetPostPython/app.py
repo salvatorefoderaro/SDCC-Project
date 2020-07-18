@@ -3,33 +3,23 @@ import requests
 
 app = Flask(__name__) #create the Flask app
 
-@app.route('/testGet', methods=['GET'])
+
+@app.route('/checkStatus', methods=['GET'])
 def query_example():
-    return request.args.get('deviceID') #if key doesn't exist, returns None
-
-@app.route('/testPost', methods=['POST'])
-def formexample():
-    input_json = request.get_json(force=True) 
-    # force=True, above, is necessary if another developer 
-    # forgot to set the MIME type to 'application/json'
-    return input_json
-
-@app.route('/testGet')
-def testGet():
     try:
-        res = requests.get('http://localhost:5000/testGet?deviceID=10')
+        res = requests.get('http://'+request.args.get('ipAddress')+'/checkStatus)')
     except requests.exceptions.RequestException as e:  # This is the correct syntax
-        return "Errore nella chiamata alla funzione get"
-    return res.text
+        return e
 
-@app.route('/testPost') 
+@app.route('/sendDataToCluster', methods=['POST'])
 def jsonexample():
-    dictToSend = {'question':'what is the answer?'}
+    dictToSend = {'id':request.json['id'], 'ip':request.json['id'], 'status':request.json['id']}
+    print(request.json['id'])
     try:
-        res = requests.post('http://localhost:5000/testPost', json=dictToSend)
+        res = requests.post('http://10.98.105.89:30006/collectData', json=dictToSend)
     except requests.exceptions.RequestException as e:  # This is the correct syntax
-        return "Errore nella chiamata alla funzione post"
+        return e
     return res.text
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000) #run app in debug mode on port 5000
+    app.run(host='0.0.0.0', debug=True, port=5000) #run app in debug mode on port 5000

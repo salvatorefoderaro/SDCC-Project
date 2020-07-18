@@ -2,22 +2,22 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: myapp
-  name: myappdeployment
+    app: ssdp
+  name: ssdpdeployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: myapp
+      app: ssdp
   strategy: {}
   template:
     metadata:
       labels:
-        app: myapp
+        app: ssdp
     spec:
       containers:
       - image: hellonode:v1
         imagePullPolicy: Never
-        name: myapp
+        name: ssdp
         ports:
-        - containerPort: 8001
+        - containerPort: 9001

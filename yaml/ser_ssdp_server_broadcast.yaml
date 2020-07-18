@@ -1,14 +1,15 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: exampleservice
+  name: ssdpbroadcast
 spec:
   selector:
-    app: myapp
+    app: ssdpbroadcast
   ports:
   # Porta accessibile all'interno del cluster dagli altri Pod
-  - targetPort: 8001
+  - targetPort: 10000
     
     # Porta accessibile all'esterno
-    port: 30005
+    port: 10000
   type: LoadBalancer
+  
