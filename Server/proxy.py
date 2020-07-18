@@ -1,8 +1,23 @@
 from flask import Flask, request #import main Flask class and request object
 import requests
+import subprocess
 
 app = Flask(__name__) #create the Flask app
 
+SERVICE_EXTERNAL_IP = ""
+
+def getServiceExternalIP():
+    global SERVICE_EXTERNAL_IP
+    a = subprocess.Popen(['kubectl','get','services'], 
+            stdout=subprocess.PIPE, 
+            stderr=subprocess.STDOUT).communicate()
+
+    list = str(a[0])
+    for i in range(0, len(list.split("\\n"))):
+        if str(a[0]).split("\\n")[i].split("  ")[0] == "collectdataservice":
+            SERVICE_EXTERNAL_IP = str(a[0]).split("\\n")[i].split("  ")[3]
+            print(SERVICE_EXTERNAL_IP)
+            return
 
 @app.route('/checkStatus', methods=['GET'])
 def query_example():
@@ -17,7 +32,7 @@ def jsonexample():
     dictToSend = {'id':request.json['id'], 'ip':request.json['ip'], 'status':request.json['status']}
     print(request.json['id'])
     try:
-        res = requests.post('http://10.99.102.181:30006/collectData', json=dictToSend)
+        res = requests.post('http://' + SERVICE_EXTERNAL_ip + ':30006/collectData', json=dictToSend)
         print(res.text)
     except requests.exceptions.RequestException as e:  # This is the correct syntax
         print(e)
