@@ -11,6 +11,14 @@ import requests
 MINE_IP_ADDRESS = ""
 CLUSTER_IP_ADDRESS = ""
 
+SEARCH_INTERVAL = 5
+BCAST_IP = '239.255.255.250'
+BCAST_PORT = 10000
+
+port = 9001
+protocol = "blockchain"
+networkid = "main1111"
+
 def getMineIPAddress():
     global MINE_IP_ADDRESS
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -24,13 +32,6 @@ def getMineIPAddress():
         s.close()
     MINE_IP_ADDRESS = IP
 
-SEARCH_INTERVAL = 5
-BCAST_IP = '239.255.255.250'
-BCAST_PORT = 10000
-port = 9001
-protocol = "blockchain"
-networkid = "main1111"
-
 def getClusterIPAddress():
         global CLUSTER_IP_ADDRESS
         '''
@@ -43,6 +44,7 @@ def getClusterIPAddress():
                         'MX: 1\r\n' +
                         'ST: ssdp:all\r\n' +
                         '\r\n')
+
         LOCATION_REGEX = re.compile("LOCATION: {}_{}://[ ]*(.+)\r\n".format(protocol, networkid), re.IGNORECASE)
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.sendto(SSDP_DISCOVER.encode('ASCII'), (BCAST_IP, BCAST_PORT))

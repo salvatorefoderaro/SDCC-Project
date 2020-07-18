@@ -17,13 +17,12 @@ def hello_world():
 
     cursor = db.cursor()
 
-    cursor.execute("INSERT INTO devices (id, ipAddress, status) VALUES (" + request.json['id'] +",\'" + request.json['ip'] + "\'," + request.json['status']+") ON DUPLICATE KEY UPDATE status = " + request.json['status'])
+    cursor.execute("INSERT INTO devices (id, ipAddress, status) VALUES (" + request.json['id'] +",\'" + request.json['ip'] + "\'," + request.json['status']+") ON DUPLICATE KEY UPDATE ipAddres = " + request.json['ip'] + ", status = " + request.json['status'])
 
     cursor.close()
-
     db.commit()
 
-    return "Ok, inserted"
+    return "Ok, inserted."
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=8005)

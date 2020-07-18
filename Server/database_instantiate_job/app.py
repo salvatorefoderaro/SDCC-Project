@@ -31,9 +31,8 @@ def hello_world():
     cursor = db.cursor()
  
     cursor.execute("CREATE TABLE IF NOT EXISTS devices (id INT PRIMARY KEY, ipAddress VARCHAR(30), status INT)")
-
+    db.commit()
     cursor.close()
-
     db.close()
 
     return 0
