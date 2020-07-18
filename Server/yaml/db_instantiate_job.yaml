@@ -1,0 +1,12 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: dbinstantiate
+spec:
+  template:
+    spec:
+      containers:
+      - image: dbinstantiate:v1
+        imagePullPolicy: Never
+        name: dbinstantiate
+      restartPolicy: Never

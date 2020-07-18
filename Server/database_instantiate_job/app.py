@@ -2,17 +2,12 @@ from flask import Flask
 import requests
 import mysql.connector as mysql
 
-app = Flask(__name__)
-
-@app.route('/')
 def hello_world():
     db = mysql.connect(
         host = "mysql",
         user = "root",
         passwd = "password"
     )
-
-    databaseList = ""
 
     ## creating an instance of 'cursor' class which is used to execute the 'SQL' statements in 'Python'
     cursor = db.cursor()
@@ -33,7 +28,16 @@ def hello_world():
         database = "datacamp"
     )
 
-    
+    cursor = db.cursor()
+ 
+    cursor.execute("CREATE TABLE IF NOT EXISTS devices (id INT PRIMARY KEY, ipAddress VARCHAR(30), status INT)")
+
+    cursor.close()
+
+    db.close()
+
+    return 0
+
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=8001)
+    hello_world()

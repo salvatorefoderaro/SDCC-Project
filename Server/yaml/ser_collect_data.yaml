@@ -1,15 +1,14 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: ssdpbroadcast
+  name: collectdataservice
 spec:
   selector:
-    app: ssdpbroadcast
+    app: collectdata
   ports:
   # Porta accessibile all'interno del cluster dagli altri Pod
-  - targetPort: 10000
+  - targetPort: 8005
     
     # Porta accessibile all'esterno
-    port: 10000
+    port: 30006
   type: LoadBalancer
-  
