@@ -8,11 +8,14 @@ app = Flask(__name__)
 @app.route('/collectData', methods=['POST'])
 def hello_world():
 
+    configFile = open("config.json", "w")
+    json_object = json.load(config)
+
     db = mysql.connect(
-        host = "mysql",
-        user = "root",
-        passwd = "password",
-        database = "datacamp"
+        host = json_object['host'],
+        user = json_object['user'],
+        passwd = json_object['passwd'],
+        database = json_object['database']
     )
 
     cursor = db.cursor()

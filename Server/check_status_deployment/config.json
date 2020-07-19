@@ -1,0 +1,8 @@
+{
+    "host" : "mysql",
+    "user" : "root",
+    "passwd" : "password",
+    "database" : "datacamp",
+    "proxy_ip" : "10.0.2.2",
+    "proxy_port" : "5000"
+}

@@ -9,7 +9,10 @@ app = Flask(__name__)
 @app.route('/getDeviceStat')
 def jsonDict():
 
-    data = requests.get("http://getdevicesstatservice:8020/getDeviceStat").json()
+    configFile = open("config.json", "w")
+    json_object = json.load(config)
+
+    data = requests.get("http://" + json_object['service_ip'] + ":" + str(json_object['service_port']) +"/getDeviceStat").json()
     print(data)
     return render_template('template_bootstrap.html', myString=data)
 

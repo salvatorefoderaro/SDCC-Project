@@ -3,11 +3,14 @@ import mysql.connector as mysql
 
 def checkStatus():
 
+    configFile = open("config.json", "w")
+    json_object = json.load(config)
+
     db = mysql.connect(
-        host = "mysql",
-        user = "root",
-        passwd = "password",
-        database = "datacamp"
+        host = json_object['host'],
+        user = json_object['user'],
+        passwd = json_object['passwd'],
+        database = json_object['database']
     )
 
     cursor = db.cursor()
@@ -18,7 +21,7 @@ def checkStatus():
 
     for x in myresult:
         try:
-            res = requests.get('http://10.0.2.2:5000/checkStatus?ipAddress='+str(x[1]), timeout=3)
+            res = requests.get('http://' + json_object['proxy_ip'] + ':'+5000 +'/checkStatus?ipAddress='+str(x[1]), timeout=3)
             cursor.execute("UPDATE devices SET status = 0 WHERE id ="+str(x[0])+"")
         except requests.exceptions.RequestException as e:  # This is the correct syntax
             cursor.execute("UPDATE devices SET status = 100 WHERE id ="+str(x[0])+"")

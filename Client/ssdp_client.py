@@ -7,16 +7,13 @@ import threading
 import socket
 import time
 import requests
-
 import json
 
 MINE_IP_ADDRESS = ""
 CLUSTER_IP_ADDRESS = ""
-
 SEARCH_INTERVAL = 5
 BCAST_IP = '239.255.255.250'
 BCAST_PORT = 10000
-
 port = 9001
 protocol = "blockchain"
 networkid = "main1111"

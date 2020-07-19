@@ -3,10 +3,14 @@ import requests
 import mysql.connector as mysql
 
 def hello_world():
+
+    configFile = open("config.json", "w")
+    json_object = json.load(config)
+
     db = mysql.connect(
-        host = "mysql",
-        user = "root",
-        passwd = "password"
+        host = json_object['host'],
+        user = json_object['user'],
+        passwd = json_object['passwd']
     )
 
     ## creating an instance of 'cursor' class which is used to execute the 'SQL' statements in 'Python'
@@ -22,10 +26,10 @@ def hello_world():
     db.close()
 
     db = mysql.connect(
-        host = "mysql",
-        user = "root",
-        passwd = "password",
-        database = "datacamp"
+        host = json_object['host'],
+        user = json_object['user'],
+        passwd = json_object['passwd'],
+        database = json_object['database']
     )
 
     cursor = db.cursor()
@@ -38,7 +42,6 @@ def hello_world():
     db.close()
 
     return 0
-
 
 if __name__ == '__main__':
     hello_world()
