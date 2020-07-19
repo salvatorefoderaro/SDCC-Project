@@ -11,7 +11,7 @@ Esempio di Kuberneetes (*Minikube*), con due applicativi che comunicano tra di l
 3. **Effettuo il build dei due container docker che mi servono**
    1. cd check_status_deployment && docker build -t checkstatus:v1 .
    2. cd collect_data_deployment && docker build -t collectdata:v1 .
-   3. cd database_instantiate_db && docker build -t dbinstantiate:v1 .
+   3. cd database_instantiate_db_job && docker build -t dbinstantiate:v1 .
 4. **Carico i servizi necessari per Kuberneetes**
    1. cd yaml
    2. kubectl apply -f mysql-pv.yaml

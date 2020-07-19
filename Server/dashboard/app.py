@@ -9,8 +9,8 @@ app = Flask(__name__)
 @app.route('/getDeviceStat')
 def jsonDict():
 
-    myString = requests.get("http://getdevicestatservice:8090/getDeviceStat").content
-    
+    data = requests.get("http://getdevicesstatservice:8020/getDeviceStat").json()
+    print(data)
     return render_template('template_bootstrap.html', myString=data)
 
 if __name__ == '__main__':

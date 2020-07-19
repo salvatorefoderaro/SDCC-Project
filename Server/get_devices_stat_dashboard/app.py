@@ -20,21 +20,22 @@ def getDevicesStat():
 
     dict = {}
 
-    cursor.execute("SELECT device.id, device.name, device.groupName, device.status, lecture.temperatura, lecture.umidita, lecture.lettura FROM devices as device JOIN lectures AS lecture on device.id = lecture.id WHERE device.id = (SELECT MAX(lettura) FROM lectures WHERE lectures.id = device.id")
+    cursor.execute("SELECT device.id, device.name, device.groupName, device.status, lecture.temperatura, lecture.umidita, lecture.lettura FROM devices as device JOIN lectures AS lecture on device.id = lecture.id ORDER BY lecture.lettura DESC LIMIT 1")
 
     myresult = cursor.fetchall()
 
     for x in myresult:
+        print(x)
         if x[4] not in dict:
             dict[x[4]] = []
-            dict[x[4]].append({'id':x[0], 'ip':x[1], 'status':x[2], 'name':x[3]})
+            dict[x[4]].append({'id':x[0], 'name':x[1], 'groupName':x[2], 'status':x[3], 'temperatura':x[4], 'umidita':x[5], 'data':str(x[6])})
         else:
-            dict[x[4]].append({'id':x[0], 'ip':x[1], 'status':x[2], 'name':x[3]})
+            dict[x[4]].append({'id':x[0], 'name':x[1], 'groupName':x[2], 'status':x[3], 'temperatura':x[4], 'umidita':x[5], 'data':str(x[6])})
 
-    jsonDict = {'list':[]}
+    jsonDict = {'list' : []}
 
     for i in dict:
-        singleDict = {'groupName':i, 'devicesList':dict[i]}
+        singleDict = {'groupName' : i, 'devicesList' : dict[i]}
         jsonDict['list'].append(singleDict)
 
     json_data = json.dumps(jsonDict)
