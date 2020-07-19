@@ -1,0 +1,14 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: getdevicestatservice
+spec:
+  selector:
+    app: getdevicestat
+  ports:
+  - protocol: "TCP"
+    # Port accessible inside cluster
+    port: 8090
+    # Port to forward to inside the pod
+    targetPort: 8090
+  type: NodePort

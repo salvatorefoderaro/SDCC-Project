@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: dashboard
+  name: dashboarddeployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dashboard
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: dashboard
+    spec:
+      containers:
+      - image: dashboard:v1
+        imagePullPolicy: Never
+        name: dashboard
+        ports:
+        - containerPort: 8010

@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: getdevicesstat
+  name: getdevicesstatdeployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: getdevicesstat
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: getdevicesstat
+    spec:
+      containers:
+      - image: getdevicesstat:v1
+        imagePullPolicy: Never
+        name: getdevicesstat
+        ports:
+        - containerPort: 8020

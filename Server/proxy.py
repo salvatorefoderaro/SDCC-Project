@@ -29,13 +29,10 @@ def query_example():
 
 @app.route('/sendDataToCluster', methods=['POST'])
 def jsonexample():
-    dictToSend = {'id':request.json['id'], 'ip':request.json['ip'], 'status':request.json['status']}
-    print(request.json['id'])
+    dictToSend = {'id':request.json['id'], 'temperatura':request.json['temperatura'], 'umidita':request.json['umidita']}
     try:
         res = requests.post('http://' + SERVICE_EXTERNAL_ip + ':30006/collectData', json=dictToSend)
-        print(res.text)
     except requests.exceptions.RequestException as e:  # This is the correct syntax
-        print(e)
         return e
     return res.text
 

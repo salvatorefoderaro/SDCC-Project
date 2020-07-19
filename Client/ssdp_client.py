@@ -8,6 +8,8 @@ import socket
 import time
 import requests
 
+import json
+
 MINE_IP_ADDRESS = ""
 CLUSTER_IP_ADDRESS = ""
 
@@ -55,9 +57,11 @@ def getClusterIPAddress():
 if __name__ == '__main__':
     getClusterIPAddress()
     getMineIPAddress()
+    with open('config.json') as config_file:
+        data = json.load(config_file)
     
     while (True):
-        dictToSend = {'id':'100', 'ip':MINE_IP_ADDRESS, 'status':'3'}
+        dictToSend = {'id':data['id'],  temperatura: 10, umidita: 11}
         try:
             res = requests.post('http://'+CLUSTER_IP_ADDRESS+':5000/sendDataToCluster', json=dictToSend)
         except requests.exceptions.RequestException as e:  # This is the correct syntax

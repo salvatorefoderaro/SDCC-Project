@@ -1,0 +1,14 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: dashboardservice
+spec:
+  selector:
+    app: dashboard
+  ports:
+  # Porta accessibile all'interno del cluster dagli altri Pod
+  - targetPort: 8010
+    
+    # Porta accessibile all'esterno
+    port: 30010
+  type: LoadBalancer

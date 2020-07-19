@@ -17,7 +17,8 @@ def hello_world():
 
     cursor = db.cursor()
 
-    cursor.execute("INSERT INTO devices (id, ipAddress, status) VALUES (" + request.json['id'] +",\'" + request.json['ip'] + "\'," + request.json['status']+") ON DUPLICATE KEY UPDATE ipAddres = " + request.json['ip'] + ", status = " + request.json['status'])
+    cursor.execute("UPDATE devices SET status = 0 where ID = " + request.json['id'])
+    cursor.execute("INSERT INTO lectures (id, temperatura, umidita, lettura) VALUES (" + request.json['id'] +"," + request.json['temperatura'] + "," + request.json['umidita']+",now())")
 
     cursor.close()
     db.commit()

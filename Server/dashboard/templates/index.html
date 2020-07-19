@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+    <body>
+
+        {% for i in range(0, myString['list']|length ) %} 
+
+        <p>Group name is: {{ myString['list'][i]['groupName'] }}</p>
+            
+            {%for j in range(0, myString['list'][i]['devicesList']|length )%} 
+
+            <p>Device is : {{ myString['list'][i]['devicesList'][j]}}
+
+                {%endfor%} 
+            
+        </p>
+
+        {%endfor%} 
+    </body>
+</html>
