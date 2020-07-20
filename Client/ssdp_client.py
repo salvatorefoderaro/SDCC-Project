@@ -37,19 +37,24 @@ def getClusterIPAddress():
         broadcast SSDP DISCOVER message to LAN network
         filter our protocal and add to network
         '''
-        SSDP_DISCOVER = ('M-SEARCH * HTTP/1.1\r\n' +
-                        'HOST: 239.255.255.250:1900\r\n' +
-                        'MAN: "ssdp:discover"\r\n' +
-                        'MX: 1\r\n' +
-                        'ST: ssdp:all\r\n' +
-                        '\r\n')
-
-        LOCATION_REGEX = re.compile("LOCATION: {}_{}://[ ]*(.+)\r\n".format(protocol, networkid), re.IGNORECASE)
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock.sendto(SSDP_DISCOVER.encode('ASCII'), (BCAST_IP, BCAST_PORT))
-        sock.settimeout(3)
-        data, addr = sock.recvfrom(1024)
-        CLUSTER_IP_ADDRESS = addr[0].split('\'')[0]
+        while True:
+            try:
+                SSDP_DISCOVER = ('M-SEARCH * HTTP/1.1\r\n' +
+                            'HOST: 239.255.255.250:1900\r\n' +
+                            'MAN: "ssdp:discover"\r\n' +
+                            'MX: 1\r\n' +
+                            'ST: ssdp:all\r\n' +
+                            '\r\n')
+                LOCATION_REGEX = re.compile("LOCATION: {}_{}://[ ]*(.+)\r\n".format(protocol, networkid), re.IGNORECASE)
+                sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                sock.sendto(SSDP_DISCOVER.encode('ASCII'), (BCAST_IP, BCAST_PORT))
+                sock.settimeout(3)
+                while True:
+                    data, addr = sock.recvfrom(1024)
+                    CLUSTER_IP_ADDRESS = addr[0].split('\'')[0]
+                    return
+            except:
+                sock.close()
                 
 if __name__ == '__main__':
     getClusterIPAddress()

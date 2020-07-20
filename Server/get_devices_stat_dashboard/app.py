@@ -20,7 +20,7 @@ def getDevicesStat():
 
     dict = {}
 
-    cursor.execute("SELECT device.id, device.name, device.groupName, device.status, lecture.temperatura, lecture.umidita, lecture.lettura FROM devices as device JOIN lectures AS lecture on device.id = lecture.id ORDER BY lecture.lettura DESC LIMIT 1")
+    cursor.execute("select L.id, L.temperatura, L.umidita, L.lettura, D.status, D.name, D.groupName FROM lectures as L JOIN devices as D on L.id = D.id WHERE lettura = (SELECT MAX(Lettura) FROM lectures WHERE id = L.id)")
 
     myresult = cursor.fetchall()
 
