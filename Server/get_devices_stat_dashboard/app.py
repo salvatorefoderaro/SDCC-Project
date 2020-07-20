@@ -28,9 +28,9 @@ def getDevicesStat():
         print(x)
         if x[4] not in dict:
             dict[x[4]] = []
-            dict[x[4]].append({'id':x[0], 'name':x[1], 'groupName':x[2], 'status':x[3], 'temperatura':x[4], 'umidita':x[5], 'data':str(x[6])})
+            dict[x[4]].append({'id':x[0], 'temperatura':x[1], 'umidita':x[2], 'lettura':x[3], 'status':x[4], 'name':x[5], 'groupName':str(x[6])})
         else:
-            dict[x[4]].append({'id':x[0], 'name':x[1], 'groupName':x[2], 'status':x[3], 'temperatura':x[4], 'umidita':x[5], 'data':str(x[6])})
+            dict[x[4]].append({'id':x[0], 'temperatura':x[1], 'umidita':x[2], 'lettura':x[3], 'status':x[4], 'name':x[5], 'groupName':str(x[6])})
 
     jsonDict = {'list' : []}
 

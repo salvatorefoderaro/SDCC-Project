@@ -11,8 +11,8 @@ def query_example():
 # Route per modificare la configurazione a runtime, magari tramite la dashboard
 @app.route('/editConfig', methods=['GET'])
 def editConfig():
-    configFile = open("config.json", "w")
-    json_object = json.load(config)
+    configFile = open("config.json", "r")
+    json_object = json.load(configFile)
     
     if (request.args.get("name") is not None):
         json_object["name"] = request.args.get("name")

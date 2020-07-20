@@ -9,8 +9,8 @@ app = Flask(__name__)
 @app.route('/getDeviceStat')
 def jsonDict():
 
-    configFile = open("config.json", "w")
-    json_object = json.load(config)
+    configFile = open("config.json", "r")
+    json_object = json.load(configFile)
 
     data = requests.get("http://" + json_object['service_ip'] + ":" + str(json_object['service_port']) +"/getDeviceStat").json()
     print(data)

@@ -3,8 +3,8 @@ import mysql.connector as mysql
 
 def checkStatus():
 
-    configFile = open("config.json", "w")
-    json_object = json.load(config)
+    configFile = open("config.json", "r")
+    json_object = json.load(configFile)
 
     db = mysql.connect(
         host = json_object['host'],
