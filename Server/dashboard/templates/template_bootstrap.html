@@ -76,19 +76,22 @@
       {%for j in range(0, myString['list'][i]['devicesList']|length )%} 
 
       <div class="card" style="width: 18rem;">
-        <img src="..." class="card-img-top" alt="...">
-        <div class="card-body">
-          <h5 class="card-title">Card title</h5>
-          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+
+        {% if myString['list'][i]['devicesList'][j]['status'] == 0 %}
+          <div class="card-body" style="background-color:green;">
+        {% else %}
+          <div class="card-body" style="background-color:red;">
+        {% endif %}
+          <h5 class="card-title">{{ status }} {{ myString['list'][i]['devicesList'][j]['name'] }}</h5>
         </div>
         <ul class="list-group list-group-flush">
           <li class="list-group-item">ID: {{ myString['list'][i]['devicesList'][j]['id'] }}</li>
           <li class="list-group-item">Indirizzo IP: {{ myString['list'][i]['devicesList'][j]['ipAddress'] }}</li>
-          <li class="list-group-item">Nome: {{ myString['list'][i]['devicesList'][j]['name'] }}</li>
-          <li class="list-group-item">Gruppo: {{ myString['list'][i]['devicesList'][j]['groupName'] }}</li>
-          <li class="list-group-item">Ultima rilevazione: {{ myString['list'][i]['devicesList'][j]['temperatura'] }}</li>
-          <li class="list-group-item">Ultima temperatura: {{ myString['list'][i]['devicesList'][j]['umidita'] }}</li>
-          <li class="list-group-item">Ultima umidità: {{ myString['list'][i]['devicesList'][j]['lettura'] }}</li>
+          <!-- <li class="list-group-item">Nome: {{ myString['list'][i]['devicesList'][j]['name'] }}</li> -->
+          <!-- <li class="list-group-item">Gruppo: {{ myString['list'][i]['devicesList'][j]['groupName'] }}</li> -->
+          <li class="list-group-item">Ultima temperatura: {{ myString['list'][i]['devicesList'][j]['temperatura'] }}</li>
+          <li class="list-group-item">Ultima umidità: {{ myString['list'][i]['devicesList'][j]['umidita'] }}</li>
+          <li class="list-group-item">Ultima rilevazione: {{ myString['list'][i]['devicesList'][j]['lettura'] }}</li>
         </ul>
 
         <div class="card-body">
@@ -97,6 +100,11 @@
           <a href="#" class="card-link">Elimina</a>
         </div>
       </div>
+
+      {% if j % 3 == 2%}
+      </div>
+      <div class="card-deck">
+      {% endif%}
       
           {%endfor%} 
         </div>

@@ -44,7 +44,9 @@ def newDevice():
 
     cursor = db.cursor()
 
-    cursor.execute("INSERT INTO  devices (id, ipAddress, status, name, groupName) VALUES (" + str(request.json['id'])+",0," + request.json['ipAddress'] + "," + request.json['name'] + "," + request.json['groupName']+") ON DUPLICATE KEY UPDATE status = 0, ipAddress =" + request.json['ipAddress'] +", name =" + request.json["name"] + ", groupName = " + request.json["groupName"])
+    print(request.json['ipAddress'])
+
+    cursor.execute("INSERT INTO  devices (id, ipAddress, status, name, groupName) VALUES (" + str(request.json['id']) + ", \'" + str(request.json['ipAddress']) + "\',0,\'" + str(request.json['name']) + "\',\'" + str(request.json['groupName'])+"\') ON DUPLICATE KEY UPDATE status = 0, ipAddress =\'" + str(request.json['ipAddress']) +"\', name =\'" + str(request.json["name"]) + "\', groupName = \'" + str(request.json["groupName"])+" \'")
 
     cursor.close()
     db.commit()

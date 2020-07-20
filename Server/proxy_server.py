@@ -28,7 +28,7 @@ def query_example():
     try:
         res = requests.get('http://'+request.args.get('ipAddress')+':7000/checkStatus')
         return res.text
-    except requests.exceptions.RequestException as e:  # This is the correct syntax
+    except requests.exceptions.RequestException as e:
         return e
 
 @app.route('/newDevice', methods=['POST'])
@@ -38,7 +38,7 @@ def new_device():
         res = requests.post('http://' + SERVICE_EXTERNAL_IP + ':30006/newDevice', json=dictToSend)
         return res.text
     except requests.exceptions.RequestException as e:  # This is the correct syntax
-        return e
+        return "Connection error"
 
 @app.route('/sendDataToCluster', methods=['POST'])
 def jsonexample():

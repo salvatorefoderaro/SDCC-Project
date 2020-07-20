@@ -102,7 +102,7 @@ def doSomeStuff():
     getClusterIPAddress()
     getMineIPAddress()
 
-
+    print (MINE_IP_ADDRESS)
     dictToSend = {'id':data['id'], 'ipAddress': MINE_IP_ADDRESS, 'name': data['name'], 'groupName':data['groupName']}
     try:
         res = requests.post('http://'+CLUSTER_IP_ADDRESS+':5000/newDevice', json=dictToSend)
