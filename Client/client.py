@@ -4,13 +4,12 @@ import os
 import socket
 import re
 import sys
-import time
 import threading
 import socket
 import time
-import requests
 import json
 from threading import Thread
+from random import randint
 
 MINE_IP_ADDRESS = ""
 CLUSTER_IP_ADDRESS = ""
@@ -20,6 +19,9 @@ BCAST_PORT = 10000
 port = 9001
 protocol = "blockchain"
 networkid = "main1111"
+
+with open('config.json') as config_file:
+    data = json.load(config_file)
 
 def getMineIPAddress():
     global MINE_IP_ADDRESS
@@ -57,6 +59,20 @@ def getClusterIPAddress():
                     print("Risposta ricevuta!")
                     CLUSTER_IP_ADDRESS = addr[0].split('\'')[0]
                     return
+
+                '''
+                                while True:
+                    data, addr = sock.recvfrom(1024)
+                    print("Risposta ricevuta!")
+                    CLUSTER_IP_ADDRESS = addr[0].split('\'')[0]
+                    dictToSend = {'id':data['id'], 'ipAddress': MINE_IP_ADDRESS, 'name': json_object['name'], 'groupName':json_object['groupName']}
+                    try:
+                        res = requests.post('http://'+CLUSTER_IP_ADDRESS+':5000/newDevice', json=dictToSend)
+                        return
+                    except requests.exceptions.RequestException as e:  # This is the correct syntax
+                        print("ricevuto errore")
+                    
+                '''
             except:
                 sock.close()
 
@@ -85,11 +101,16 @@ def editConfig():
 def doSomeStuff():
     getClusterIPAddress()
     getMineIPAddress()
-    with open('config.json') as config_file:
-        data = json.load(config_file)
+
+
+    dictToSend = {'id':data['id'], 'ipAddress': MINE_IP_ADDRESS, 'name': data['name'], 'groupName':data['groupName']}
+    try:
+        res = requests.post('http://'+CLUSTER_IP_ADDRESS+':5000/newDevice', json=dictToSend)
+    except requests.exceptions.RequestException as e:  # This is the correct syntax
+        print("ricevuto errore")
     
     while (True):
-        dictToSend = {'id':data['id'],  'temperatura': 10, 'umidita': 11}
+        dictToSend = {'id':data['id'], 'temperatura': randint(0, 10), 'umidita': randint(0, 100)}
         try:
             res = requests.post('http://'+CLUSTER_IP_ADDRESS+':5000/sendDataToCluster', json=dictToSend)
         except requests.exceptions.RequestException as e:  # This is the correct syntax

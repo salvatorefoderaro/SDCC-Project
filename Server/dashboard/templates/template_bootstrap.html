@@ -83,12 +83,12 @@
         </div>
         <ul class="list-group list-group-flush">
           <li class="list-group-item">ID: {{ myString['list'][i]['devicesList'][j]['id'] }}</li>
-          <li class="list-group-item">Indirizzo IP: {{ myString['list'][i]['devicesList'][j]['ip'] }}</li>
+          <li class="list-group-item">Indirizzo IP: {{ myString['list'][i]['devicesList'][j]['ipAddress'] }}</li>
           <li class="list-group-item">Nome: {{ myString['list'][i]['devicesList'][j]['name'] }}</li>
-          <li class="list-group-item">Gruppo: {{ myString['list'][i]['devicesList'][j]['name'] }}</li>
-          <li class="list-group-item">Ultima rilevazione: {{ myString['list'][i]['devicesList'][j]['name'] }}</li>
-          <li class="list-group-item">Ultima temperatura: {{ myString['list'][i]['devicesList'][j]['name'] }}</li>
-          <li class="list-group-item">Ultima umidità: {{ myString['list'][i]['devicesList'][j]['name'] }}</li>
+          <li class="list-group-item">Gruppo: {{ myString['list'][i]['devicesList'][j]['groupName'] }}</li>
+          <li class="list-group-item">Ultima rilevazione: {{ myString['list'][i]['devicesList'][j]['temperatura'] }}</li>
+          <li class="list-group-item">Ultima temperatura: {{ myString['list'][i]['devicesList'][j]['umidita'] }}</li>
+          <li class="list-group-item">Ultima umidità: {{ myString['list'][i]['devicesList'][j]['lettura'] }}</li>
         </ul>
 
         <div class="card-body">
