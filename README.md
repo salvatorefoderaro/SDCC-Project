@@ -10,7 +10,7 @@
    1. minikube tunnel
 4. **Avvio la dashboard**
    1. minikube dashboard
-5. **Trovo l'IP esposto dai servizi del cluster**
+5. **Trovo l'IP esposto dai servizi del cluster (lo fa comunque in automatico il modulo minikubeservice)**
    1. Andare alla sezione *Discovery and Load Balancing*
    2. Trovare il servizio *exampleservice*
    3. Cliccare sull'ip alla colonna *External Endpoints*
