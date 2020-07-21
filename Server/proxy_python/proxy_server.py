@@ -1,31 +1,13 @@
 from flask import Flask, request #import main Flask class and request object
 import requests
-import subprocess
 from ssdp import Server
 from ssdp import gen_logger
+import minikubeservice
+import time
 
 app = Flask(__name__) #create the Flask app
 
-SERVICE_EXTERNAL_IP = ""
-
 logger = gen_logger('sample')
-
-
-def getServiceExternalIP():
-    global SERVICE_EXTERNAL_IP
-    a = subprocess.Popen(['kubectl','get','services'], 
-            stdout=subprocess.PIPE, 
-            stderr=subprocess.STDOUT).communicate()
-
-    list = str(a[0])
-    for i in range(0, len(list.split("\\n"))):
-        list = str(a[0]).split("\\n")[i].split("  ")
-        for k in list:
-            if '' in list:
-                list.remove('')
-        if list[0] == "collectdataservice":
-            SERVICE_EXTERNAL_IP = list[3].replace(" ", "")
-            return
 
 @app.route('/checkStatus', methods=['GET'])
 def query_example():
@@ -59,8 +41,13 @@ def jsonexample():
         return "Not inserted"
 
 if __name__ == '__main__':
-    getServiceExternalIP()
-    print(SERVICE_EXTERNAL_IP)
+   
+    global SERVICE_EXTERNAL_IP
+    SERVICE_EXTERNAL_IP = minikubeservice.getServiceExternalIP("collectdataservice") 
+    while SERVICE_EXTERNAL_IP == None:
+        time.sleep(30)   
+        SERVICE_EXTERNAL_IP = minikubeservice.getServiceExternalIP("collectdataservice") 
+   
     upnpServer = Server(9001, 'blockchain', 'main1111')
     upnpServer.start()
     app.run(host='0.0.0.0', debug=True, port=5000, threaded=True) #run app in debug mode on port 5000

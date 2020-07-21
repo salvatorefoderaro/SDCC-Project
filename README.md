@@ -1,7 +1,5 @@
 # Introduzione
 
-Esempio di Kuberneetes (*Minikube*), con due applicativi che comunicano tra di loro in ottica di Microservizi. Al momento non è Kuberneetes puro.
-
 0. **Installo Minikube**
    1. https://computingforgeeks.com/how-to-install-minikube-on-ubuntu-debian-linux/
 1. **Avvio Minikube** 
