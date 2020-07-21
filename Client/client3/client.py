@@ -14,17 +14,30 @@ import fakesensor
 
 MINE_IP_ADDRESS = ""
 CLUSTER_IP_ADDRESS = ""
-SEARCH_INTERVAL = 5
-BCAST_IP = '239.255.255.250'
-BCAST_PORT = 10000
-port = 9001
-protocol = "blockchain"
-networkid = "main1111"
-MINE_IP_PORT = 9003
+SEARCH_INTERVAL = 0
+BCAST_IP = ''
+BCAST_PORT = 0  
+PROTOCOL = ""
+NETWORK_ID = ""
 MINE_IP_ADDRESS = ""
+MINE_IP_PORT = 0
+MINE_ID = 0
+NAME = ""
+GROUP_NAME = ""
 
-with open('config.json') as config_file:
-    data = json.load(config_file)
+def readJson():
+    global SEARCH_INTERVAL, BCAST_IP, BCAST_PORT, PROTOCOL, NETWORK_ID, MINE_IP_PORT, DATA, NAME, GROUP_NAME, MINE_ID
+    with open('config.json') as config_file:
+        data = json.load(config_file)
+        MINE_ID = data['id']
+        NAME = data['name']
+        GROUP_NAME = data['groupName']
+        SEARCH_INTERVAL = data['searchInterval']
+        BCAST_IP = data['bcast_ip']
+        BCAST_PORT = data['bcast_port']
+        PROTOCOL = data['protocol']
+        NETWORK_ID = data['networkid']
+        MINE_IP_PORT = data['mine_ip_port']
 
 def getMineIPAddress():
     global MINE_IP_ADDRESS
@@ -53,7 +66,7 @@ def getClusterIPAddress():
                             'MX: 1\r\n' +
                             'ST: ssdp:all\r\n' +
                             '\r\n')
-                LOCATION_REGEX = re.compile("LOCATION: {}_{}://[ ]*(.+)\r\n".format(protocol, networkid), re.IGNORECASE)
+                LOCATION_REGEX = re.compile("LOCATION: {}_{}://[ ]*(.+)\r\n".format(PROTOCOL, NETWORK_ID), re.IGNORECASE)
                 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
                 sock.sendto(SSDP_DISCOVER.encode('ASCII'), (BCAST_IP, BCAST_PORT))
                 sock.settimeout(3)
@@ -105,7 +118,7 @@ def doSomeStuff():
     getClusterIPAddress()
     getMineIPAddress()
 
-    dictToSend = {'id':data['id'], 'ipAddress': MINE_IP_ADDRESS, 'ipPort': MINE_IP_PORT, 'name': data['name'], 'groupName':data['groupName']}
+    dictToSend = {'id':MINE_ID, 'ipAddress': MINE_IP_ADDRESS, 'ipPort': MINE_IP_PORT, 'name': data['name'], 'groupName':data['groupName']}
     try:
         res = requests.post('http://'+CLUSTER_IP_ADDRESS+':5000/newDevice', json=dictToSend)
     except requests.exceptions.RequestException as e:  # This is the correct syntax
