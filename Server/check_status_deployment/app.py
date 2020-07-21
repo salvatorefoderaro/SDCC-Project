@@ -16,13 +16,13 @@ def checkStatus():
 
     cursor = db.cursor()
 
-    cursor.execute("SELECT id, ipAddress from devices")
+    cursor.execute("SELECT id, ipAddress, ipPort from devices")
 
     myresult = cursor.fetchall()
 
     for x in myresult:
         try:
-            res = requests.get('http://' + json_object['proxy_ip'] + ':'+str(5000) +'/checkStatus?ipAddress='+str(x[1]), timeout=3)
+            res = requests.get('http://' + str(json_object['proxy_ip']) + ':'+str(json_object['proxy_port']) +'/checkStatus?ipAddress='+str(x[1])+'&ipPort=' + str(x[2]), timeout=3)
             cursor.execute("UPDATE devices SET status = 0 WHERE id ="+str(x[0])+"")
             if res.text != "I'm alive":
                 cursor.execute("UPDATE devices SET status = 100 WHERE id ="+str(x[0])+"")

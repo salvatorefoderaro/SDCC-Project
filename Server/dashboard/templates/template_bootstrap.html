@@ -67,7 +67,6 @@
 </nav>
 
 <main role="main" class="container">
-
   {% for i in range(0, myString['list']|length ) %} 
 
   <h2>Group name is: {{ myString['list'][i]['groupName'] }}</h2>
@@ -86,7 +85,7 @@
         </div>
         <ul class="list-group list-group-flush">
           <li class="list-group-item">ID: {{ myString['list'][i]['devicesList'][j]['id'] }}</li>
-          <li class="list-group-item">Indirizzo IP: {{ myString['list'][i]['devicesList'][j]['ipAddress'] }}</li>
+          <li class="list-group-item">Indirizzo IP: {{ myString['list'][i]['devicesList'][j]['ipAddress'] }} : {{ myString['list'][i]['devicesList'][j]['ipPort']}}</li>
           <!-- <li class="list-group-item">Nome: {{ myString['list'][i]['devicesList'][j]['name'] }}</li> -->
           <!-- <li class="list-group-item">Gruppo: {{ myString['list'][i]['devicesList'][j]['groupName'] }}</li> -->
           <li class="list-group-item">Ultima temperatura: {{ myString['list'][i]['devicesList'][j]['temperatura'] }}</li>
@@ -114,6 +113,6 @@
 
 
 </main><!-- /.container -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<!-- <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script> -->
       <script>window.jQuery || document.write('<script src="../assets/js/vendor/jquery.slim.min.js"><\/script>')</script><script src="{{ url_for('static', filename='js/bootstrap.bundle.js') }}"></script></body>
 </html>

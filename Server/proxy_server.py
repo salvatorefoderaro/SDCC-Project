@@ -19,35 +19,44 @@ def getServiceExternalIP():
 
     list = str(a[0])
     for i in range(0, len(list.split("\\n"))):
-        if str(a[0]).split("\\n")[i].split("  ")[0] == "collectdataservice":
-            SERVICE_EXTERNAL_IP = str(a[0]).split("\\n")[i].split("  ")[6]
+        list = str(a[0]).split("\\n")[i].split("  ")
+        for k in list:
+            if '' in list:
+                list.remove('')
+        if list[0] == "collectdataservice":
+            SERVICE_EXTERNAL_IP = list[3].replace(" ", "")
             return
 
 @app.route('/checkStatus', methods=['GET'])
 def query_example():
+    print( " A chi mando la richiesta? " + " " + "http://"+ str(request.args.get("ipAddress"))+":"+ str(request.args.get("ipPort")))
     try:
-        res = requests.get('http://'+request.args.get('ipAddress')+':7000/checkStatus')
+        res = requests.get("http://"+ str(request.args.get("ipAddress"))+":"+ str(request.args.get("ipPort")) + "/checkStatus", timeout=3)
+        print(res.text)
         return res.text
     except requests.exceptions.RequestException as e:
-        return e
+        print("Dead")
+        return "Dead"
 
 @app.route('/newDevice', methods=['POST'])
 def new_device():
-    dictToSend = {'id':request.json['id'], 'ipAddress':request.json['ipAddress'], 'name':request.json['name'], 'groupName' : request.json['groupName']}
+    dictToSend = {'id':request.json['id'], 'ipAddress':request.json['ipAddress'], 'ipPort':request.json['ipPort'], 'name':request.json['name'], 'groupName' : request.json['groupName']}
     try:
-        res = requests.post('http://' + SERVICE_EXTERNAL_IP + ':30006/newDevice', json=dictToSend)
+        res = requests.post("http://" + SERVICE_EXTERNAL_IP + ":30006/newDevice", json=dictToSend)
         return res.text
     except requests.exceptions.RequestException as e:  # This is the correct syntax
         return "Connection error"
 
 @app.route('/sendDataToCluster', methods=['POST'])
 def jsonexample():
+    print(SERVICE_EXTERNAL_IP)
     dictToSend = {'id':request.json['id'], 'temperatura':request.json['temperatura'], 'umidita':request.json['umidita']}
     try:
-        res = requests.post('http://' + SERVICE_EXTERNAL_IP + ':30006/collectData', json=dictToSend)
+        print ("http://" + SERVICE_EXTERNAL_IP + ":30006/collectData")
+        res = requests.post("http://" + SERVICE_EXTERNAL_IP + ":30006/collectData", json=dictToSend)
         return res.text
     except requests.exceptions.RequestException as e:  # This is the correct syntax
-        return e
+        return "Not inserted"
 
 if __name__ == '__main__':
     getServiceExternalIP()
