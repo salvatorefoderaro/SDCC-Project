@@ -24,15 +24,16 @@ MINE_IP_PORT = 0
 MINE_ID = 0
 NAME = ""
 GROUP_NAME = ""
+data = ""
 
 def readJson():
-    global SEARCH_INTERVAL, BCAST_IP, BCAST_PORT, PROTOCOL, NETWORK_ID, MINE_IP_PORT, DATA, NAME, GROUP_NAME, MINE_ID
+    global data, SEARCH_INTERVAL, BCAST_IP, BCAST_PORT, PROTOCOL, NETWORK_ID, MINE_IP_PORT, DATA, NAME, GROUP_NAME, MINE_ID
     with open('config.json') as config_file:
         data = json.load(config_file)
         MINE_ID = data['id']
         NAME = data['name']
         GROUP_NAME = data['groupName']
-        SEARCH_INTERVAL = data['searchInterval']
+        SEARCH_INTERVAL = data['search_interval']
         BCAST_IP = data['bcast_ip']
         BCAST_PORT = data['bcast_port']
         PROTOCOL = data['protocol']
@@ -115,21 +116,24 @@ def editConfig():
     configFile.close()
 
 def doSomeStuff():
+    readJson()
     getClusterIPAddress()
     getMineIPAddress()
 
     dictToSend = {'id':MINE_ID, 'ipAddress': MINE_IP_ADDRESS, 'ipPort': MINE_IP_PORT, 'name': data['name'], 'groupName':data['groupName']}
     try:
         res = requests.post('http://'+CLUSTER_IP_ADDRESS+':5000/newDevice', json=dictToSend)
+        print("Dispositivo inserito correttamente.")
     except requests.exceptions.RequestException as e:  # This is the correct syntax
-        print("ricevuto errore")
+        print("Errore durante l'inserimento del dispositivo.")
     
     while (True):
         dictToSend = {'id':data['id'], 'temperatura': fakesensor.getTemperature(), 'umidita': fakesensor.getUmidity()}
         try:
             res = requests.post('http://'+CLUSTER_IP_ADDRESS+':5000/sendDataToCluster', json=dictToSend)
+            print("Misurazione registrata correttamente.")
         except requests.exceptions.RequestException as e:  # This is the correct syntax
-            print("ricevuto errore")
+            print("Errore durante la registrazione della misurazione.")
             getClusterIPAddress()
         time.sleep(60)
 
