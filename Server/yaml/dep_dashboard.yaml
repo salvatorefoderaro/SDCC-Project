@@ -21,3 +21,10 @@ spec:
         name: dashboard
         ports:
         - containerPort: 8010
+        volumeMounts:
+        - name: mysql-persistent-storage-dump
+          mountPath: /app/dump
+      volumes:
+      - name: mysql-persistent-storage-dump
+        persistentVolumeClaim:
+          claimName: mysql-pv-claim-dump

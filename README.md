@@ -3,7 +3,7 @@
 0. **Installo Minikube**
    1. https://computingforgeeks.com/how-to-install-minikube-on-ubuntu-debian-linux/
 1. **Effettuo l'instanziazione del cluster**
-   3. cd Server && sh instantiate_cluster.sh
+   1. cd Server && sh instantiate_cluster.sh
 2. **Avvio la dashboard**
    1. minikube dashboard
 

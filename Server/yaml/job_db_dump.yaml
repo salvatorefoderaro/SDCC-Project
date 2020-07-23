@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: jobdbdump 
+spec:
+  template:
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:5.7
+        command: ["/bin/sh","-c",  "mysqldump --single-transaction -u $MYSQL_USER $MYSQL_DB -h $MYSQL_HOST > /var/lib/mysql/dump`date '+%Y%m%d'`.sql"]
+        volumeMounts:
+        - mountPath: /var/lib/mysql
+          name: mysql-persistent-storage-dump
+        env :
+        - name: MYSQL_USER
+          value: "root"
+        - name: MYSQL_DB
+          value: "datacamp"
+        - name: MYSQL_PWD
+          value: "password"
+        - name: MYSQL_HOST
+          value: "mysql"
+      restartPolicy: Never
+      volumes:
+      - name: mysql-persistent-storage-dump
+        persistentVolumeClaim:
+          claimName: mysql-pv-claim-dump
+  backoffLimit: 4
