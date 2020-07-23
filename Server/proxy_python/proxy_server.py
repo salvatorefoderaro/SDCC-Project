@@ -9,9 +9,16 @@ app = Flask(__name__) #create the Flask app
 
 logger = gen_logger('sample')
 
+@app.route('/editConfig', methods=['GET'])
+def edit_config():
+    try:
+        res = requests.get("http://"+ str(request.args.get("ipAddress"))+":"+ str(request.args.get("ipPort")) + "/editConfig?type=" + str(request.args.get("type")) + "&new_value=" + str(request.args.get("new_value")), timeout=3)
+        return res.text
+    except requests.exceptions.RequestException as e:
+        return "Dead"
+
 @app.route('/checkStatus', methods=['GET'])
 def query_example():
-    print( " A chi mando la richiesta? " + " " + "http://"+ str(request.args.get("ipAddress"))+":"+ str(request.args.get("ipPort")))
     try:
         res = requests.get("http://"+ str(request.args.get("ipAddress"))+":"+ str(request.args.get("ipPort")) + "/checkStatus", timeout=3)
         print(res.text)
@@ -44,7 +51,7 @@ if __name__ == '__main__':
    
     global SERVICE_EXTERNAL_IP
     SERVICE_EXTERNAL_IP = minikubeservice.getServiceExternalIP("collectdataservice") 
-    while SERVICE_EXTERNAL_IP == None:
+    while SERVICE_EXTERNAL_IP == None or SERVICE_EXTERNAL_IP == "<pending>":
         time.sleep(30)   
         SERVICE_EXTERNAL_IP = minikubeservice.getServiceExternalIP("collectdataservice") 
    

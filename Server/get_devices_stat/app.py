@@ -31,8 +31,6 @@ def getDevicesStat():
             dict[key].append({'id':x[0], 'temperatura':x[1], 'umidita':x[2], 'lettura':str(x[3]), 'ipAddress':x[4], 'ipPort':x[5], 'status':x[6], 'name':x[7], 'groupName':str(x[8])})
         else:
             dict[key].append({'id':x[0], 'temperatura':x[1], 'umidita':x[2], 'lettura':str(x[3]), 'ipAddress':x[4], 'ipPort':x[5], 'status':x[6], 'name':x[7], 'groupName':str(x[8])})
-
-    print(x)
     
     jsonDict = {'list' : []}
 
@@ -45,6 +43,57 @@ def getDevicesStat():
     cursor.close()
 
     return json_data
+
+@app.route('/editConfig', methods=['GET'])
+def hello_world():
+
+    configFile = open("config.json", "r")
+    json_object = json.load(configFile)
+
+    db = mysql.connect(
+        host = json_object['host'],
+        user = json_object['user'],
+        passwd = json_object['passwd'],
+        database = json_object['database']
+    )
+
+    cursor = db.cursor()
+
+    if (request.args.get("type") == "name"):
+        cursor.execute("UPDATE devices SET name=\'"+ str(request.args.get("new_value")) + "\' where id = " + str(request.args.get("id")))
+
+    elif (request.args.get("type") == "groupName"):
+        cursor.execute("UPDATE devices SET groupName=\'"+ str(request.args.get("new_value")) +"\' where id = " + str(request.args.get("id")))
+
+    cursor.close()
+    db.commit()
+
+    return "Ok, inserted."
+
+
+@app.route('/deleteDevice', methods=['GET'])
+def hello_world123ssss():
+
+    configFile = open("config.json", "r")
+    json_object = json.load(configFile)
+
+    db = mysql.connect(
+        host = json_object['host'],
+        user = json_object['user'],
+        passwd = json_object['passwd'],
+        database = json_object['database']
+    )
+
+    cursor = db.cursor()
+
+    cursor.execute("DELETE from devices where id =" + str(request.args.get("id")))
+    cursor.execute("DELETE from lectures where id =" + str(request.args.get("id")))
+
+    cursor.close()
+    db.commit()
+
+    return "Ok, deleted."
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=8020)

@@ -10,5 +10,5 @@ spec:
         spec:
           containers:
             - name: checkstatus
-              image: checkstatus:v1
+              image: checkdevicestatus:v1
           restartPolicy: Never

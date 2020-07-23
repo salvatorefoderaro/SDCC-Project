@@ -1,12 +1,1 @@
-{
-    "id" : 1025,
-    "name" : "one",
-    "groupName": "one",
-    "search_interval": 5,
-    "bcast_ip" : "239.255.255.250",
-    "bcast_port" : 10000,
-    "port" : 9001,
-    "protocol" : "blockchain",
-    "networkid" : "main1111",
-    "mine_ip_port" : 9003
-}
+{"id": 1025, "name": "b", "groupName": "one", "search_interval": 5, "bcast_ip": "239.255.255.250", "bcast_port": 10000, "protocol": "blockchain", "networkid": "main1111", "mine_ip_port": 9003}

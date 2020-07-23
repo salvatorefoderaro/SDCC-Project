@@ -4,5 +4,7 @@
     "passwd" : "password",
     "database" : "datacamp",
     "service_ip" : "getdevicesstatservice",
-    "service_port" : 8020
+    "service_port" : 8020,
+    "proxy_ip" : "10.0.2.2",
+    "proxy_port" : "5000"
 }

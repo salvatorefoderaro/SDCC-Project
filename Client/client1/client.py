@@ -20,14 +20,14 @@ BCAST_PORT = 0
 PROTOCOL = ""
 NETWORK_ID = ""
 MINE_IP_ADDRESS = ""
-MINE_IP_PORT = 0
+MINE_IP_PORT = 9003
 MINE_ID = 0
 NAME = ""
 GROUP_NAME = ""
 data = ""
 
 def readJson():
-    global data, SEARCH_INTERVAL, BCAST_IP, BCAST_PORT, PROTOCOL, NETWORK_ID, MINE_IP_PORT, DATA, NAME, GROUP_NAME, MINE_ID
+    global data, SEARCH_INTERVAL, BCAST_IP, BCAST_PORT, PROTOCOL, MINE_IP_PORT, NETWORK_ID, MINE_IP_PORT, DATA, NAME, GROUP_NAME, MINE_ID
     with open('config.json') as config_file:
         data = json.load(config_file)
         MINE_ID = data['id']
@@ -39,6 +39,7 @@ def readJson():
         PROTOCOL = data['protocol']
         NETWORK_ID = data['networkid']
         MINE_IP_PORT = data['mine_ip_port']
+        config_file.close()
 
 def getMineIPAddress():
     global MINE_IP_ADDRESS
@@ -104,16 +105,21 @@ def query_example():
 # Route per modificare la configurazione a runtime, magari tramite la dashboard
 @app.route('/editConfig', methods=['GET'])
 def editConfig():
-    configFile = open("config.json", "r")
-    json_object = json.load(configFile)
-    
-    if (request.args.get("name") is not None):
-        json_object["name"] = request.args.get("name")
-    if (requests.arg.get("groupName") is not None):
-        json_object["groupName"] = request.args.get("groupName")
+    with open('config.json') as config_file:
+        data = json.load(config_file)
+        config_file.close()
 
-    json.dump(json_object, configFile)
-    configFile.close()
+        configFile = open("config.json", "w")
+
+        if (request.args.get("type") == "name"):
+            data["name"] = request.args.get("new_value")
+        if (request.args.get("type") == "groupName"):
+            data["groupName"] = request.args.get("new_value")
+
+        json.dump(data, configFile)
+        configFile.close()
+
+    return "Modified"
 
 def doSomeStuff():
     readJson()
@@ -127,17 +133,24 @@ def doSomeStuff():
     except requests.exceptions.RequestException as e:  # This is the correct syntax
         print("Errore durante l'inserimento del dispositivo.")
     
+    time.sleep(20)
+
     while (True):
         dictToSend = {'id':data['id'], 'temperatura': fakesensor.getTemperature(), 'umidita': fakesensor.getUmidity()}
         try:
             res = requests.post('http://'+CLUSTER_IP_ADDRESS+':5000/sendDataToCluster', json=dictToSend)
-            print("Misurazione registrata correttamente.")
+            print(res.text)
+            if res.text == "Ok, inserted.":
+                print("Misurazione registrata correttamente.")
+            else:
+                print("Misura non registrata")
         except requests.exceptions.RequestException as e:  # This is the correct syntax
             print("Errore durante la registrazione della misurazione.")
             getClusterIPAddress()
-        time.sleep(60)
+        time.sleep(20)
 
 if __name__ == '__main__':
+    print(MINE_IP_PORT)
     thread = Thread(target = doSomeStuff)
     thread.start()
     app.run(host='0.0.0.0', debug=False, port=MINE_IP_PORT) #run app in debug mode on port 5000
