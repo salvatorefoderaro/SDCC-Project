@@ -20,14 +20,15 @@ BCAST_PORT = 0
 PROTOCOL = ""
 NETWORK_ID = ""
 MINE_IP_ADDRESS = ""
-MINE_IP_PORT = 9002
+MINE_IP_PORT = 9003
 MINE_ID = 0
 NAME = ""
 GROUP_NAME = ""
 data = ""
+CLUSTER_PORT = 0
 
 def readJson():
-    global data, SEARCH_INTERVAL, BCAST_IP, BCAST_PORT, PROTOCOL, MINE_IP_PORT, NETWORK_ID, MINE_IP_PORT, DATA, NAME, GROUP_NAME, MINE_ID
+    global data, SEARCH_INTERVAL, CLUSTER_PORT, BCAST_IP, BCAST_PORT, PROTOCOL, MINE_IP_PORT, NETWORK_ID, MINE_IP_PORT, DATA, NAME, GROUP_NAME, MINE_ID
     with open('config.json') as config_file:
         data = json.load(config_file)
         MINE_ID = data['id']
@@ -39,6 +40,7 @@ def readJson():
         PROTOCOL = data['protocol']
         NETWORK_ID = data['networkid']
         MINE_IP_PORT = data['mine_ip_port']
+        CLUSTER_PORT = data['cluster_port']
         config_file.close()
 
 def getMineIPAddress():
@@ -77,20 +79,6 @@ def getClusterIPAddress():
                     print("Risposta ricevuta!")
                     CLUSTER_IP_ADDRESS = addr[0].split('\'')[0]
                     return
-
-                '''
-                                while True:
-                    data, addr = sock.recvfrom(1024)
-                    print("Risposta ricevuta!")
-                    CLUSTER_IP_ADDRESS = addr[0].split('\'')[0]
-                    dictToSend = {'id':data['id'], 'ipAddress': MINE_IP_ADDRESS, 'name': json_object['name'], 'groupName':json_object['groupName']}
-                    try:
-                        res = requests.post('http://'+CLUSTER_IP_ADDRESS+':5000/newDevice', json=dictToSend)
-                        return
-                    except requests.exceptions.RequestException as e:  # This is the correct syntax
-                        print("ricevuto errore")
-                    
-                '''
             except:
                 sock.close()
 
@@ -128,7 +116,7 @@ def doSomeStuff():
 
     dictToSend = {'id':MINE_ID, 'ipAddress': MINE_IP_ADDRESS, 'ipPort': MINE_IP_PORT, 'name': data['name'], 'groupName':data['groupName']}
     try:
-        res = requests.post('http://'+CLUSTER_IP_ADDRESS+':5000/newDevice', json=dictToSend)
+        res = requests.post('http://'+CLUSTER_IP_ADDRESS+':'+CLUSTER_PORT+'/newDevice', json=dictToSend)
         print("Dispositivo inserito correttamente.")
     except requests.exceptions.RequestException as e:  # This is the correct syntax
         print("Errore durante l'inserimento del dispositivo.")
@@ -138,7 +126,7 @@ def doSomeStuff():
     while (True):
         dictToSend = {'id':data['id'], 'temperatura': fakesensor.getTemperature(), 'umidita': fakesensor.getUmidity()}
         try:
-            res = requests.post('http://'+CLUSTER_IP_ADDRESS+':5000/sendDataToCluster', json=dictToSend)
+            res = requests.post('http://'+CLUSTER_IP_ADDRESS+':'+CLUSTER_PORT+'/sendDataToCluster', json=dictToSend)
             print(res.text)
             if res.text == "Ok, inserted.":
                 print("Misurazione registrata correttamente.")

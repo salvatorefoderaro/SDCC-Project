@@ -7,6 +7,9 @@ import time
 
 app = Flask(__name__) #create the Flask app
 
+COLLECT_DATA_PORT = 30006
+FLASK_PORT = 5000
+
 logger = gen_logger('sample')
 
 @app.route('/editConfig', methods=['GET'])
@@ -31,7 +34,7 @@ def query_example():
 def new_device():
     dictToSend = {'id':request.json['id'], 'ipAddress':request.json['ipAddress'], 'ipPort':request.json['ipPort'], 'name':request.json['name'], 'groupName' : request.json['groupName']}
     try:
-        res = requests.post("http://" + SERVICE_EXTERNAL_IP + ":30006/newDevice", json=dictToSend)
+        res = requests.post("http://" + SERVICE_EXTERNAL_IP + ":" + COLLECT_DATA_PORT +"/newDevice", json=dictToSend)
         return res.text
     except requests.exceptions.RequestException as e:  # This is the correct syntax
         return "Connection error"
@@ -41,8 +44,8 @@ def jsonexample():
     print(SERVICE_EXTERNAL_IP)
     dictToSend = {'id':request.json['id'], 'temperatura':request.json['temperatura'], 'umidita':request.json['umidita']}
     try:
-        print ("http://" + SERVICE_EXTERNAL_IP + ":30006/collectData")
-        res = requests.post("http://" + SERVICE_EXTERNAL_IP + ":30006/collectData", json=dictToSend)
+        print ("http://" + SERVICE_EXTERNAL_IP + ":" + COLLECT_DATA_PORT +"/collectData")
+        res = requests.post("http://" + SERVICE_EXTERNAL_IP + ":"+ COLLECT_DATA_PORT +"/collectData", json=dictToSend)
         return res.text
     except requests.exceptions.RequestException as e:  # This is the correct syntax
         return "Not inserted"
@@ -57,4 +60,4 @@ if __name__ == '__main__':
    
     upnpServer = Server(9001, 'blockchain', 'main1111')
     upnpServer.start()
-    app.run(host='0.0.0.0', debug=True, port=5000, threaded=True) #run app in debug mode on port 5000
+    app.run(host='0.0.0.0', debug=True, port=FLASK_PORT, threaded=True) #run app in debug mode on port 5000

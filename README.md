@@ -2,18 +2,10 @@
 
 0. **Installo Minikube**
    1. https://computingforgeeks.com/how-to-install-minikube-on-ubuntu-debian-linux/
-1. **Avvio Minikube** 
-   1. minikube start
-2. **Effettuo l'instanziazione del cluster**
-   1. cd Server && sh instantiate_cluster.sh
-3. **Attivo il tunnel verso i servizi di tipo *LoadBalancer***
-   1. minikube tunnel
-4. **Avvio la dashboard**
+1. **Effettuo l'instanziazione del cluster**
+   3. cd Server && sh instantiate_cluster.sh
+2. **Avvio la dashboard**
    1. minikube dashboard
-5. **Trovo l'IP esposto dai servizi del cluster (lo fa comunque in automatico il modulo minikubeservice)**
-   1. Andare alla sezione *Discovery and Load Balancing*
-   2. Trovare il servizio *exampleservice*
-   3. Cliccare sull'ip alla colonna *External Endpoints*
 
 ---
 
