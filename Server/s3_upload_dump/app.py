@@ -1,5 +1,7 @@
 import boto3
 from botocore.client import Config
+import glob
+import os
 
 ##Il session token risulta essere necessario quando si utilizza un account AWSEducate. In particolare deve essere aggiunto a boto3. Se non 
 ##Dovesse essere presente allora la funzione restituirebbe un errore.
@@ -13,6 +15,8 @@ app = Flask(__name__)
 ##S3 config############################
 
 ### information from configS3
+ACCESS_KEY_ID =  "AKIA57G4V3XA676XKBE2"
+ACCESS_SECRET_KEY = "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"
 BUCKET_NAME = "sdcc-test-bucket"
 
 s3 = boto3.resource(
@@ -27,8 +31,12 @@ def addToBucket():
     #La funzione aggiunge l'immagine all'interno del bucket desiderato.
     #imgPath: str --> path locale del file
     #imgName: str --> nome del file una volta inserito all'interno del bucket.
+
+    list_of_files = glob.glob('/path/to/folder/*') # * means all if need specific format then *.csv
+    latest_file = max(list_of_files, key=os.path.getctime)
+
     try:
-        data = open("dump/dump20200723.sql", 'rb')
+        data = open(latest_file, 'rb')
     except IOError as e:
         print(e)
         print("Errore nel caricamento dell'immagine.")
@@ -36,12 +44,6 @@ def addToBucket():
     
     s3.Bucket(BUCKET_NAME).put_object(Key="dump20200723.sql", Body=data)
     print('Upload eseguito correttamente.')
-
-    '''my_bucket = s3.Bucket(BUCKET_NAME)
-
-    for file in my_bucket.objects.all():
-        s3.Bucket(BUCKET_NAME).download_file(file.key, file.key)
-        print(file.key)'''
 
 if __name__ == '__main__':
     addToBucket()
