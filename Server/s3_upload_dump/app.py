@@ -15,8 +15,6 @@ app = Flask(__name__)
 ##S3 config############################
 
 ### information from configS3
-ACCESS_KEY_ID =  "AKIA57G4V3XA676XKBE2"
-ACCESS_SECRET_KEY = "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"
 BUCKET_NAME = "sdcc-test-bucket"
 
 s3 = boto3.resource(
