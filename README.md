@@ -15,6 +15,12 @@
    2. Trovare il servizio *exampleservice*
    3. Cliccare sull'ip alla colonna *External Endpoints*
 
+---
+
+- **Comandi utili:**
+  - **Aggiornamento del deployment:** *sh update_deployment.sh*
+  - **Pulizia del cluster:** *sh clean_cluster.sh*
+
 # Link utili
 
 https://medium.com/@felipedutratine/kubernetes-on-local-with-minikube-tutorial-413475d587e6
