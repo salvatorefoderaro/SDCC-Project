@@ -9,11 +9,14 @@ app = Flask(__name__)
 @app.route('/getDeviceStat', methods=['GET'])
 def getDevicesStat():
 
+    configFile = open("/config/config.json", "r")
+    json_object = json.load(configFile)
+
     db = mysql.connect(
-        host = "mysql",
-        user = "root",
-        passwd = "password",
-        database = "datacamp"
+        host = json_object['host'],
+        user = json_object['user'],
+        passwd = json_object['passwd'],
+        database = json_object['database']
     )
 
     cursor = db.cursor()
@@ -47,7 +50,7 @@ def getDevicesStat():
 @app.route('/editConfig', methods=['GET'])
 def hello_world():
 
-    configFile = open("config.json", "r")
+    configFile = open("/config/config.json", "r")
     json_object = json.load(configFile)
 
     db = mysql.connect(
@@ -68,13 +71,13 @@ def hello_world():
     cursor.close()
     db.commit()
 
-    return "Ok, inserted."
+    return "Ok"
 
 
 @app.route('/deleteDevice', methods=['GET'])
 def hello_world123ssss():
 
-    configFile = open("config.json", "r")
+    configFile = open("/config/config.json", "r")
     json_object = json.load(configFile)
 
     db = mysql.connect(
@@ -92,8 +95,8 @@ def hello_world123ssss():
     cursor.close()
     db.commit()
 
-    return "Ok, deleted."
+    return "Ok"
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=8020)
+    app.run(debug=True, host='0.0.0.0', port=8020, threaded=True)

@@ -6,11 +6,15 @@ RUN apt-get update -y && \
 # We copy just the requirements.txt first to leverage Docker cache
 COPY ./requirements.txt /app/requirements.txt
 
+COPY ./config.json /config/config.json
+
 WORKDIR /app
 
 RUN pip install --default-timeout=100 -r requirements.txt
 
 COPY . /app
+
+RUN rm config.json
 
 ENTRYPOINT [ "python" ]
 

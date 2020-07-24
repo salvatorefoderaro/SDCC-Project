@@ -5,7 +5,7 @@ import json
 
 def hello_world():
 
-    configFile = open("config.json", "r")
+    configFile = open("/config/config.json", "r")
     json_object = json.load(configFile)
 
     db = mysql.connect(

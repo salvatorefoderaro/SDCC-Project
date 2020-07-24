@@ -11,6 +11,7 @@ import json
 from threading import Thread
 from random import randint
 import fakesensor
+import logging
 
 MINE_IP_ADDRESS = ""
 CLUSTER_IP_ADDRESS = ""
@@ -76,7 +77,7 @@ def getClusterIPAddress():
                 sock.settimeout(3)
                 while True:
                     data, addr = sock.recvfrom(1024)
-                    print("Risposta ricevuta!")
+                    logging.info('Risposta SSDP ricevuta.')
                     CLUSTER_IP_ADDRESS = addr[0].split('\'')[0]
                     return
             except:
@@ -88,7 +89,7 @@ app = Flask(__name__) #create the Flask app
 # Router per la get per controllare lo stato del dispositivo
 @app.route('/checkStatus', methods=['GET'])
 def query_example():
-    return "I'm alive"
+    return "Ok"
 
 # Route per modificare la configurazione a runtime, magari tramite la dashboard
 @app.route('/editConfig', methods=['GET'])
@@ -107,38 +108,42 @@ def editConfig():
         json.dump(data, configFile)
         configFile.close()
 
-    return "Modified"
+    return "Ok"
 
 def doSomeStuff():
     readJson()
     getClusterIPAddress()
     getMineIPAddress()
+    res.text = ""
 
-    dictToSend = {'id':MINE_ID, 'ipAddress': MINE_IP_ADDRESS, 'ipPort': MINE_IP_PORT, 'name': data['name'], 'groupName':data['groupName']}
-    try:
-        res = requests.post('http://'+CLUSTER_IP_ADDRESS+':'+CLUSTER_PORT+'/newDevice', json=dictToSend)
-        print("Dispositivo inserito correttamente.")
-    except requests.exceptions.RequestException as e:  # This is the correct syntax
-        print("Errore durante l'inserimento del dispositivo.")
-    
-    time.sleep(20)
+    while (res.text != "Ok"):
+        dictToSend = {'id':MINE_ID, 'ipAddress': MINE_IP_ADDRESS, 'ipPort': MINE_IP_PORT, 'name': data['name'], 'groupName':data['groupName']}
+        try:
+            res = requests.post('http://'+CLUSTER_IP_ADDRESS+':'+ str(CLUSTER_PORT)+'/newDevice', json=dictToSend, timeout = 3)
+            if res.text == "Ok":
+                logging.warning('Dispositivo inserito correttamente.')
+            else:
+                raise(request.exceptions.RequestException)
+        except requests.exceptions.RequestException as e:  # This is the correct syntax
+            logging.warning("Errore durante l'inserimento del dispositivo.")
+        
+        time.sleep(20)
 
     while (True):
         dictToSend = {'id':data['id'], 'temperatura': fakesensor.getTemperature(), 'umidita': fakesensor.getUmidity()}
         try:
-            res = requests.post('http://'+CLUSTER_IP_ADDRESS+':'+CLUSTER_PORT+'/sendDataToCluster', json=dictToSend)
+            res = requests.post('http://'+CLUSTER_IP_ADDRESS+':'+str(CLUSTER_PORT)+'/sendDataToCluster', json=dictToSend, timeout=3)
             print(res.text)
-            if res.text == "Ok, inserted.":
-                print("Misurazione registrata correttamente.")
-            else:
-                print("Misura non registrata")
+            if res.text == "Ok":
+                logging.info('Misura inserita correttamente.')
+            elif res.text == "Not present":
+                logging.warning('Il dispositivo non è registrato.')
         except requests.exceptions.RequestException as e:  # This is the correct syntax
-            print("Errore durante la registrazione della misurazione.")
+            logging.warning('Errore durante la registrazione della misurazione.')
             getClusterIPAddress()
         time.sleep(20)
 
 if __name__ == '__main__':
-    print(MINE_IP_PORT)
     thread = Thread(target = doSomeStuff)
     thread.start()
     app.run(host='0.0.0.0', debug=False, port=MINE_IP_PORT) #run app in debug mode on port 5000

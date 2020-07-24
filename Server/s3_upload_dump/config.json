@@ -1,8 +1,0 @@
-{
-    "host" : "mysql",
-    "user" : "root",
-    "passwd" : "password",
-    "database" : "datacamp",
-    "service_ip" : "getdevicesstatservice",
-    "service_port" : 8020
-}

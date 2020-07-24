@@ -4,7 +4,7 @@ import json
 
 def checkStatus():
 
-    configFile = open("config.json", "r")
+    configFile = open("/config/config.json", "r")
     json_object = json.load(configFile)
 
     db = mysql.connect(
@@ -23,10 +23,10 @@ def checkStatus():
     for x in myresult:
         try:
             res = requests.get('http://' + str(json_object['proxy_ip']) + ':'+str(json_object['proxy_port']) +'/checkStatus?ipAddress='+str(x[1])+'&ipPort=' + str(x[2]), timeout=3)
-            cursor.execute("UPDATE devices SET status = 0 WHERE id ="+str(x[0])+"")
-            if res.text != "I'm alive":
+            if res.text != "Ok":
                 cursor.execute("UPDATE devices SET status = 100 WHERE id ="+str(x[0])+"")
-            
+            else:
+                cursor.execute("UPDATE devices SET status = 0 WHERE id ="+str(x[0])+"")
         except requests.exceptions.RequestException as e:  # This is the correct syntax
             cursor.execute("UPDATE devices SET status = 100 WHERE id ="+str(x[0])+"")
                 

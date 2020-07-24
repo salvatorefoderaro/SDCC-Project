@@ -111,8 +111,10 @@
         {% set link_delete = "deleteDevices?id=" ~ myString['list'][i]['devicesList'][j]['id'] %}
 
         <div class="card-body">
+          {% if myString['list'][i]['devicesList'][j]['status'] == 0 %}
           <a data-toggle="collapse" href= {{ link_name_collapse }} role="button" aria-expanded="false" aria-controls="nameCollapse" class="card-link">Modifica nome</a>
           <a data-toggle="collapse" href= {{ link_group_collapse }} role="button" aria-expanded="false" aria-controls="groupCollapse" class="card-link">Modifica gruppo</a>
+          {% endif %}
           <a href={{ link_delete }} class="card-link">Elimina</a>
         </div>
 
@@ -140,9 +142,12 @@
             <form action="/modifyDevice" method="GET">
               <div class="form-group">
                 <label for="exampleInputEmail1">Gruppo</label>
-                <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="new_value" placeholder="Nome nuovo gruppo">
-                <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="id" value="10">
-                <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="type" value="group">
+                <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="new_value" placeholder="Gruppo nuovo">
+                <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="id" value={{ myString['list'][i]['devicesList'][j]['id'] }}>
+                <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="type" value="groupName">
+                <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="ip_address" value= {{ myString['list'][i]['devicesList'][j]['ipAddress'] }}>
+                <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="port" value= {{ myString['list'][i]['devicesList'][j]['ipPort'] }}>
+
                 <button type="submit" class="btn btn-primary">Submit</button>
               </div>
             </form>

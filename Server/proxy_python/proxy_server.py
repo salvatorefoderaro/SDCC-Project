@@ -12,6 +12,15 @@ FLASK_PORT = 5000
 
 logger = gen_logger('sample')
 
+def getExternalIp():
+    global SERVICE_EXTERNAL_IP
+    SERVICE_EXTERNAL_IP = minikubeservice.getServiceExternalIP("collectdataservice") 
+    print("Prima di andare in while il valore è " + str(SERVICE_EXTERNAL_IP))
+    while (SERVICE_EXTERNAL_IP == None or SERVICE_EXTERNAL_IP == "<pending>"):
+        print("Prima di andare in sleep il valore è " + str(SERVICE_EXTERNAL_IP))
+        time.sleep(30)   
+        SERVICE_EXTERNAL_IP = minikubeservice.getServiceExternalIP("collectdataservice") 
+
 @app.route('/editConfig', methods=['GET'])
 def edit_config():
     try:
@@ -24,40 +33,35 @@ def edit_config():
 def query_example():
     try:
         res = requests.get("http://"+ str(request.args.get("ipAddress"))+":"+ str(request.args.get("ipPort")) + "/checkStatus", timeout=3)
-        print(res.text)
         return res.text
     except requests.exceptions.RequestException as e:
-        print("Dead")
         return "Dead"
 
 @app.route('/newDevice', methods=['POST'])
 def new_device():
     dictToSend = {'id':request.json['id'], 'ipAddress':request.json['ipAddress'], 'ipPort':request.json['ipPort'], 'name':request.json['name'], 'groupName' : request.json['groupName']}
     try:
-        res = requests.post("http://" + SERVICE_EXTERNAL_IP + ":" + COLLECT_DATA_PORT +"/newDevice", json=dictToSend)
+        res = requests.post("http://" + SERVICE_EXTERNAL_IP + ":" + str(COLLECT_DATA_PORT) +"/newDevice", json=dictToSend, timeout=10)
         return res.text
     except requests.exceptions.RequestException as e:  # This is the correct syntax
-        return "Connection error"
+        return "Not ok"
+        print(e)
+        getExternalIp()
 
 @app.route('/sendDataToCluster', methods=['POST'])
 def jsonexample():
-    print(SERVICE_EXTERNAL_IP)
+    print("http://" + SERVICE_EXTERNAL_IP + ":"+ str(COLLECT_DATA_PORT) +"/collectData")
     dictToSend = {'id':request.json['id'], 'temperatura':request.json['temperatura'], 'umidita':request.json['umidita']}
     try:
-        print ("http://" + SERVICE_EXTERNAL_IP + ":" + COLLECT_DATA_PORT +"/collectData")
-        res = requests.post("http://" + SERVICE_EXTERNAL_IP + ":"+ COLLECT_DATA_PORT +"/collectData", json=dictToSend)
+        res = requests.post("http://" + SERVICE_EXTERNAL_IP + ":"+ str(COLLECT_DATA_PORT) +"/collectData", json=dictToSend, timeout=10)
         return res.text
     except requests.exceptions.RequestException as e:  # This is the correct syntax
-        return "Not inserted"
+        return "Not ok"
+        print(e)
+        getExternalIp()
 
-if __name__ == '__main__':
-   
-    global SERVICE_EXTERNAL_IP
-    SERVICE_EXTERNAL_IP = minikubeservice.getServiceExternalIP("collectdataservice") 
-    while SERVICE_EXTERNAL_IP == None or SERVICE_EXTERNAL_IP == "<pending>":
-        time.sleep(30)   
-        SERVICE_EXTERNAL_IP = minikubeservice.getServiceExternalIP("collectdataservice") 
-   
+if __name__ == '__main__':   
+    getExternalIp()
     upnpServer = Server(9001, 'blockchain', 'main1111')
     upnpServer.start()
     app.run(host='0.0.0.0', debug=True, port=FLASK_PORT, threaded=True) #run app in debug mode on port 5000
