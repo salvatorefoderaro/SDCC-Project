@@ -4,6 +4,7 @@ from ssdp import Server
 from ssdp import gen_logger
 import minikubeservice
 import time
+import logging
 
 app = Flask(__name__) #create the Flask app
 
@@ -15,9 +16,8 @@ logger = gen_logger('sample')
 def getExternalIp():
     global SERVICE_EXTERNAL_IP
     SERVICE_EXTERNAL_IP = minikubeservice.getServiceExternalIP("collectdataservice") 
-    print("Prima di andare in while il valore è " + str(SERVICE_EXTERNAL_IP))
     while (SERVICE_EXTERNAL_IP == None or SERVICE_EXTERNAL_IP == "<pending>"):
-        print("Prima di andare in sleep il valore è " + str(SERVICE_EXTERNAL_IP))
+        print("Waiting for SERVICE_EXTERNAL_IP...")
         time.sleep(30)   
         SERVICE_EXTERNAL_IP = minikubeservice.getServiceExternalIP("collectdataservice") 
 
@@ -50,7 +50,6 @@ def new_device():
 
 @app.route('/sendDataToCluster', methods=['POST'])
 def jsonexample():
-    print("http://" + SERVICE_EXTERNAL_IP + ":"+ str(COLLECT_DATA_PORT) +"/collectData")
     dictToSend = {'id':request.json['id'], 'temperatura':request.json['temperatura'], 'umidita':request.json['umidita']}
     try:
         res = requests.post("http://" + SERVICE_EXTERNAL_IP + ":"+ str(COLLECT_DATA_PORT) +"/collectData", json=dictToSend, timeout=10)
@@ -61,7 +60,6 @@ def jsonexample():
         getExternalIp()
 
 if __name__ == '__main__':   
-    getExternalIp()
     upnpServer = Server(9001, 'blockchain', 'main1111')
     upnpServer.start()
     app.run(host='0.0.0.0', debug=True, port=FLASK_PORT, threaded=True) #run app in debug mode on port 5000

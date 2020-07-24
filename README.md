@@ -9,6 +9,11 @@
 
 ---
 
+### **Dockerizzazione Client**
+
+1. docker build -t client* .
+2. docker run -p port:port client*
+
 - **Comandi utili:**
   - **Aggiornamento del deployment:** *sh update_deployment.sh*
   - **Pulizia del cluster:** *sh clean_cluster.sh*

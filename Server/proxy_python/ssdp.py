@@ -45,7 +45,6 @@ class Server(threading.Thread):
             sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, socket.inet_aton(self.BCAST_IP) + socket.inet_aton(self.IP))
             sock.bind((self.IP, self.UPNP_PORT))
             sock.settimeout(1)
-            logger.info("upnp server is listening...")
             while True:
                 try:
                     data, addr = sock.recvfrom(1024)

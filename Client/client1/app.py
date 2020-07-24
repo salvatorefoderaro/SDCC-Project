@@ -77,7 +77,7 @@ def getClusterIPAddress():
                 sock.settimeout(3)
                 while True:
                     data, addr = sock.recvfrom(1024)
-                    logging.info('Risposta SSDP ricevuta.')
+                    ('Risposta SSDP ricevuta.')
                     CLUSTER_IP_ADDRESS = addr[0].split('\'')[0]
                     return
             except:
@@ -114,30 +114,30 @@ def doSomeStuff():
     readJson()
     getClusterIPAddress()
     getMineIPAddress()
-    res.text = ""
+    result = ""
 
-    while (res.text != "Ok"):
+    while (result != "Ok"):
         dictToSend = {'id':MINE_ID, 'ipAddress': MINE_IP_ADDRESS, 'ipPort': MINE_IP_PORT, 'name': data['name'], 'groupName':data['groupName']}
         try:
-            res = requests.post('http://'+CLUSTER_IP_ADDRESS+':'+ str(CLUSTER_PORT)+'/newDevice', json=dictToSend, timeout = 3)
-            if res.text == "Ok":
-                logging.warning('Dispositivo inserito correttamente.')
+            result = requests.post('http://'+CLUSTER_IP_ADDRESS+':'+ str(CLUSTER_PORT)+'/newDevice', json=dictToSend, timeout = 3).text
+            logging.info(result)
+            if result == "Ok":
+                print('Dispositivo inserito correttamente.')
             else:
                 raise(request.exceptions.RequestException)
         except requests.exceptions.RequestException as e:  # This is the correct syntax
-            logging.warning("Errore durante l'inserimento del dispositivo.")
+            print("Errore durante l'inserimento del dispositivo.")
         
         time.sleep(20)
 
     while (True):
         dictToSend = {'id':data['id'], 'temperatura': fakesensor.getTemperature(), 'umidita': fakesensor.getUmidity()}
         try:
-            res = requests.post('http://'+CLUSTER_IP_ADDRESS+':'+str(CLUSTER_PORT)+'/sendDataToCluster', json=dictToSend, timeout=3)
-            print(res.text)
-            if res.text == "Ok":
-                logging.info('Misura inserita correttamente.')
-            elif res.text == "Not present":
-                logging.warning('Il dispositivo non è registrato.')
+            result = requests.post('http://'+CLUSTER_IP_ADDRESS+':'+str(CLUSTER_PORT)+'/sendDataToCluster', json=dictToSend, timeout=3).text
+            if result == "Ok":
+                print("Misurazione inserita correttamente.")
+            elif result == "Not present":
+                print("Il dispositivo non e' registrato.")
         except requests.exceptions.RequestException as e:  # This is the correct syntax
             logging.warning('Errore durante la registrazione della misurazione.')
             getClusterIPAddress()

@@ -36,7 +36,7 @@ def addToBucket():
         exit(-1)
     
     try:
-        s3.Bucket(BUCKET_NAME).put_object(Key="dump20200723.sql", Body=data)
+        s3.Bucket(BUCKET_NAME).put_object(Key=latest_file, Body=data)
     except Exception as e:
         print(e)
         exit(-1)

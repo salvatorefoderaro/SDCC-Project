@@ -1,11 +1,9 @@
 import requests
-import mysql.connector as mysql
 import json
-from flask import Flask, render_template
+from flask import Flask, render_template, send_file
 from flask import request
 import boto3
 from botocore.client import Config
-from flask import send_file
 
 app = Flask(__name__)
 
@@ -71,7 +69,7 @@ def asd123():
         return render_template('error_template.html', responseMessage="Errore nell'ottenimento della lista dei dispositivi.")
     return render_template('template_bootstrap.html', myString=data, response=response123)
 
-@app.route('/getDeviceStat',)
+@app.route('/',)
 def jsonDictasddd():
 
     configFile = open("/config/config.json", "r")
@@ -107,8 +105,11 @@ def jsonDictDownload():
 @app.route('/getFileList')
 def jsonDict():
 
-    ### information from configS3
+    ### information from configS3   
+    ACCESS_KEY_ID =  "AKIA57G4V3XA7CWVE7C7"
+    ACCESS_SECRET_KEY = "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"
     BUCKET_NAME = "sdcc-test-bucket"
+
 
     try:
         s3 = boto3.resource(
@@ -124,8 +125,7 @@ def jsonDict():
             file_key_list.append(file.key)
 
         return render_template('template_bootstrap_file.html', myString=file_key_list)
-    except requests.exceptions.RequestException as e:
-        print(e)
+    except Exception as e:
         return render_template('error_template.html', responseMessage="Errore nell'ottenumento dei file da S3.")
 
 if __name__ == '__main__':
