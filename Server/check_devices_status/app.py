@@ -22,6 +22,7 @@ def checkStatus():
     myresult = cursor.fetchall()
 
     for x in myresult:
+        print(x)
         try:
             res = requests.get('http://' + str(json_object['proxy_ip']) + ':'+str(json_object['proxy_port']) +'/checkStatus?ipAddress='+str(x[1])+'&ipPort=' + str(x[2]), timeout=3)
             logging.info(res.text)
@@ -30,6 +31,7 @@ def checkStatus():
             else:
                 cursor.execute("UPDATE devices SET status = 0 WHERE id ="+str(x[0])+"")
         except requests.exceptions.RequestException as e:  # This is the correct syntax
+            print(e)
             cursor.execute("UPDATE devices SET status = 100 WHERE id ="+str(x[0])+"")
                 
     cursor.close()

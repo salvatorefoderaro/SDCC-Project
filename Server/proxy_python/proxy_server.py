@@ -60,6 +60,7 @@ def jsonexample():
         getExternalIp()
 
 if __name__ == '__main__':   
+    getExternalIp()
     upnpServer = Server(9001, 'blockchain', 'main1111')
     upnpServer.start()
     app.run(host='0.0.0.0', debug=True, port=FLASK_PORT, threaded=True) #run app in debug mode on port 5000

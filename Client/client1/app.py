@@ -77,7 +77,7 @@ def getClusterIPAddress():
                 sock.settimeout(3)
                 while True:
                     data, addr = sock.recvfrom(1024)
-                    ('Risposta SSDP ricevuta.')
+                    print('Risposta SSDP ricevuta.')
                     CLUSTER_IP_ADDRESS = addr[0].split('\'')[0]
                     return
             except:
