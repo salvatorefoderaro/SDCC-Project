@@ -163,18 +163,14 @@ def getGroupsList():
 
     myresult = cursor.fetchall()
 
-    for x in myresult:
-        key = str(x[0]).replace(" ", "")
-        if key not in dict:
-            dict[key] = []
-            dict[key].append({'groupName':x[0], 'parameter1':x[1], 'parameter2':x[2], 'parameter3':x[3]})
-        else:
-            dict[key].append({'groupName':x[0], 'parameter1':x[1], 'parameter2':x[2], 'parameter3':x[3]})
-
-
     jsonDict = {'list' : []}
 
-    for i in dict:
+    for x in myresult:
+        dict = {}
+        dict['groupName'] = x[0]
+        dict['parameter1'] = x[1]
+        dict['parameter2'] = x[2]
+        dict['parameter3'] = x[3]
         jsonDict['list'].append(dict)
 
     json_data = json.dumps(jsonDict)

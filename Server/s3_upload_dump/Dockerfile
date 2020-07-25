@@ -12,7 +12,7 @@ RUN pip3 install --default-timeout=100 -r requirements.txt
 
 COPY . /app
 
-ENTRYPOINT [ "python" ]
+ENTRYPOINT [ "python3" ]
 
 CMD [ "app.py" ]
 

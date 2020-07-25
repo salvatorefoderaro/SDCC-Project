@@ -41,7 +41,7 @@ def hello_world():
     db.commit()
     cursor.execute("CREATE TABLE IF NOT EXISTS devices (id INT PRIMARY KEY, ipAddress VARCHAR(30), ipPort INT, status INT, name VARCHAR(100), groupName VARCHAR(100), type VARCHAR(100), FOREIGN KEY (groupName) REFERENCES groups(groupName))")
     db.commit()
-    cursor.execute("CREATE TABLE IF NOT EXISTS lectures (id INT, temperatura float, umidita float,lettura DATETIME, PRIMARY KEY(id, lettura)), FOREIGN KEY (id) REFERENCES devices(id)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS lectures (id INT, temperatura float, umidita float,lettura DATETIME, PRIMARY KEY(id, lettura), FOREIGN KEY (id) REFERENCES devices(id))")
     db.commit()
     cursor.close()
     db.close()

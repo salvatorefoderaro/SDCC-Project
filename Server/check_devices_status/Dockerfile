@@ -16,7 +16,7 @@ COPY . /app
 
 RUN rm config.json
 
-ENTRYPOINT [ "python" ]
+ENTRYPOINT [ "python3" ]
 
 CMD [ "app.py" ]
 

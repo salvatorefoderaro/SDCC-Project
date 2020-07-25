@@ -44,7 +44,7 @@
         <a class="nav-link" href="/getFileList">Archivio dump</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="">Gestione gruppi</a>
+        <a class="nav-link" href="/getGroupsList">Gestione gruppi</a>
       </li>
     </ul>
    </div>
@@ -79,7 +79,7 @@
         {% else %}
           <div class="card-body" style="background-color:red;">
         {% endif %}
-          <h5 class="card-title">{{ status }} {{ myString['list'][i]['devicesList'][j]['name'] }}</h5>
+          <h5 class="card-title">{{ myString['list'][i]['devicesList'][j]['name'] }}</h5>
         </div>
         <ul class="list-group list-group-flush">
           <li class="list-group-item">ID: {{ myString['list'][i]['devicesList'][j]['id'] }}</li>
@@ -165,7 +165,7 @@
         {% else %}
           <div class="card-body" style="background-color:red;">
         {% endif %}
-              <h5 class="card-title">{{ status }} {{ myString['list'][i]['controlList'][j]['name'] }}</h5>
+              <h5 class="card-title">{{ myString['list'][i]['controlList'][j]['name'] }}</h5>
             </div>
 
               <ul class="list-group list-group-flush">

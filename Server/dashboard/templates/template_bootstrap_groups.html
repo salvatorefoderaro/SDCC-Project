@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Jekyll v4.0.1">
+    <title>Starter Template · Bootstrap</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/starter-template/">
+
+    <!-- Bootstrap core CSS -->
+<link href="{{ url_for('static', filename='css/bootstrap.css') }}" rel="stylesheet">
+
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+    </style>
+    <!-- Custom styles for this template -->
+    <link href="{{ url_for('static', filename='css/starter-template.css') }}" rel="stylesheet">
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+
+  <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/getFileList">Archivio dump</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/getGroupsList">Gestione gruppi</a>
+      </li>
+    </ul>
+   </div>
+</nav>
+
+<main role="main" class="container">
+
+  {% if response == true %}
+  <div class="alert alert-success" role="alert">
+    Modifica effettuata con successo!
+  </div>
+    {% elif response == false %}
+    <div class="alert alert-warning" role="alert">
+    Modifica non effettuata!
+    </div>
+      {% endif %}
+
+
+  {% if myString['list']|length == 0 %}
+
+    <h2>Nessun gruppo presente. <a href="addGroupLink">Aggiungine uno.</a></h2>
+
+ {% else %}
+  {% for i in range(0, myString['list']|length ) %} 
+
+  <div class="card-deck">
+
+      <div class="card" style="width: 18rem;">
+          <div class="card-body">
+          <h5 class="card-title"> {{ myString['list'][i]['groupName'] }}</h5>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">Parameter 1: {{ myString['list'][i]['parameter1'] }}</li>
+          <li class="list-group-item">Parameter 2: {{ myString['list'][i]['parameter2'] }}</li>
+          <li class="list-group-item">Parameter3: {{ myString['list'][i]['parameter3'] }}</li>
+        </ul>
+
+        <div class="card-body">
+          <a href="/addGroupLink" class="card-link">Aggiungi nuovo gruppo</a>
+        </div>
+
+    </div>
+
+      {% if i % 3 == 2%}
+      </div>
+      <div class="card-deck">
+      {% endif %}
+      
+        </div>
+
+  {% endfor %}
+
+  {% endif %}
+
+
+
+</main><!-- /.container -->
+<script src=" {{ url_for('static', filename='js/jquery-3.5.1.slim.min.js') }}"></script>
+      <script>window.jQuery || document.write('<script src="../assets/js/vendor/jquery.slim.min.js"><\/script>')</script><script src="{{ url_for('static', filename='js/bootstrap.bundle.js') }}"></script></body>
+</html>

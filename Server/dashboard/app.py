@@ -13,6 +13,13 @@ Modulo per la dashboard di gestione dell'intero applicativo.
 
 app = Flask(__name__)
 
+
+# Funzione per l'aggiunta di un nuovo gruppo
+@app.route('/addGroupLink', methods=['GET'])
+def addGroupLink():
+
+    return render_template('template_bootstrap_add_groups.html')
+
 # Funzione per l'aggiunta di un nuovo gruppo
 @app.route('/addGroup', methods=['GET'])
 def addGroup():
@@ -34,8 +41,8 @@ def addGroup():
         print(e)
         return render_template('error_template.html', responseMessage=str(e))
 
-    data = requests.get("http://" + json_object['service_ip'] + ":" + str(json_object['service_port']) +"/getDeviceStat").json()
-    return render_template('template_bootstrap.html', myString=data, response=response123)
+    data = requests.get("http://" + json_object['service_ip'] + ":" + str(json_object['service_port']) +"/getGroupsList").json()
+    return render_template('template_bootstrap_groups.html', myString=data, response=response123)
 
 # Funzione per l'eliminazione di un dispositivo
 @app.route('/deleteDevices', methods=['GET'])
@@ -130,7 +137,7 @@ def getGroups():
     except Exception as e:
         print(e)
         return render_template('error_template.html', responseMessage="Errore nell'ottenimento della lista dei dispositivi.")
-    return data
+    return render_template('template_bootstrap_groups.html', myString=data)
     ##return render_template('template_bootstrap.html', myString=data)
 
 @app.route('/downloadFile', methods=['GET'])
