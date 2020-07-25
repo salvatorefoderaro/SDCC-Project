@@ -11,6 +11,11 @@ import logging
 ##S3 config############################
 
 ### information from configS3
+
+'''
+Modulo per il caricamento del dump del database nel bucket S3.
+'''
+
 BUCKET_NAME = "sdcc-test-bucket"
 
 s3 = boto3.resource(

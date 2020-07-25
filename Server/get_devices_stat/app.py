@@ -4,6 +4,10 @@ import json
 from flask import Flask
 from flask import request
 
+'''
+Modulo per la comunicazione tra la dashboard ed il database.
+'''
+
 app = Flask(__name__)
 
 def connectToDb():
@@ -19,10 +23,10 @@ def connectToDb():
 
     return db
 
+# Funzione che crea un json con le informazioni dei dispositivi presenti nella base di dati, e delle loro ultime attivitò.
 @app.route('/getDeviceStat', methods=['GET'])
 def getDevicesStat():
 
-    
     db = connectToDb()
 
     cursor = db.cursor()
@@ -87,6 +91,7 @@ def getDevicesStat():
 
     return json_data
 
+# Funzione che modifica la configurazione di un siingolo dispositivo
 @app.route('/editConfig', methods=['GET'])
 def hello_world():
 
@@ -94,9 +99,12 @@ def hello_world():
 
     cursor = db.cursor()
 
+    # Se la richiesta è di tipo nome, oltre a modificare il record nel db contatto anche il dispositivo per l'aggiornamento
+    # del file 'config.json'
     if (request.args.get("type") == "name"):
         cursor.execute("UPDATE devices SET name=\'"+ str(request.args.get("new_value")) + "\' where id = " + str(request.args.get("id")))
-
+    # Se devo modificare il gruppo di appartenenza di un dispositivo, controllo prima che il gruppo esista
+    # altrimenti fallirebbe il controllo sulla foreign key.
     elif (request.args.get("type") == "groupName"):
         cursor.execute("select * FROM groups WHERE groupName = " + str(request.args.get("new_value")))
         row = cursor.fetchone()
@@ -110,6 +118,7 @@ def hello_world():
 
     return "Ok"
 
+# Funzione per l'eliminazione di un dispositivo
 @app.route('/deleteDevice', methods=['GET'])
 def hello_world123ssss():
 
@@ -125,6 +134,7 @@ def hello_world123ssss():
 
     return "Ok"
 
+# Funzione per l'aggiunta di un nuovo gruppo
 @app.route('/addGroup', methods=['GET'])
 def addGroup():
 
@@ -139,6 +149,7 @@ def addGroup():
 
     return "Ok"
 
+# Funzione per l'ottenimento dei gruppi attualmente presenti.
 @app.route('/getGroupsList', methods=['GET'])
 def getGroupsList():
 

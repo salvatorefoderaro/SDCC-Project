@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*- 
+
 from flask import Flask
 import requests
 import mysql.connector as mysql
@@ -5,6 +7,10 @@ from flask import request
 import json
 
 app = Flask(__name__)
+
+'''
+Modulo che si occupa di regisrare i nuovi dispositivi e le registrazioni prodotte nel sengolo dai singoli dispositivi.
+'''
 
 @app.route('/collectData', methods=['POST'])
 def hello_worldas():
@@ -21,12 +27,14 @@ def hello_worldas():
 
     cursor = db.cursor()
 
+    # Controllo se il dispositivo è attualmente presente nella base dati
     cursor.execute("select * FROM devices WHERE id = " + str(request.json['id']))
     
     row = cursor.fetchone()
     if row == None:
         return "Not present"
 
+    # In caso positivo, aggiorno lo stato e registro la misurazione
     cursor.execute("UPDATE devices SET status = 0 where id = " + str(request.json['id']))
     cursor.execute("INSERT INTO lectures (id, temperatura, umidita, lettura) VALUES (" + str(request.json['id']) +"," + str(request.json['temperatura']) + "," + str(request.json['umidita'])+",now())")
 
@@ -50,6 +58,7 @@ def newDevice():
 
     cursor = db.cursor()
 
+    # Inserisco il dispositivo nel database
     cursor.execute("INSERT INTO devices (id, ipAddress, ipPort, status, name, groupName, type) VALUES (" + str(request.json['id']) + ", \'" + str(request.json['ipAddress']) + "\'" + ", \'" + str(request.json['ipPort']) + "\',0,\'" + str(request.json['name']) + "\',NULL,\'" + str(request.json['type']) + "\') ON DUPLICATE KEY UPDATE status = 0, ipAddress =\'" + str(request.json['ipAddress']) +"\', name =\'" + str(request.json["name"]) + "\'")
 
     cursor.close()

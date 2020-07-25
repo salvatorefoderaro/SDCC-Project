@@ -9,7 +9,7 @@ cd ../dashboard && docker build -t dashboard:v1 .
 cd ../get_devices_stat && docker build -t getdevicesstat:v1 .
 cd ../s3_upload_dump && docker build -t uploads3:v1 .
 cd ../yaml
-docker pull mysql:5.7
+docker pull mysql:latest
 kubectl apply -f secret.yaml
 sleep 1
 kubectl apply -f mysql-dump.yaml

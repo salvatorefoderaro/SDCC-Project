@@ -7,8 +7,13 @@ from flask import request
 import boto3
 from botocore.client import Config
 
+'''
+Modulo per la dashboard di gestione dell'intero applicativo.
+'''
+
 app = Flask(__name__)
 
+# Funzione per l'aggiunta di un nuovo gruppo
 @app.route('/addGroup', methods=['GET'])
 def addGroup():
 
@@ -32,7 +37,7 @@ def addGroup():
     data = requests.get("http://" + json_object['service_ip'] + ":" + str(json_object['service_port']) +"/getDeviceStat").json()
     return render_template('template_bootstrap.html', myString=data, response=response123)
 
-
+# Funzione per l'eliminazione di un dispositivo
 @app.route('/deleteDevices', methods=['GET'])
 def asd():
 
@@ -57,6 +62,7 @@ def asd():
     data = requests.get("http://" + json_object['service_ip'] + ":" + str(json_object['service_port']) +"/getDeviceStat").json()
     return render_template('template_bootstrap.html', myString=data, response=response123)
 
+# Funzione per la modifica di un dispositivo
 @app.route('/modifyDevice', methods=['GET'])
 def asd123():
 
@@ -99,6 +105,7 @@ def asd123():
         return render_template('error_template.html', responseMessage=str(e))
     return render_template('template_bootstrap.html', myString=data, response=True)
 
+# Funzione per la visualizzazione della lista dei dispositivi
 @app.route('/',)
 def jsonDictasddd():
 

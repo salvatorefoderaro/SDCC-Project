@@ -3,6 +3,10 @@ import requests
 import mysql.connector as mysql
 import json
 
+'''
+Modulo che si occupa dell'instanziazione del database.
+'''
+
 def hello_world():
 
     configFile = open("/config/config.json", "r")
@@ -14,12 +18,9 @@ def hello_world():
         passwd = json_object['passwd']
     )
 
-    ## creating an instance of 'cursor' class which is used to execute the 'SQL' statements in 'Python'
     cursor = db.cursor()
 
-    ## creating a databse called 'datacamp'
-    ## 'execute()' method is used to compile a 'SQL' statement
-    ## below statement is used to create tha 'datacamp' database
+    # Effettuo la creazione del database
     cursor.execute("CREATE DATABASE IF NOT EXISTS datacamp")
     
     cursor.close()
@@ -33,12 +34,14 @@ def hello_world():
         database = json_object['database']
     )
 
+    # Eseguo le query per la creazione delle tabelle
+
     cursor = db.cursor()
     cursor.execute("CREATE TABLE IF NOT EXISTS groups (groupName VARCHAR(100) PRIMARY KEY, parameter1 float, parameter2 float, parameter3 float)")
     db.commit()
     cursor.execute("CREATE TABLE IF NOT EXISTS devices (id INT PRIMARY KEY, ipAddress VARCHAR(30), ipPort INT, status INT, name VARCHAR(100), groupName VARCHAR(100), type VARCHAR(100), FOREIGN KEY (groupName) REFERENCES groups(groupName))")
     db.commit()
-    cursor.execute("CREATE TABLE IF NOT EXISTS lectures (id INT, temperatura float, umidita float,lettura DATETIME, PRIMARY KEY(id, lettura))")
+    cursor.execute("CREATE TABLE IF NOT EXISTS lectures (id INT, temperatura float, umidita float,lettura DATETIME, PRIMARY KEY(id, lettura)), FOREIGN KEY (id) REFERENCES devices(id)")
     db.commit()
     cursor.close()
     db.close()
