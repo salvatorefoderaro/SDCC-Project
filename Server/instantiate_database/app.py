@@ -34,8 +34,9 @@ def hello_world():
     )
 
     cursor = db.cursor()
- 
-    cursor.execute("CREATE TABLE IF NOT EXISTS devices (id INT PRIMARY KEY, ipAddress VARCHAR(30), ipPort INT, status INT, name VARCHAR(100), groupName VARCHAR(100))")
+    cursor.execute("CREATE TABLE IF NOT EXISTS groups (groupName VARCHAR(100) PRIMARY KEY, parameter1 float, parameter2 float, parameter3 float)")
+    db.commit()
+    cursor.execute("CREATE TABLE IF NOT EXISTS devices (id INT PRIMARY KEY, ipAddress VARCHAR(30), ipPort INT, status INT, name VARCHAR(100), groupName VARCHAR(100), type VARCHAR(100), FOREIGN KEY (groupName) REFERENCES groups(groupName))")
     db.commit()
     cursor.execute("CREATE TABLE IF NOT EXISTS lectures (id INT, temperatura float, umidita float,lettura DATETIME, PRIMARY KEY(id, lettura))")
     db.commit()

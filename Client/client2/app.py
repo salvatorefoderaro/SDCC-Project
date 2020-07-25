@@ -77,7 +77,7 @@ def getClusterIPAddress():
                 sock.settimeout(3)
                 while True:
                     data, addr = sock.recvfrom(1024)
-                    ('Risposta SSDP ricevuta.')
+                    print('Risposta SSDP ricevuta.')
                     CLUSTER_IP_ADDRESS = addr[0].split('\'')[0]
                     return
             except:
@@ -117,7 +117,7 @@ def doSomeStuff():
     result = ""
 
     while (result != "Ok"):
-        dictToSend = {'id':MINE_ID, 'ipAddress': MINE_IP_ADDRESS, 'ipPort': MINE_IP_PORT, 'name': data['name'], 'groupName':data['groupName']}
+        dictToSend = {'id':MINE_ID, 'ipAddress': MINE_IP_ADDRESS, 'ipPort': MINE_IP_PORT, 'name': data['name'], 'type':data['type']}
         try:
             result = requests.post('http://'+CLUSTER_IP_ADDRESS+':'+ str(CLUSTER_PORT)+'/newDevice', json=dictToSend, timeout = 3).text
             logging.info(result)
@@ -131,13 +131,18 @@ def doSomeStuff():
         time.sleep(20)
 
     while (True):
-        dictToSend = {'id':data['id'], 'temperatura': fakesensor.getTemperature(), 'umidita': fakesensor.getUmidity()}
+        if data['type'] == 'control':
+            dictToSend = {'id':data['id'], 'temperatura': 0, 'umidita': 0}
+        else:
+            dictToSend = {'id':data['id'], 'temperatura': fakesensor.getTemperature(), 'umidita': fakesensor.getUmidity()}
         try:
             result = requests.post('http://'+CLUSTER_IP_ADDRESS+':'+str(CLUSTER_PORT)+'/sendDataToCluster', json=dictToSend, timeout=3).text
             if result == "Ok":
                 print("Misurazione inserita correttamente.")
             elif result == "Not present":
                 print("Il dispositivo non e' registrato.")
+            else:
+                print("Errore durante la registrazione della misurazione.")
         except requests.exceptions.RequestException as e:  # This is the correct syntax
             logging.warning('Errore durante la registrazione della misurazione.')
             getClusterIPAddress()

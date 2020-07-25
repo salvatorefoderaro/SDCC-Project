@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*- 
+
 import requests
 import json
 from flask import Flask, render_template, send_file
@@ -6,6 +8,30 @@ import boto3
 from botocore.client import Config
 
 app = Flask(__name__)
+
+@app.route('/addGroup', methods=['GET'])
+def addGroup():
+
+    configFile = open("/config/config.json", "r")
+    json_object = json.load(configFile)
+
+    groupName = str(request.args.get("groupName"))
+    parameter1 = str(request.args.get("parameter1"))
+    parameter2 = str(request.args.get("parameter2"))
+    parameter3 = str(request.args.get("parameter3"))
+
+    response123 = False
+
+    try:
+        res = requests.get('http://' + json_object['service_ip'] + ':' + str(json_object['service_port']) +'/addGroup?groupName='+groupName+'&parameter1=' + parameter1 + '&parameter2=' + parameter2 + '&parameter3=' + parameter3, timeout=5)
+        response123 = True
+    except Exception as e:
+        print(e)
+        return render_template('error_template.html', responseMessage=str(e))
+
+    data = requests.get("http://" + json_object['service_ip'] + ":" + str(json_object['service_port']) +"/getDeviceStat").json()
+    return render_template('template_bootstrap.html', myString=data, response=response123)
+
 
 @app.route('/deleteDevices', methods=['GET'])
 def asd():
@@ -26,7 +52,7 @@ def asd():
         response123 = True
     except requests.exceptions.RequestException as e:
         print(e)
-        return render_template('error_template.html', responseMessage="Errore nell'eliminazione del dispositivo.")
+        return render_template('error_template.html', responseMessage=str(e))
 
     data = requests.get("http://" + json_object['service_ip'] + ":" + str(json_object['service_port']) +"/getDeviceStat").json()
     return render_template('template_bootstrap.html', myString=data, response=response123)
@@ -43,44 +69,62 @@ def asd123():
     ip_address = str(request.args.get("ip_address"))
     port = str(request.args.get("port"))
 
-    try:
-        res = requests.get('http://' + str(json_object['proxy_ip']) + ':'+str(json_object['proxy_port']) +'/editConfig?ipAddress='+ip_address+'&ipPort=' + port + '&new_value=' + new_value + '&type=' + type, timeout=3)
-        if (res.text != "Ok"):
-            raise(Exception)
-    except requests.exceptions.RequestException as e:
-        print(e)
-        return render_template('error_template.html', responseMessage="Errore mentre contatto il proxy.")
+    if type == "name":
+        try:
+            res = requests.get('http://' + str(json_object['proxy_ip']) + ':'+str(json_object['proxy_port']) +'/editConfig?ipAddress='+ip_address+'&ipPort=' + port + '&new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
+            if (res.text != "Ok"):
+                raise(Exception)
+        except Exception as e:
+            print(e)
+            return render_template('error_template.html', responseMessage="Errore nella modifica del dispositivo.")
     
-    response123 = False
-
-    try:
-        res = requests.get('http://' + json_object['service_ip'] + ':' + str(json_object['service_port']) +'/editConfig?ipAddress='+ip_address+'&ipPort=' + port + '&new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
-        if (res.text != "Ok"):
-            raise(Exception)
-    except requests.exceptions.RequestException as e:
-        print(e)
-        return render_template('error_template.html', responseMessage="Errore nell'aggiornamento dei dati.")
-    response123 = True
+    else:
+        try:
+            res = requests.get('http://' + json_object['service_ip'] + ':' + str(json_object['service_port']) +'/editConfig?ipAddress='+ip_address+'&ipPort=' + port + '&new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
+            print(res.text)
+            if (res.text == "Group name not present."):
+                errorMessage = "Il gruppo indicato non è presente. Aggiungerlo prima."
+                raise(Exception)
+            elif (res.text != "Ok"):
+                errorMessage = "Errore nella modifica del dispositivo."
+                raise(Exception)
+        except Exception as e:
+            print(e)
+            return render_template('error_template.html', responseMessage=errorMessage)
 
     try:
         data = requests.get("http://" + json_object['service_ip'] + ":" + str(json_object['service_port']) +"/getDeviceStat").json()
     except requests.exceptions.RequestException as e:
         print(e)
-        return render_template('error_template.html', responseMessage="Errore nell'ottenimento della lista dei dispositivi.")
-    return render_template('template_bootstrap.html', myString=data, response=response123)
+        return render_template('error_template.html', responseMessage=str(e))
+    return render_template('template_bootstrap.html', myString=data, response=True)
 
 @app.route('/',)
 def jsonDictasddd():
 
     configFile = open("/config/config.json", "r")
     json_object = json.load(configFile)
-
+     
     try:
         data = requests.get("http://" + json_object['service_ip'] + ":" + str(json_object['service_port']) +"/getDeviceStat").json()
-    except requests.exceptions.RequestException as e:
+    except Exception as e:
         print(e)
         return render_template('error_template.html', responseMessage="Errore nell'ottenimento della lista dei dispositivi.")
     return render_template('template_bootstrap.html', myString=data)
+
+@app.route('/getGroupsList',)
+def getGroups():
+
+    configFile = open("/config/config.json", "r")
+    json_object = json.load(configFile)
+     
+    try:
+        data = requests.get("http://" + json_object['service_ip'] + ":" + str(json_object['service_port']) +"/getGroupsList").json()
+    except Exception as e:
+        print(e)
+        return render_template('error_template.html', responseMessage="Errore nell'ottenimento della lista dei dispositivi.")
+    return data
+    ##return render_template('template_bootstrap.html', myString=data)
 
 @app.route('/downloadFile', methods=['GET'])
 def jsonDictDownload():

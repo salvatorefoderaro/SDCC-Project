@@ -39,6 +39,13 @@
 
 ---
 
+## **Possibile query per l'invio ad EC2**
+
+- *select AVG(L.temperatura), AVG(L.umidita), D.groupName FROM lectures as L JOIN devices as D on L.id = D.id WHERE D.type='sensor' GROUP BY D.groupName;*
+
+
+---
+
 ### **Dockerizzazione Client**
 
 1. docker build -t client* .

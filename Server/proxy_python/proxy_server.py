@@ -16,7 +16,7 @@ logger = gen_logger('sample')
 def getExternalIp():
     global SERVICE_EXTERNAL_IP
     SERVICE_EXTERNAL_IP = minikubeservice.getServiceExternalIP("collectdataservice") 
-    while (SERVICE_EXTERNAL_IP == None or SERVICE_EXTERNAL_IP == "<pending>"):
+    while (SERVICE_EXTERNAL_IP == 'None' or SERVICE_EXTERNAL_IP == "<pending>"):
         print("Waiting for SERVICE_EXTERNAL_IP...")
         time.sleep(30)   
         SERVICE_EXTERNAL_IP = minikubeservice.getServiceExternalIP("collectdataservice") 
@@ -39,25 +39,23 @@ def query_example():
 
 @app.route('/newDevice', methods=['POST'])
 def new_device():
-    dictToSend = {'id':request.json['id'], 'ipAddress':request.json['ipAddress'], 'ipPort':request.json['ipPort'], 'name':request.json['name'], 'groupName' : request.json['groupName']}
+    dictToSend = {'id':request.json['id'], 'ipAddress':request.json['ipAddress'], 'ipPort':request.json['ipPort'], 'name':request.json['name'], 'type' : request.json['type']}
     try:
-        res = requests.post("http://" + SERVICE_EXTERNAL_IP + ":" + str(COLLECT_DATA_PORT) +"/newDevice", json=dictToSend, timeout=10)
+        res = requests.post("http://" + str(SERVICE_EXTERNAL_IP) + ":" + str(COLLECT_DATA_PORT) +"/newDevice", json=dictToSend, timeout=10)
         return res.text
     except requests.exceptions.RequestException as e:  # This is the correct syntax
-        return "Not ok"
-        print(e)
         getExternalIp()
+        return "Not ok"
 
 @app.route('/sendDataToCluster', methods=['POST'])
 def jsonexample():
     dictToSend = {'id':request.json['id'], 'temperatura':request.json['temperatura'], 'umidita':request.json['umidita']}
     try:
-        res = requests.post("http://" + SERVICE_EXTERNAL_IP + ":"+ str(COLLECT_DATA_PORT) +"/collectData", json=dictToSend, timeout=10)
+        res = requests.post("http://" + str(SERVICE_EXTERNAL_IP) + ":"+ str(COLLECT_DATA_PORT) +"/collectData", json=dictToSend, timeout=10)
         return res.text
     except requests.exceptions.RequestException as e:  # This is the correct syntax
-        return "Not ok"
-        print(e)
         getExternalIp()
+        return "Not ok"
 
 if __name__ == '__main__':   
     getExternalIp()

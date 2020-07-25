@@ -43,6 +43,9 @@
       <li class="nav-item">
         <a class="nav-link" href="/getFileList">Archivio dump</a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link" href="">Gestione gruppi</a>
+      </li>
     </ul>
    </div>
 </nav>
@@ -63,6 +66,9 @@
 
   <h2>Group name is: {{ myString['list'][i]['groupName'] }}</h2>
       
+  {% if myString['list'][i]['devicesList']|length > 0%}
+
+  <h3>Sensor list</h3>
   <div class="card-deck">
       {%for j in range(0, myString['list'][i]['devicesList']|length )%} 
 
@@ -135,7 +141,7 @@
           </div>
         </div>
 
-      </div>
+    </div>
 
       {% if j % 3 == 2%}
       </div>
@@ -144,7 +150,95 @@
       
           {%endfor%} 
         </div>
-  </p>
+{% endif %}
+
+
+<br><br>
+{% if myString['list'][i]['controlList']|length > 0%}
+        <h3>Control list</h3>
+        <div class="card-deck">
+          {%for j in range(0, myString['list'][i]['controlList']|length )%} 
+    
+          <div class="card" style="width: 18rem;">
+            {% if myString['list'][i]['controlList'][j]['status'] == 0 %}
+          <div class="card-body" style="background-color:green;">
+        {% else %}
+          <div class="card-body" style="background-color:red;">
+        {% endif %}
+              <h5 class="card-title">{{ status }} {{ myString['list'][i]['controlList'][j]['name'] }}</h5>
+            </div>
+
+              <ul class="list-group list-group-flush">
+              <li class="list-group-item">ID: {{ myString['list'][i]['controlList'][j]['id'] }}</li>
+              <li class="list-group-item">Indirizzo IP: {{ myString['list'][i]['controlList'][j]['ipAddress'] }} : {{ myString['list'][i]['controlList'][j]['ipPort']}}</li>
+              <!-- <li class="list-group-item">Nome: {{ myString['list'][i]['controlList'][j]['name'] }}</li> -->
+              <!-- <li class="list-group-item">Gruppo: {{ myString['list'][i]['controlList'][j]['groupName'] }}</li> -->
+              <li class="list-group-item">Ultima temperatura: {{ myString['list'][i]['controlList'][j]['temperatura'] }}</li>
+              <li class="list-group-item">Ultima umidità: {{ myString['list'][i]['controlList'][j]['umidita'] }}</li>
+              <li class="list-group-item">Ultima rilevazione: {{ myString['list'][i]['controlList'][j]['lettura'] }}</li>
+            </ul>
+    
+            {% set name_collapse = "name_collapse" ~ myString['list'][i]['controlList'][j]['id'] %}
+            {% set group_collapse = "group_collapse" ~ myString['list'][i]['controlList'][j]['id'] %}
+            {% set link_name_collapse = "#name_collapse" ~ myString['list'][i]['controlList'][j]['id'] %}
+            {% set link_group_collapse = "#group_collapse" ~ myString['list'][i]['controlList'][j]['id'] %}
+            {% set link_delete = "deleteDevices?id=" ~ myString['list'][i]['controlList'][j]['id'] %}
+    
+            <div class="card-body">
+              {% if myString['list'][i]['controlList'][j]['status'] == 0 %}
+              <a data-toggle="collapse" href= {{ link_name_collapse }} role="button" aria-expanded="false" aria-controls="nameCollapse" class="card-link">Modifica nome</a>
+              <a data-toggle="collapse" href= {{ link_group_collapse }} role="button" aria-expanded="false" aria-controls="groupCollapse" class="card-link">Modifica gruppo</a>
+              {% endif %}
+              <a href={{ link_delete }} class="card-link">Elimina</a>
+            </div>
+    
+            <div class="collapse" id={{ name_collapse }}>
+              <div class="card card-body">
+    
+                <form action="/modifyDevice" method="GET">
+                  <div class="form-group">
+                    <label for="exampleInputEmail">Nome</label>
+                    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="new_value" placeholder="Nome nuovo">
+                    <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="id" value={{ myString['list'][i]['controlList'][j]['id'] }}>
+                    <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="type" value="name">
+                    <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="ip_address" value= {{ myString['list'][i]['controlList'][j]['ipAddress'] }}>
+                    <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="port" value= {{ myString['list'][i]['controlList'][j]['ipPort'] }}>
+    
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+    
+            <div class="collapse" id= {{ group_collapse }}>
+              <div class="card card-body">
+    
+                <form action="/modifyDevice" method="GET">
+                  <div class="form-group">
+                    <label for="exampleInputEmail1">Gruppo</label>
+                    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="new_value" placeholder="Gruppo nuovo">
+                    <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="id" value={{ myString['list'][i]['controlList'][j]['id'] }}>
+                    <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="type" value="groupName">
+                    <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="ip_address" value= {{ myString['list'][i]['controlList'][j]['ipAddress'] }}>
+                    <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="port" value= {{ myString['list'][i]['controlList'][j]['ipPort'] }}>
+    
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+    
+    
+          {% if j % 3 == 2%}
+          </div>
+          <div class="card-deck">
+          {% endif%}
+          
+              {%endfor%} 
+            </div>
+          {% endif %}
+
+        
 
   {%endfor%} 
 
