@@ -1,4 +1,6 @@
-# Introduzione
+# SDCC-Project
+
+## **Avvio cluster**
 
 0. **Installo Minikube**
    1. https://computingforgeeks.com/how-to-install-minikube-on-ubuntu-debian-linux/
@@ -9,14 +11,40 @@
 
 ---
 
+## **Avvio proxy**
+
+1. cd proxy_python
+2. **Installo i pacchetti necessari**
+   1. sh requirement.sh
+3. **Avvio il proxy**
+   1. sh run.sh
+
+---
+
+## **Avvio client**
+
+1. cd Client/client*
+2. **Installo i pacchetti necessari**
+   1. sh requirement.sh
+3. **Avvio il client**
+   1. sh run.sh
+
+---
+
+- **Comandi utili:**
+  - **Aggiornamento del deployment:**
+    - *sh update_deployment.sh*
+  - **Pulizia del cluster:**
+    - *sh clean_cluster.sh*
+
+---
+
 ### **Dockerizzazione Client**
 
 1. docker build -t client* .
 2. docker run -p port:port client*
 
-- **Comandi utili:**
-  - **Aggiornamento del deployment:** *sh update_deployment.sh*
-  - **Pulizia del cluster:** *sh clean_cluster.sh*
+Esercizio di stile, tanto non va la rete, non potendo mandare messaggi in broadcast al proxy
 
 # Link utili
 
@@ -43,3 +71,9 @@ https://stackoverflow.com/questions/41322541/rebuild-docker-container-on-file-ch
 https://stackoverflow.com/questions/48077931/delete-all-the-contents-from-a-kubernetes-node
 
 https://kubernetes.io/docs/tasks/run-application/run-single-instance-stateful-application/
+
+# **Sviluppi futuri**
+
+https://github.com/clach04/python-tuya
+
+https://www.amazon.it/compatibile-telecomando-automazione-regolatore-Manipolatore/dp/B084VPD5TM/
