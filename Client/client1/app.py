@@ -13,6 +13,10 @@ from random import randint
 import fakesensor
 import logging
 
+'''
+Modulo del singolo dispositivo IoT per la registrazione dei dati.
+'''
+
 MINE_IP_ADDRESS = ""
 CLUSTER_IP_ADDRESS = ""
 SEARCH_INTERVAL = 0
@@ -28,6 +32,7 @@ GROUP_NAME = ""
 data = ""
 CLUSTER_PORT = 0
 
+# Funzione per la lettura del file 'config.json'
 def readJson():
     global data, SEARCH_INTERVAL, CLUSTER_PORT, BCAST_IP, BCAST_PORT, PROTOCOL, MINE_IP_PORT, NETWORK_ID, MINE_IP_PORT, DATA, NAME, GROUP_NAME, MINE_ID
     with open('config.json') as config_file:
@@ -44,6 +49,7 @@ def readJson():
         CLUSTER_PORT = data['cluster_port']
         config_file.close()
 
+# Funzione per l'ottenimento del proprio indirizzo IP all'interno della rete
 def getMineIPAddress():
     global MINE_IP_ADDRESS
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -57,6 +63,7 @@ def getMineIPAddress():
         s.close()
     MINE_IP_ADDRESS = IP
 
+# Client SSDP per l'ottenimento dell'indirizzo IP del cluster.
 def getClusterIPAddress():
         global CLUSTER_IP_ADDRESS
         '''
@@ -110,6 +117,7 @@ def editConfig():
 
     return "Ok"
 
+# Funzione per l'inserimento del dispositivo e delle letture.
 def doSomeStuff():
     readJson()
     getClusterIPAddress()
