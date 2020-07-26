@@ -13,7 +13,6 @@ Modulo per la dashboard di gestione dell'intero applicativo.
 
 app = Flask(__name__)
 
-
 # Funzione per l'aggiunta di un nuovo gruppo
 @app.route('/addGroupLink', methods=['GET'])
 def addGroupLink():
