@@ -1,4 +1,4 @@
-# SDCC-Project
+# **SDCC-Project**
 
 ## **Avvio cluster**
 
@@ -53,7 +53,7 @@
 
 Esercizio di stile, tanto non va la rete, non potendo mandare messaggi in broadcast al proxy
 
-# Link utili
+# **Link utili**
 
 https://medium.com/@felipedutratine/kubernetes-on-local-with-minikube-tutorial-413475d587e6
 
@@ -86,3 +86,9 @@ https://github.com/clach04/python-tuya
 https://github.com/codetheweb/tuyapi
 
 https://www.amazon.it/compatibile-telecomando-automazione-regolatore-Manipolatore/dp/B084VPD5TM/
+
+# **Possibili problemi di sicurezza**
+
+https://blog.rapid7.com/2013/01/29/security-flaws-in-universal-plug-and-play-unplug-dont-play/
+
+https://blog.cloudflare.com/ssdp-100gbps/
