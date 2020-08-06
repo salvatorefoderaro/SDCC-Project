@@ -92,3 +92,5 @@ https://www.amazon.it/compatibile-telecomando-automazione-regolatore-Manipolator
 https://blog.rapid7.com/2013/01/29/security-flaws-in-universal-plug-and-play-unplug-dont-play/
 
 https://blog.cloudflare.com/ssdp-100gbps/
+
+https://www.cloudflare.com/learning/ddos/ssdp-ddos-attack/

@@ -19,6 +19,27 @@ def addGroupLink():
 
     return render_template('template_bootstrap_add_groups.html')
 
+@app.route('/deleteGroup', methods=['GET'])
+def deleteGroup():
+
+    configFile = open("/config/config.json", "r")
+    json_object = json.load(configFile)
+
+    groupName = str(request.args.get("groupName"))
+
+    try:
+        res = requests.get('http://' + json_object['service_ip'] + ':' + str(json_object['service_port']) +'/deleteGroup?groupName='+groupName, timeout=5)
+        response123 = True
+    except Exception as e:
+        print(e)
+        return render_template('error_template.html', responseMessage=str(e))
+
+    if res.text != "Ok":
+        return render_template('error_template.html', responseMessage=str("Errore nell'eliminazione del gruppo."))
+
+    data = requests.get("http://" + json_object['service_ip'] + ":" + str(json_object['service_port']) +"/getGroupsList").json()
+    return render_template('template_bootstrap_groups.html', myString=data, response=response123)
+
 # Funzione per l'aggiunta di un nuovo gruppo
 @app.route('/addGroup', methods=['GET'])
 def addGroup():
@@ -39,6 +60,10 @@ def addGroup():
     except Exception as e:
         print(e)
         return render_template('error_template.html', responseMessage=str(e))
+
+    if res.text != "Ok":
+        return render_template('error_template.html', responseMessage=str("Gruppo non aggiunto"))
+
 
     data = requests.get("http://" + json_object['service_ip'] + ":" + str(json_object['service_port']) +"/getGroupsList").json()
     return render_template('template_bootstrap_groups.html', myString=data, response=response123)

@@ -134,6 +134,21 @@ def hello_world123ssss():
 
     return "Ok"
 
+# Funzione per l'eliminazione di un dispositivo
+@app.route('/deleteGroup', methods=['GET'])
+def deleteGroup():
+
+    db = connectToDb()
+
+    cursor = db.cursor()
+
+    cursor.execute("DELETE from devicesGroups where groupName =\'" + str(request.args.get("groupName")) + "\'")
+
+    cursor.close()
+    db.commit()
+
+    return "Ok"
+
 # Funzione per l'aggiunta di un nuovo gruppo
 @app.route('/addGroup', methods=['GET'])
 def addGroup():
@@ -142,7 +157,10 @@ def addGroup():
 
     cursor = db.cursor()
 
-    cursor.execute("INSERT INTO groups (groupName, parameter1, parameter2, parameter3) VALUES (\'" + str(request.args.get("groupName")) + "\'," + str(request.args.get("parameter1")) + ", " + str(request.args.get("parameter2")) + ", " + str(request.args.get("parameter3")) + ")")
+    try:
+        cursor.execute("INSERT INTO devicesGroups(groupName, p1, p2, p3) VALUES (\'" + str(request.args.get("groupName")) + "\'," + str(request.args.get("parameter1")) + ", " + str(request.args.get("parameter2")) + ", " + str(request.args.get("parameter3")) + ")")
+    except Exception as e:
+        print(str(e))
 
     cursor.close()
     db.commit()
@@ -159,7 +177,7 @@ def getGroupsList():
 
     dict = {}
 
-    cursor.execute("select * from groups")
+    cursor.execute("select * from devicesGroups")
 
     myresult = cursor.fetchall()
 

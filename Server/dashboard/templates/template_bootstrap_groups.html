@@ -70,6 +70,9 @@
  {% else %}
   {% for i in range(0, myString['list']|length ) %} 
 
+  <h2><a href="addGroupLink">Aggiungi gruppo.</a></h2>
+
+
   <div class="card-deck">
 
       <div class="card" style="width: 18rem;">
@@ -82,8 +85,10 @@
           <li class="list-group-item">Parameter3: {{ myString['list'][i]['parameter3'] }}</li>
         </ul>
 
+        {% set link_delete = "deleteGroup?groupName=" ~ myString['list'][i]['groupName'] %}
+
         <div class="card-body">
-          <a href="/addGroupLink" class="card-link">Aggiungi nuovo gruppo</a>
+          <a href={{ link_delete }} class="card-link">Elimina gruppo</a>
         </div>
 
     </div>
