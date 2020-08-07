@@ -40,7 +40,7 @@
 
 **Gestione dei guasti**
 
-- Nel caso il proxy non dovesse riuscire a contattare il server, dunque dovesse fallire una delle *POST*, il proxy avviera nuovamente la funzione *getExternalIp()* per l'ottenimento dell'indirizzo IP del cluster. La funzione è bloccante fin quando non viene rilevato un indirizzo IP valido.
+- Nel caso il proxy non dovesse riuscire a contattare il cluster, dunque dovesse fallire una delle *POST*, il proxy avviera nuovamente la funzione *getExternalIp()* per l'ottenimento dell'indirizzo IP del cluster. La funzione è bloccante fin quando non viene rilevato un indirizzo IP valido.
 
 ### **Cluster**
 
@@ -56,6 +56,10 @@
   - Si occupa di fornire la dashboard all'utente
 - Modulo **s3_upload_dump**
   - Su occupa di caricare su *S3*, in modo periodico, il backup del singolo cluster
+
+**Gestione dei guasti**
+
+- Tramite il numero di repliche ed altri meccanismi interni, viene gestito in automatico da Kuberneetes.
 
 # **SDCC-Project - Installazione**
 
