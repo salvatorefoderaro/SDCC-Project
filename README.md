@@ -5,6 +5,18 @@
 - Modulo **app.py**
   - Si occupa della ricerca del server tramite il protocollo SSDP
   - Invia ogni tot di tempo le letture al Server
+  - ***readJson()***
+    - Funzione per la lettura del file *config.json*
+  - ***getMineIpAddress()**
+    - Funzione per l'ottenimento del proprio indirizzo IP all'interno della rete locale
+  - ***getClusterIpAddress()***
+    - Funzione per l'avvio del client SSDP per l'ottenimento dell'indirizzo ip del *proxy* in esecuzione sul server
+  - ***doSomeStuff()***
+    - Funzione per la registrazione del dispositivo e, successivamente, l'invio periodico delle misure registrate
+
+**Gestione dei guasti**
+
+- Nel caso il client non dovesse riuscire a contattare il server, dunque dovesse fallire la *POST*, il client avviera nuovamente la funzione *getClusteIpAddress()* per l'ottenimento dell'indirizzo IP del cluster. La funzione è bloccante fin quando non viene rilevato un indirizzo IP valido. Per una migliore ridondanza, è possibile l'utilizzo di più *proxy*.
 
 ## **Server**
 
@@ -13,6 +25,22 @@
 - Modulo **proxy_server.py**
   - Si occupa della comunicazione tra la rete locale ed il cluster Kuberneetes. Questo in quanto il cluster viene avviato utilizzando **Minikube** in una macchina virtuale, con connessione di rete solo tra la macchina e l'host stesso. Il proxy è necessario per raggiungere la macchina virtuale dalla rete locale, o viceversa, raggiungere la rete locale da dentro il cluster.
   - Si occupa anche del server SSDP per essere rintracciato in automatico dai Client. Inoltre, trova in automatico l'indirizzo IP del cluster anche in caso di *caduta*.
+  - ***getExternalIp()***
+    - Funzione per l'ottenimento dell'indirizzo IP del servizio *collect_data* esposto da cluster **Minikube**
+  - ***upnpServer()***
+    - Funzione per l'avvio del server SSDP
+  - ***route sendDataToCluster***
+    - Route per la ricezione delle letture da parte dei client ed inoltro al cluster
+  - ***route newDevice***
+    - Route per la ricezione dell'inserimento del dispositivo da parte dei client ed inoltro al cluster
+  - ***route checkStatus***
+    - Router per la ricezione delle richieste da parte del cluster da inoltrare ai singoli client per il controllo dello stato, up o down
+  - ***route editConfig***
+    - Router per la ricezione delle richieste da parte del cluster di modifica della configurazione del dispositivo da inoltrare ai singoli client
+
+**Gestione dei guasti**
+
+- Nel caso il proxy non dovesse riuscire a contattare il server, dunque dovesse fallire una delle *POST*, il proxy avviera nuovamente la funzione *getExternalIp()* per l'ottenimento dell'indirizzo IP del cluster. La funzione è bloccante fin quando non viene rilevato un indirizzo IP valido.
 
 ### **Cluster**
 
@@ -37,8 +65,15 @@
    1. cd Server && sh install_minikube.sh
 1. **Effettuo l'instanziazione del cluster**
    1. cd Server && sh instantiate_cluster.sh
+      1. La password per l'utente *root* è necessaria per l'avvio del servizio *minikube tunnel*
 2. **Avvio la dashboard**
    1. minikube dashboard
+
+- **Comandi utili:**
+  - **Aggiornamento del deployment:**
+    - *sh update_deployment.sh*
+  - **Pulizia del cluster:**
+    - *sh clean_cluster.sh*
 
 ## **Avvio proxy**
 
@@ -56,17 +91,11 @@
 3. **Avvio il client**
    1. sh run.sh
 
-- **Comandi utili:**
-  - **Aggiornamento del deployment:**
-    - *sh update_deployment.sh*
-  - **Pulizia del cluster:**
-    - *sh clean_cluster.sh*
-
 # **SDCC-Project - Materiale vario**
 
 ## **Possibile query per l'invio ad EC2**
 
-- *select AVG(L.temperatura), AVG(L.umidita), D.groupName FROM lectures as L JOIN devices as D on L.id = D.id WHERE D.type='sensor' GROUP BY D.groupName;*
+- *select AVG(L.temperatura), AVG(L.umidita), D.groupName, G.p1, G.p2, G.p3 FROM lectures as L JOIN devices as D on L.id = D.id JOIN devicesGroups as G on D.groupName = G.groupName WHERE D.type='sensor' GROUP BY D.groupName;*
 
 ## **Dockerizzazione Client**
 

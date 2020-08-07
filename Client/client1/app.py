@@ -50,7 +50,7 @@ def readJson():
         config_file.close()
 
 # Funzione per l'ottenimento del proprio indirizzo IP all'interno della rete
-def getMineIPAddress():
+def getMineIpAddress():
     global MINE_IP_ADDRESS
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
@@ -64,7 +64,7 @@ def getMineIPAddress():
     MINE_IP_ADDRESS = IP
 
 # Client SSDP per l'ottenimento dell'indirizzo IP del cluster.
-def getClusterIPAddress():
+def getClusterIpAddress():
         global CLUSTER_IP_ADDRESS
         '''
         broadcast SSDP DISCOVER message to LAN network
@@ -120,8 +120,8 @@ def editConfig():
 # Funzione per l'inserimento del dispositivo e delle letture.
 def doSomeStuff():
     readJson()
-    getClusterIPAddress()
-    getMineIPAddress()
+    getClusterIpAddress()
+    getMineIpAddress()
     result = ""
 
     while (result != "Ok"):
