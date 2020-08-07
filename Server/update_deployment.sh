@@ -35,4 +35,6 @@ sleep 1
 kubectl apply -f dep_get_devices_stat.yaml
 sleep 1
 kubectl apply -f cronjob_check_devices_status.yaml
+sleep 1
+kubectl apply -f dep_calculate_value.yaml
 minikube tunnel

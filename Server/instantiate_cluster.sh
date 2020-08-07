@@ -9,6 +9,7 @@ cd ../instantiate_database && docker build -t dbinstantiate:v1 .
 cd ../dashboard && docker build -t dashboard:v1 .
 cd ../get_devices_stat && docker build -t getdevicesstat:v1 .
 cd ../s3_upload_dump && docker build -t uploads3:v1 .
+cd ../calculate_value && docker build -t calculatevalue:v1 .
 cd ../yaml
 docker pull mysql:latest
 kubectl apply -f secret.yaml
@@ -36,6 +37,8 @@ sleep 4
 kubectl apply -f dep_dashboard.yaml
 sleep 4
 kubectl apply -f dep_get_devices_stat.yaml
+sleep 4
+kubectl apply -f dep_calculate_value.yaml
 sleep 4
 kubectl apply -f cronjob_check_devices_status.yaml
 minikube tunnel

@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: calculatevalue
+  name: calculatevaluedeployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: calculatevalue
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: calculatevalue
+    spec:
+      containers:
+      - image: calculatevalue:v1
+        imagePullPolicy: Never
+        name: calculatevalue
+        ports:
+        - containerPort: 8070
