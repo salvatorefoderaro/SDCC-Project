@@ -95,7 +95,7 @@ app = Flask(__name__) #create the Flask app
 
 # Router per la get per controllare lo stato del dispositivo
 @app.route('/checkStatus', methods=['GET'])
-def query_example():
+def checkStatus():
     return "Ok"
 
 # Route per modificare la configurazione a runtime, magari tramite la dashboard

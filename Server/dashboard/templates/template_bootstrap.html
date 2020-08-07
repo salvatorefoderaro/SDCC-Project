@@ -182,7 +182,7 @@
             {% set group_collapse = "group_collapse" ~ myString['list'][i]['controlList'][j]['id'] %}
             {% set link_name_collapse = "#name_collapse" ~ myString['list'][i]['controlList'][j]['id'] %}
             {% set link_group_collapse = "#group_collapse" ~ myString['list'][i]['controlList'][j]['id'] %}
-            {% set link_delete = "deleteDevices?id=" ~ myString['list'][i]['controlList'][j]['id'] %}
+            {% set link_delete = "deleteDevice?id=" ~ myString['list'][i]['controlList'][j]['id'] %}
     
             <div class="card-body">
               {% if myString['list'][i]['controlList'][j]['status'] == 0 %}

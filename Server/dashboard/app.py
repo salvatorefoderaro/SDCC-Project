@@ -69,8 +69,8 @@ def addGroup():
     return render_template('template_bootstrap_groups.html', myString=data, response=response123)
 
 # Funzione per l'eliminazione di un dispositivo
-@app.route('/deleteDevices', methods=['GET'])
-def asd():
+@app.route('/deleteDevice', methods=['GET'])
+def deleteDevice():
 
     configFile = open("/config/config.json", "r")
     json_object = json.load(configFile)
@@ -97,7 +97,7 @@ def asd():
 
 # Funzione per la modifica di un dispositivo
 @app.route('/modifyDevice', methods=['GET'])
-def asd123():
+def modifyDevice():
 
     configFile = open("/config/config.json", "r")
     json_object = json.load(configFile)
@@ -140,7 +140,7 @@ def asd123():
 
 # Funzione per la visualizzazione della lista dei dispositivi
 @app.route('/',)
-def jsonDictasddd():
+def indexRoute():
 
     configFile = open("/config/config.json", "r")
     json_object = json.load(configFile)
@@ -153,7 +153,7 @@ def jsonDictasddd():
     return render_template('template_bootstrap.html', myString=data)
 
 @app.route('/getGroupsList',)
-def getGroups():
+def getGroupsList():
 
     configFile = open("/config/config.json", "r")
     json_object = json.load(configFile)
@@ -167,7 +167,7 @@ def getGroups():
     ##return render_template('template_bootstrap.html', myString=data)
 
 @app.route('/downloadFile', methods=['GET'])
-def jsonDictDownload():
+def downloadFile():
 
     ### information from configS3
     BUCKET_NAME = "sdcc-test-bucket"
@@ -187,7 +187,7 @@ def jsonDictDownload():
         return render_template('error_template.html', responseMessage="Errore nel download del file da S3.")
 
 @app.route('/getFileList')
-def jsonDict():
+def getFileList():
 
     ### information from configS3   
     ACCESS_KEY_ID =  "AKIA57G4V3XA7CWVE7C7"

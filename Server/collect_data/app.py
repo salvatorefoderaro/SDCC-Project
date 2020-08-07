@@ -13,7 +13,7 @@ Modulo che si occupa di regisrare i nuovi dispositivi e le registrazioni prodott
 '''
 
 @app.route('/collectData', methods=['POST'])
-def hello_worldas():
+def collectData():
 
     configFile = open("/config/config.json", "r")
     json_object = json.load(configFile)

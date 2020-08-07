@@ -7,7 +7,7 @@ import json
 Modulo che si occupa dell'instanziazione del database.
 '''
 
-def hello_world():
+def instantiateDatabase():
 
     configFile = open("/config/config.json", "r")
     json_object = json.load(configFile)
@@ -49,4 +49,4 @@ def hello_world():
     return 0
 
 if __name__ == '__main__':
-    hello_world()
+    instantiateDatabase()

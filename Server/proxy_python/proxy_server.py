@@ -28,7 +28,7 @@ def getExternalIp():
 
 # Modifico la configurazione di un dispositivo
 @app.route('/editConfig', methods=['GET'])
-def edit_config():
+def editConfig():
     try:
         res = requests.get("http://"+ str(request.args.get("ipAddress"))+":"+ str(request.args.get("ipPort")) + "/editConfig?type=" + str(request.args.get("type")) + "&new_value=" + str(request.args.get("new_value")), timeout=3)
         return res.text
@@ -37,7 +37,7 @@ def edit_config():
 
 # Controllo lo stato di un dispositivo
 @app.route('/checkStatus', methods=['GET'])
-def query_example():
+def checkstatus():
     try:
         res = requests.get("http://"+ str(request.args.get("ipAddress"))+":"+ str(request.args.get("ipPort")) + "/checkStatus", timeout=3)
         return res.text
@@ -46,7 +46,7 @@ def query_example():
 
 # Aggiungo un dispositivo al cluster
 @app.route('/newDevice', methods=['POST'])
-def new_device():
+def newDevice():
     dictToSend = {'id':request.json['id'], 'ipAddress':request.json['ipAddress'], 'ipPort':request.json['ipPort'], 'name':request.json['name'], 'type' : request.json['type']}
     try:
         res = requests.post("http://" + str(SERVICE_EXTERNAL_IP) + ":" + str(COLLECT_DATA_PORT) +"/newDevice", json=dictToSend, timeout=10)
@@ -57,7 +57,7 @@ def new_device():
 
 # Invio la lettura del dispositivo al cluster
 @app.route('/sendDataToCluster', methods=['POST'])
-def jsonexample():
+def sendDataToCluster():
     dictToSend = {'id':request.json['id'], 'temperatura':request.json['temperatura'], 'umidita':request.json['umidita']}
     try:
         res = requests.post("http://" + str(SERVICE_EXTERNAL_IP) + ":"+ str(COLLECT_DATA_PORT) +"/collectData", json=dictToSend, timeout=10)

@@ -93,7 +93,7 @@ def getDevicesStat():
 
 # Funzione che modifica la configurazione di un siingolo dispositivo
 @app.route('/editConfig', methods=['GET'])
-def hello_world():
+def editConfig():
 
     db = connectToDb()
 
@@ -120,7 +120,7 @@ def hello_world():
 
 # Funzione per l'eliminazione di un dispositivo
 @app.route('/deleteDevice', methods=['GET'])
-def hello_world123ssss():
+def deleteDevice():
 
     db = connectToDb()
 

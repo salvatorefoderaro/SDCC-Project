@@ -8,7 +8,7 @@ Modulo che si occupa di controllare lo stato di vita dei dispositivi, inviando u
 In caso di risposta, verrà aggiornato lo stato del dispositivo come attivo, altrimenti come non attivo.
 '''
 
-def checkStatus():
+def checkStcheckDevicesStatusatus():
 
     configFile = open("/config/config.json", "r")
     json_object = json.load(configFile)
@@ -46,4 +46,4 @@ def checkStatus():
     return 0
 
 if __name__ == '__main__':
-    checkStatus()
+    checkDevicesStatus()
