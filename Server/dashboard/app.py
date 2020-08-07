@@ -57,12 +57,12 @@ def addGroup():
     try:
         res = requests.get('http://' + json_object['service_ip'] + ':' + str(json_object['service_port']) +'/addGroup?groupName='+groupName+'&parameter1=' + parameter1 + '&parameter2=' + parameter2 + '&parameter3=' + parameter3, timeout=5)
         response123 = True
+        if res.text != "Ok":
+            message = "Errore nell'aggiunta del gruppo."
+            return render_template('error_template.html', responseMessage=message)
     except Exception as e:
         print(e)
         return render_template('error_template.html', responseMessage=str(e))
-
-    if res.text != "Ok":
-        return render_template('error_template.html', responseMessage=str("Gruppo non aggiunto"))
 
 
     data = requests.get("http://" + json_object['service_ip'] + ":" + str(json_object['service_port']) +"/getGroupsList").json()
@@ -85,7 +85,9 @@ def asd():
 
     try:
         res = requests.get('http://' + json_object['service_ip'] + ':' + str(json_object['service_port']) +'/deleteDevice?ipAddress='+ip_address+'&ipPort=' + port + '&new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
-        response123 = True
+        if res.text != "Ok":
+            message = "Errore nell'eliminazione del dispositivo."
+            return render_template('error_template.html', responseMessage = message)
     except requests.exceptions.RequestException as e:
         print(e)
         return render_template('error_template.html', responseMessage=str(e))
