@@ -3,6 +3,8 @@
 ## **Client**
 
 - Modulo **app.py**
+  - Si occupa della ricerca del server tramite il protocollo SSDP
+  - Invia ogni tot di tempo le letture al Server
 
 ## **Server**
 
