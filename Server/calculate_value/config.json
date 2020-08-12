@@ -2,5 +2,5 @@
     "host" : "mysql",
     "user" : "root",
     "passwd" : "password",
-    "database" : "datacamp"
+    "database" : "cluster"
 }

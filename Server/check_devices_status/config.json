@@ -2,7 +2,7 @@
     "host" : "mysql",
     "user" : "root",
     "passwd" : "password",
-    "database" : "datacamp",
+    "database" : "cluster",
     "proxy_ip" : "10.0.2.2",
     "proxy_port" : "5000"
 }

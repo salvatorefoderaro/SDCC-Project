@@ -1,6 +1,57 @@
 # **SDCC-Project - Introduzione**
 
-## **Client**
+## **Astract**
+
+L'idea del progetto è quello di realizzare un'applicazione volta al paradigma fog-computing, che utilizza sensori IoT. I sensori possono essere di due tipi:
+
+- **Lettura:** sensori che leggono i valori di umidità e di temperatura, inviando le letture al cluster
+- **Controllo:** sensori che controllano un sistema idrico, e che ricevono indicazioni sulla quantità di acqua da destinare ad un determinato gruppo di coltivazioni
+
+I singoli sensori producono ad intervalli di tempi regolari letture che vengono inviate al cluster e vengono memorizzate all'interno di un database locale. Per garantire la disponibilità dei dati, ad intervalli di tempo regolari viene eseguito il backup del database e caricato su S3 dal modulo **s3_upload_dump**. 
+
+Il cluster offre una dashboard per l'utente, tramite la quale è possibile controllare lo stato dei dispositivi, la lista dei gruppi di coltivazioni ed aggiungere nuovi gruppi di coltivazioni.
+
+L'integrazione con i servizi **Amazon AWS** avviene tramite *S3*, per il backup dei dump del database, e con *EC2* per il calcolo dei valori da inoltrare ai singoli dispositivi di controllo.
+
+## **Librerie Python utilizzate**
+
+- **Flask (https://pypi.org/project/Flask/)**
+  - Necessario per il web server della dashboard e gli endpoint per le chiamate REST
+- **SSDP (https://github.com/codingjoe/ssdp)**
+  - Necessario come servizio per il discovery da parte del client del/dei proxy
+- **mysql-connector-python (https://pypi.org/project/mysql-connector-python/)**
+  - Necessario per la comunicazione con il database
+- **requests (https://pypi.org/project/requests/)**
+  - Necessario per effettuare chiamate GET e POST
+- **boto3 (https://pypi.org/project/boto3/)**
+  - Necessario per la comunicazione con S3
+
+## **Altri servizi utilizzati**
+
+- **Minikube**
+  - Necessario per avere un'istanza locale di testing per Kuberneetes
+- **Kuberneetes**
+  - Necessario per l'orchestrazione dei container
+- **Docker**
+  - Necessario per la creazione dei container
+
+## **Cosa è stato utilizzato, di offerto, da Kuberneetes?**
+
+- *To do...*
+
+## **Possibili problemi di sicurezza**
+
+https://blog.rapid7.com/2013/01/29/security-flaws-in-universal-plug-and-play-unplug-dont-play/
+
+https://blog.cloudflare.com/ssdp-100gbps/
+
+https://www.cloudflare.com/learning/ddos/ssdp-ddos-attack/
+
+---
+
+## **Implementazione**
+
+### **Client**
 
 - Modulo **app.py**
   - Si occupa della ricerca del server tramite il protocollo SSDP
@@ -18,9 +69,9 @@
 
 - Nel caso il client non dovesse riuscire a contattare il server, dunque dovesse fallire la *POST*, il client avviera nuovamente la funzione *getClusteIpAddress()* per l'ottenimento dell'indirizzo IP del cluster. La funzione è bloccante fin quando non viene rilevato un indirizzo IP valido. Per una migliore ridondanza, è possibile l'utilizzo di più *proxy*.
 
-## **Server**
+### **Server**
 
-### **Proxy**
+#### **Proxy**
 
 - Modulo **proxy_server.py**
   - Si occupa della comunicazione tra la rete locale ed il cluster Kuberneetes. Questo in quanto il cluster viene avviato utilizzando **Minikube** in una macchina virtuale, con connessione di rete solo tra la macchina e l'host stesso. Il proxy è necessario per raggiungere la macchina virtuale dalla rete locale, o viceversa, raggiungere la rete locale da dentro il cluster.
@@ -42,20 +93,22 @@
 
 - Nel caso il proxy non dovesse riuscire a contattare il cluster, dunque dovesse fallire una delle *POST*, il proxy avviera nuovamente la funzione *getExternalIp()* per l'ottenimento dell'indirizzo IP del cluster. La funzione è bloccante fin quando non viene rilevato un indirizzo IP valido.
 
-### **Cluster**
+#### **Cluster**
 
 - Modulo **instantiate_database**
-  - Si occupa dell'istanziazione del database, dunque creazione del db e delle tabelle necessarie
+  - Si occupa dell'istanziazione del database, dunque creazione del db e delle tabelle necessarie. Trattandosi di un job, viene eseguito una sola volta.
 - Modulo **collect_data**
   - Si occupa della ricezione della lettura dei dati da parte dei vari client. Ogni lettura viene inserita all'interno del database
 - Modulo **check_devices_status**
-  - Si occupa di andare ad interrogare periodicamente tutti i client, per vedere chi è ancora up e chi invece no
+  - Si occupa di andare ad interrogare periodicamente tutti i client, per vedere chi è ancora up e chi invece no. Trattandosi di un chronjob, viene eseguito ad intervalli regolari di tempo.
 - Modulo **get_devices_stat**
   - Si occupa della comunicazione con il database per la Dashboard. Da rinominare in qualcos'altro
 - Modulo **dashboard**
   - Si occupa di fornire la dashboard all'utente
 - Modulo **s3_upload_dump**
-  - Su occupa di caricare su *S3*, in modo periodico, il backup del singolo cluster
+  - Si occupa di caricare su *S3*, in modo periodico, il backup del singolo cluster. Trattandosi di un chronjob, viene eseguito ad intervalli regolari di tempo
+- Modulo **calculate_value**
+  - Si occupa di inviare i dati ad EC2 per il calcolo dei valori di acqua da inviare ai singoli dispositivi adibiti al controllo
 
 **Gestione dei guasti**
 
@@ -66,7 +119,7 @@
 ## **Avvio cluster**
 
 0. **Installo Minikube**
-   1. cd Server && sh install_minikube.sh
+   1. cd Server && sh install_update_minikube.sh
 1. **Effettuo l'instanziazione del cluster**
    1. cd Server && sh instantiate_cluster.sh
       1. La password per l'utente *root* è necessaria per l'avvio del servizio *minikube tunnel*
@@ -94,6 +147,11 @@
    1. sh requirement.sh
 3. **Avvio il client**
    1. sh run.sh
+
+## **Connessione al Database**
+
+1. sh mysql_client.sh
+   1. Permette di avviare una shell per interagire con il database
 
 # **SDCC-Project - Materiale vario**
 
@@ -141,11 +199,3 @@ https://github.com/clach04/python-tuya
 https://github.com/codetheweb/tuyapi
 
 https://www.amazon.it/compatibile-telecomando-automazione-regolatore-Manipolatore/dp/B084VPD5TM/
-
-## **Possibili problemi di sicurezza**
-
-https://blog.rapid7.com/2013/01/29/security-flaws-in-universal-plug-and-play-unplug-dont-play/
-
-https://blog.cloudflare.com/ssdp-100gbps/
-
-https://www.cloudflare.com/learning/ddos/ssdp-ddos-attack/

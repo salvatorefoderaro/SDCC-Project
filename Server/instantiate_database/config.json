@@ -2,7 +2,7 @@
     "host" : "mysql",
     "user" : "root",
     "passwd" : "password",
-    "database" : "datacamp",
+    "database" : "cluster",
     "service_ip" : "getdevicesstatservice",
     "service_port" : 8020
 }

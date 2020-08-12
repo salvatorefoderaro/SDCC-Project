@@ -21,7 +21,7 @@ def instantiateDatabase():
     cursor = db.cursor()
 
     # Effettuo la creazione del database
-    cursor.execute("CREATE DATABASE IF NOT EXISTS datacamp")
+    cursor.execute("CREATE DATABASE IF NOT EXISTS cluster")
     
     cursor.close()
 
@@ -37,6 +37,10 @@ def instantiateDatabase():
     # Eseguo le query per la creazione delle tabelle
 
     cursor = db.cursor()
+
+    # Query per l'instanziazione di una tabella con le info riguardanti il cluster
+    # cursor.execute("CREATE TABLE")
+
     cursor.execute("CREATE TABLE IF NOT EXISTS devicesGroups (groupName VARCHAR(100) PRIMARY KEY, p1 float, p2 float, p3 float)")
     db.commit()
     cursor.execute("CREATE TABLE IF NOT EXISTS devices (id INT PRIMARY KEY, ipAddress VARCHAR(30), ipPort INT, status INT, name VARCHAR(100), groupName VARCHAR(100), type VARCHAR(100), FOREIGN KEY (groupName) REFERENCES devicesGroups(groupName))")
