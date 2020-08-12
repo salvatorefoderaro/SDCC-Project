@@ -1,6 +1,6 @@
 # **SDCC-Project - Introduzione**
 
-## **Astract**
+## **Abstract**
 
 L'idea del progetto è quello di realizzare un'applicazione volta al paradigma fog-computing, che utilizza sensori IoT. I sensori possono essere di due tipi:
 
@@ -72,6 +72,10 @@ https://www.cloudflare.com/learning/ddos/ssdp-ddos-attack/
 ### **Server**
 
 #### **Proxy**
+
+**A cosa serve il proxy?** *Minikube* permette di avere un'istanza di Kuberneetes in esecuzione all'interno di una macchina virtuale. Il problema di questo approccio è che, nella configurazione della macchina virtuale, viene creata una rete esclusiva tra host e macchina virtuale. Questo significa che il cluster, all'interno della macchina virtuale, non è raggiungibile direttamente dalla rete locale. Per risolvere questo motivo è presente il proxy, che inoltra le richieste che arrivano dalla rete locale verso il cluster e che, anche, permette di inoltrare delle richieste dal cluster verso la rete interna.
+
+Il proxy è raggiungibile tramite due endpoint, quello relativo alla **dashboard** e quello relativo al servizio **collect_data**. Il proxy, per il momento, si occupa solamente del secondo caso. Bisogna vedere se è necessaria un'implementazione anche della dashboard, o se la si vuole rendere "esclusiva" dell'host dove viene eseguito Minikube. Il proxy ha a disposizione una funzione che, effettuando il parse del risultato ottenuto dal terminale del comando *kubectl get services*, individua l'indirizzo ip esposto all'eserno dal servizio *collect_data*, a cui devono essere inoltrate tutte le richieste.
 
 - Modulo **proxy_server.py**
   - Si occupa della comunicazione tra la rete locale ed il cluster Kuberneetes. Questo in quanto il cluster viene avviato utilizzando **Minikube** in una macchina virtuale, con connessione di rete solo tra la macchina e l'host stesso. Il proxy è necessario per raggiungere la macchina virtuale dalla rete locale, o viceversa, raggiungere la rete locale da dentro il cluster.
@@ -159,7 +163,7 @@ https://www.cloudflare.com/learning/ddos/ssdp-ddos-attack/
 
 - *select AVG(L.temperatura), AVG(L.umidita), D.groupName, G.p1, G.p2, G.p3 FROM lectures as L JOIN devices as D on L.id = D.id JOIN devicesGroups as G on D.groupName = G.groupName WHERE D.type='sensor' GROUP BY D.groupName;*
 
-## **Dockerizzazione Client**
+## **Dockerizzazione Client - Mantenuto solamente come storico - Non funziona**
 
 1. docker build -t client* .
 2. docker run -p port:port client*
