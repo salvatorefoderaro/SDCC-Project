@@ -17,7 +17,7 @@ L'integrazione con i servizi **Amazon AWS** avviene tramite *S3*, per il backup 
 
 - **Flask (https://pypi.org/project/Flask/)**
   - Necessario per il web server della dashboard e gli endpoint per le chiamate REST
-- **SSDP (https://github.com/codingjoe/ssdp)**
+- **SSDP (https://pypi.org/project/ssdp-upnp/)**
   - Necessario come servizio per il discovery da parte del client del/dei proxy
 - **mysql-connector-python (https://pypi.org/project/mysql-connector-python/)**
   - Necessario per la comunicazione con il database
