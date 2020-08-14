@@ -37,7 +37,14 @@ L'integrazione con i servizi **Amazon AWS** avviene tramite *S3*, per il backup 
 
 ## **Cosa è stato utilizzato, di offerto, da Kuberneetes?**
 
-- *To do...*
+- **Deployment:**
+- **Job:**
+- **ChronJob:**
+- **Service:**
+- **PersistentVolume:**
+  - https://kubernetes.io/docs/concepts/storage/persistent-volumes/
+- **PersistentVoumeClaim:**
+  - https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims
 
 ## **Possibili problemi di sicurezza**
 
