@@ -1,4 +1,4 @@
-from flask import Flask, request, copy_current_request_context #import main Flask class and request object
+from flask import Flask, request #import main Flask class and request object
 import requests
 import os
 import socket
@@ -31,10 +31,11 @@ NAME = ""
 GROUP_NAME = ""
 data = ""
 CLUSTER_PORT = 0
+LECTURE_INTERVAL = 0
 
 # Funzione per la lettura del file 'config.json'
 def readJson():
-    global data, SEARCH_INTERVAL, CLUSTER_PORT, BCAST_IP, BCAST_PORT, PROTOCOL, MINE_IP_PORT, NETWORK_ID, MINE_IP_PORT, DATA, NAME, GROUP_NAME, MINE_ID
+    global data, SEARCH_INTERVAL, CLUSTER_PORT, BCAST_IP, BCAST_PORT, PROTOCOL, MINE_IP_PORT, NETWORK_ID, MINE_IP_PORT, DATA, NAME, GROUP_NAME, MINE_ID, LECTURE_INTERVAL
     with open('config.json') as config_file:
         data = json.load(config_file)
         MINE_ID = data['id']
@@ -47,6 +48,7 @@ def readJson():
         NETWORK_ID = data['networkid']
         MINE_IP_PORT = data['mine_ip_port']
         CLUSTER_PORT = data['cluster_port']
+        LECTURE_INTERVAL = data['lecture_interval']
         config_file.close()
 
 # Funzione per l'ottenimento del proprio indirizzo IP all'interno della rete
@@ -95,12 +97,13 @@ app = Flask(__name__) #create the Flask app
 
 # Router per la get per controllare lo stato del dispositivo
 @app.route('/checkStatus', methods=['GET'])
-def checkStatus():    
+def checkStatus():
     return "Ok"
 
 # Route per modificare la configurazione a runtime, magari tramite la dashboard
 @app.route('/editConfig', methods=['GET'])
 def editConfig():
+    global LECTURE_INTERVAL
     with open('config.json') as config_file:
         data = json.load(config_file)
         config_file.close()
@@ -111,6 +114,9 @@ def editConfig():
             data["name"] = request.args.get("new_value")
         if (request.args.get("type") == "groupName"):
             data["groupName"] = request.args.get("new_value")
+        if (request.args.get("type") == "lecture_interval"):
+            LECTURE_INTERVAL = int(request.args.get("new_value"))
+            data["lecture_interval"] = int(request.args.get("lecture_interval"))
 
         json.dump(data, configFile)
         configFile.close()
@@ -153,8 +159,8 @@ def doSomeStuff():
                 print("Errore durante la registrazione della misurazione.")
         except requests.exceptions.RequestException as e:  # This is the correct syntax
             logging.warning('Errore durante la registrazione della misurazione.')
-            getClusterIPAddress()
-        time.sleep(20)
+            getClusterIpAddress()
+        time.sleep(LECTURE_INTERVAL)
 
 if __name__ == '__main__':
     thread = Thread(target = doSomeStuff)

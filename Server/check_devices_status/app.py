@@ -31,7 +31,7 @@ def checkDevicesStatus():
     for x in myresult:
         # Effettuo una chiamata get e, in base alla risposta, aggiorno l stato del dispositivo
         try:
-            res = requests.get('http://' + str(json_object['proxy_ip']) + ':'+str(json_object['proxy_port']) +'/checkStatus?ipAddress='+str(x[1])+'&ipPort=' + str(x[2]), timeout=3)
+            res = requests.get('http://' + str(x[1]) + ':' + str(x[2]) +'/checkStatus', timeout=3)
             logging.info(res.text)
             if res.text != "Ok":
                 cursor.execute("UPDATE devices SET status = 100 WHERE id ="+str(x[0])+"")

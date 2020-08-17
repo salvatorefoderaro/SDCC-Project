@@ -121,16 +121,18 @@ def editConfig():
 @app.route('/deleteDevice', methods=['GET'])
 def deleteDevice():
 
-    db = connectToDb()
+    try:
+        db = connectToDb()
 
-    cursor = db.cursor()
+        cursor = db.cursor()
 
-    cursor.execute("DELETE from devices where id =" + str(request.args.get("id")))
-    cursor.execute("DELETE from lectures where id =" + str(request.args.get("id")))
-
-    cursor.close()
-    db.commit()
-
+        cursor.execute("DELETE from lectures where id = " + request.args.get("id"))
+        cursor.execute("DELETE from devices where id = " + request.args.get("id"))
+        cursor.close()
+        db.commit()
+    except Exception as e:
+        print(str(e))
+    print("Finitooooo")
     return "Ok"
 
 # Funzione per l'eliminazione di un dispositivo

@@ -12,3 +12,4 @@ kubectl delete services getdevicesstatservice
 kubectl delete services dashboardservice
 kubectl delete services collectdataservice
 kubectl delete services mysql
+kubectl delete deployment calculatevaluedeployment 
