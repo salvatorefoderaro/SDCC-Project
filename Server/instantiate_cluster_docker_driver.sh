@@ -1,6 +1,6 @@
 #!/bin/bash
 
-minikube start --vm-driver=docker
+minikube start --driver=docker
 minikube addons enable storage-provisioner
 eval $(minikube docker-env)
 cd check_devices_status && docker build -t checkdevicestatus:v1 .
@@ -13,32 +13,19 @@ cd ../calculate_value && docker build -t calculatevalue:v1 .
 cd ../yaml
 docker pull mysql:latest
 kubectl apply -f secret.yaml
-sleep 1
 kubectl apply -f mysql-dump.yaml
-sleep 1
 kubectl apply -f mysql-pv.yaml
-sleep 1
 kubectl apply -f mysql-deployment.yaml
-sleep 1
+sleep 20
 kubectl apply -f ser_collect_data.yaml
-sleep 1
 kubectl apply -f ser_dashboard.yaml
-sleep 1
 kubectl apply -f ser_get_devices_stat.yaml
-sleep 1
 kubectl apply -f job_db_instantiate.yaml
-sleep 1
 kubectl apply -f job_db_dump.yaml
-sleep 1
 kubectl apply -f job_dump_upload.yaml
-sleep 1
 kubectl apply -f dep_collect_data.yaml
-sleep 1
 kubectl apply -f dep_dashboard.yaml
-sleep 1
 kubectl apply -f dep_get_devices_stat.yaml
-sleep 1
 kubectl apply -f dep_calculate_value.yaml
-sleep 1
 kubectl apply -f cronjob_check_devices_status.yaml
 minikube tunnel

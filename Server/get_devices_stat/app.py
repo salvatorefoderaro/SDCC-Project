@@ -106,11 +106,10 @@ def editConfig():
     # Se devo modificare il gruppo di appartenenza di un dispositivo, controllo prima che il gruppo esista
     # altrimenti fallirebbe il controllo sulla foreign key.
     elif (request.args.get("type") == "groupName"):
-        cursor.execute("select * FROM groups WHERE groupName = " + str(request.args.get("new_value")))
+        cursor.execute("select * FROM devicesGroups WHERE groupName = \'" + str(request.args.get("new_value")) +"\'")
         row = cursor.fetchone()
         if row == None:
             return "Group name not present."
-
         cursor.execute("UPDATE devices SET groupName=\'"+ str(request.args.get("new_value")) +"\' where id = " + str(request.args.get("id")))
 
     cursor.close()
@@ -122,16 +121,18 @@ def editConfig():
 @app.route('/deleteDevice', methods=['GET'])
 def deleteDevice():
 
-    db = connectToDb()
+    try:
+        db = connectToDb()
 
-    cursor = db.cursor()
+        cursor = db.cursor()
 
-    cursor.execute("DELETE from devices where id =" + str(request.args.get("id")))
-    cursor.execute("DELETE from lectures where id =" + str(request.args.get("id")))
-
-    cursor.close()
-    db.commit()
-
+        cursor.execute("DELETE from lectures where id = " + request.args.get("id"))
+        cursor.execute("DELETE from devices where id = " + request.args.get("id"))
+        cursor.close()
+        db.commit()
+    except Exception as e:
+        print(str(e))
+    print("Finitooooo")
     return "Ok"
 
 # Funzione per l'eliminazione di un dispositivo

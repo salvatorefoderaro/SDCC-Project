@@ -15,7 +15,6 @@ def getServiceExternalIP(serviceName):
                 list.remove('')
         if list[0] == serviceName:
             SERVICE_EXTERNAL_IP = list[3].replace(" ", "")
-            print(SERVICE_EXTERNAL_IP)
             return SERVICE_EXTERNAL_IP
     return 'None'
 

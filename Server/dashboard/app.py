@@ -81,7 +81,8 @@ def deleteDevice():
     ip_address = str(request.args.get("ip_address"))
     port = str(request.args.get("port"))
 
-    response123 = False
+    response123 = True
+
 
     try:
         res = requests.get('http://' + json_object['service_ip'] + ':' + str(json_object['service_port']) +'/deleteDevice?ipAddress='+ip_address+'&ipPort=' + port + '&new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
@@ -107,10 +108,12 @@ def modifyDevice():
     type = str(request.args.get("type"))
     ip_address = str(request.args.get("ip_address"))
     port = str(request.args.get("port"))
+    
 
-    if type == "name":
+    if type == "lecture_interval":     
         try:
-            res = requests.get('http://' + str(json_object['proxy_ip']) + ':'+str(json_object['proxy_port']) +'/editConfig?ipAddress='+ip_address+'&ipPort=' + port + '&new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
+            res = requests.get('http://' + str(ip_address) + ':' +str(port) +'/editConfig?new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
+            print(res.text)
             if (res.text != "Ok"):
                 raise(Exception)
         except Exception as e:
@@ -118,6 +121,15 @@ def modifyDevice():
             return render_template('error_template.html', responseMessage="Errore nella modifica del dispositivo.")
     
     else:
+        if type =="name":
+            try:
+                res = requests.get('http://' + str(ip_address) + ':' +str(port) +'/editConfig?new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
+                print(res.text)
+                if (res.text != "Ok"):
+                    raise(Exception)
+            except Exception as e:
+                print(e)
+                return render_template('error_template.html', responseMessage="Errore nella modifica del dispositivo.")
         try:
             res = requests.get('http://' + json_object['service_ip'] + ':' + str(json_object['service_port']) +'/editConfig?ipAddress='+ip_address+'&ipPort=' + port + '&new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
             print(res.text)
