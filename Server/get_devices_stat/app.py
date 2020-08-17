@@ -106,11 +106,10 @@ def editConfig():
     # Se devo modificare il gruppo di appartenenza di un dispositivo, controllo prima che il gruppo esista
     # altrimenti fallirebbe il controllo sulla foreign key.
     elif (request.args.get("type") == "groupName"):
-        cursor.execute("select * FROM groups WHERE groupName = " + str(request.args.get("new_value")))
+        cursor.execute("select * FROM devicesGroups WHERE groupName = \'" + str(request.args.get("new_value")) +"\'")
         row = cursor.fetchone()
         if row == None:
             return "Group name not present."
-
         cursor.execute("UPDATE devices SET groupName=\'"+ str(request.args.get("new_value")) +"\' where id = " + str(request.args.get("id")))
 
     cursor.close()

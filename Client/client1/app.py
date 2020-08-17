@@ -1,4 +1,4 @@
-from flask import Flask, request #import main Flask class and request object
+from flask import Flask, request, copy_current_request_context #import main Flask class and request object
 import requests
 import os
 import socket
@@ -95,7 +95,7 @@ app = Flask(__name__) #create the Flask app
 
 # Router per la get per controllare lo stato del dispositivo
 @app.route('/checkStatus', methods=['GET'])
-def checkStatus():
+def checkStatus():    
     return "Ok"
 
 # Route per modificare la configurazione a runtime, magari tramite la dashboard
