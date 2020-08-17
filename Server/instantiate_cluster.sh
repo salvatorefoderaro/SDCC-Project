@@ -1,6 +1,6 @@
 #!/bin/bash
 
-minikube start --vm-driver=docker
+minikube start
 minikube addons enable storage-provisioner
 eval $(minikube docker-env)
 cd check_devices_status && docker build -t checkdevicestatus:v1 .
