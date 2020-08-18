@@ -142,8 +142,6 @@ def doSomeStuff():
         except requests.exceptions.RequestException as e:  # This is the correct syntax
             print("Errore durante l'inserimento del dispositivo.")
         
-        time.sleep(20)
-
     while (True):
         if data['type'] == 'control':
             dictToSend = {'id':data['id'], 'temperatura': 0, 'umidita': 0}
