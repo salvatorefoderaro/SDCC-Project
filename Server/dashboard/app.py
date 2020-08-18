@@ -83,7 +83,6 @@ def deleteDevice():
 
     response123 = True
 
-
     try:
         res = requests.get('http://' + json_object['service_ip'] + ':' + str(json_object['service_port']) +'/deleteDevice?ipAddress='+ip_address+'&ipPort=' + port + '&new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
         if res.text != "Ok":
