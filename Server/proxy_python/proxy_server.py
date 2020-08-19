@@ -5,6 +5,7 @@ from ssdp import gen_logger
 import minikubeservice
 import time
 import logging
+import json
 
 '''
 Modulo necessario per la comunicazione tra la rete interna (dispositivi) ed il cluster.

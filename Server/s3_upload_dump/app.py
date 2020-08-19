@@ -3,6 +3,7 @@ from botocore.client import Config
 import glob
 import os
 import logging
+import json
 
 ##Il session token risulta essere necessario quando si utilizza un account AWSEducate. In particolare deve essere aggiunto a boto3. Se non 
 ##Dovesse essere presente allora la funzione restituirebbe un errore.
@@ -32,7 +33,6 @@ def addToBucket():
     #imgName: str --> nome del file una volta inserito all'interno del bucket.
 
     list_of_files = glob.glob('dump/*') # * means all if need specific format then *.csv
-    print(list_of_files)
     latest_file = max(list_of_files, key=os.path.getctime)
     try:
         data = open(latest_file, 'rb')
@@ -41,12 +41,15 @@ def addToBucket():
         exit(-1)
     
     try:
-        s3.Bucket(BUCKET_NAME).put_object(Key=latest_file, Body=data)
+        s3.Bucket(BUCKET_NAME).put_object(Key=directory_name+'/'+latest_file, Body=data)
     except Exception as e:
         print(e)
         exit(-1)
 
     logging.info('Upload eseguito correttamente.')
+
+    # Dopo l'upload elimino il file per non occupare inutilmente spazio
+    os.remove(latest_file)
 
 if __name__ == '__main__':
     addToBucket()

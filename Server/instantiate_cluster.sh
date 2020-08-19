@@ -1,6 +1,6 @@
 #!/bin/bash
 
-minikube start --driver=docker
+minikube start --driver=virtualbox
 minikube addons enable storage-provisioner
 eval $(minikube docker-env)
 cd check_devices_status && docker build -t checkdevicestatus:v1 .
@@ -16,7 +16,7 @@ kubectl apply -f secret.yaml
 kubectl apply -f mysql-dump.yaml
 kubectl apply -f mysql-pv.yaml
 kubectl apply -f mysql-deployment.yaml
-sleep 20
+sleep 60
 kubectl apply -f ser_collect_data.yaml
 kubectl apply -f ser_dashboard.yaml
 kubectl apply -f ser_get_devices_stat.yaml

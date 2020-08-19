@@ -14,7 +14,6 @@ def getServiceExternalIP(serviceName):
             if '' in list:
                 list.remove('')
         if list[0] == serviceName:
-            print(list)
             SERVICE_EXTERNAL_IP = list[3].replace(" ", "")
             SERVICE_EXTERNAL_PORT = list[4].split(":")[0].replace(" ", "")
             return "http://" + SERVICE_EXTERNAL_IP + ":" + SERVICE_EXTERNAL_PORT
