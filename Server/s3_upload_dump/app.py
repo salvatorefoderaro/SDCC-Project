@@ -17,6 +17,7 @@ import json
 Modulo per il caricamento del dump del database nel bucket S3.
 '''
 
+
 BUCKET_NAME = "sdcc-test-bucket"
 
 s3 = boto3.resource(
@@ -32,6 +33,11 @@ def addToBucket():
     #imgPath: str --> path locale del file
     #imgName: str --> nome del file una volta inserito all'interno del bucket.
 
+    with open('/config/cluster_config.json') as config_file:
+        data = json.load(config_file)
+        FOLDER_NAME = data['folder_name']
+        config_file.close()
+
     list_of_files = glob.glob('dump/*') # * means all if need specific format then *.csv
     latest_file = max(list_of_files, key=os.path.getctime)
     try:
@@ -41,7 +47,7 @@ def addToBucket():
         exit(-1)
     
     try:
-        s3.Bucket(BUCKET_NAME).put_object(Key=directory_name+'/'+latest_file, Body=data)
+        s3.Bucket(BUCKET_NAME).put_object(Key=FOLDER_NAME+'/'+latest_file, Body=data)
     except Exception as e:
         print(e)
         exit(-1)

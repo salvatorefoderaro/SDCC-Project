@@ -9,7 +9,7 @@ spec:
       - name: mysql
         image: mysql:latest
         command: ["/bin/sh","-c"]
-        args: ["mysqldump --single-transaction -u $MYSQL_USER $MYSQL_DB -h $MYSQL_HOST > /var/lib/mysql/dump`date '+%Y%m%d'`.sql; mysql -u $MYSQL_USER -p$MYSQL_PWD $MYSQL_DB -e \"DELETE FROM lectures WHERE lettura < DATE_SUB(NOW(), INTERVAL $DAY_INTERVAL DAY)\""]
+        args: ["mysqldump --single-transaction -u $MYSQL_USER $MYSQL_DB -h $MYSQL_HOST > /var/lib/mysql/dump/`date '+%Y%m%d'`.sql; mysql -u $MYSQL_USER -p$MYSQL_PWD $MYSQL_DB -e \"DELETE FROM lectures WHERE lettura < DATE_SUB(NOW(), INTERVAL $DAY_INTERVAL DAY)\""]
         volumeMounts:
         - mountPath: /var/lib/mysql/dump
           name: mysql-persistent-storage-dump
@@ -23,7 +23,7 @@ spec:
         - name: MYSQL_HOST
           value: "mysql"
         - name: DAY_INTERVAL
-          value: "7"
+          value: "1"
       restartPolicy: Never
       volumes:
       - name: mysql-persistent-storage-dump

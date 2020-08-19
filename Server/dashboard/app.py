@@ -20,12 +20,12 @@ app = Flask(__name__)
 
 def readJson():
     global FOLDER_NAME, SERVICE_IP, SERVICE_PORT
-    with open('config.json') as config_file:
+    with open('/config/config.json') as config_file:
         data = json.load(config_file)
         SERVICE_IP = data['service_ip']
         SERVICE_PORT = data['service_port']
         config_file.close()
-    with open('cluster_config.json') as config_file:
+    with open('/config/cluster_config.json') as config_file:
         data = json.load(config_file)
         FOLDER_NAME = data['folder_name']
         config_file.close()
@@ -56,7 +56,6 @@ def checkDevicesStatus():
         try:
 
             res = requests.get('http://' + str(x[1]) + ':' + str(x[2]) +'/checkStatus', timeout=3)
-            logging.info(res.text)
             if res.text != "Ok":
                 cursor.execute("UPDATE devices SET status = 100 WHERE id ="+str(x[0])+"")
             else:
@@ -236,9 +235,11 @@ def downloadFile():
             aws_secret_access_key=ACCESS_SECRET_KEY,
             config=Config(signature_version='s3v4'))
 
-        file_key = DIR_NAME + "/" + request.args.get("file_name")
-        s3.Bucket(BUCKET_NAME).download_file(file_key, file_key)
-        return send_file(file_key, as_attachment=True)
+        file_key = request.args.get("file_name")
+        file_name_save = file_key.split("/")
+        file_name_save = file_name_save[len(file_name_save)-1]
+        s3.Bucket(BUCKET_NAME).download_file(file_key, file_name_save)
+        return send_file(file_name_save, as_attachment=True)
     except requests.exceptions.RequestException as e:
         print(e)
         return render_template('error_template.html', responseMessage="Errore nel download del file da S3.")
@@ -247,8 +248,6 @@ def downloadFile():
 def getFileList():
 
     ### information from configS3   
-    ACCESS_KEY_ID =  "AKIA57G4V3XA7CWVE7C7"
-    ACCESS_SECRET_KEY = "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"
     BUCKET_NAME = "sdcc-test-bucket"
 
 

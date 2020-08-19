@@ -8,7 +8,7 @@ COPY ./requirements.txt /app/requirements.txt
 
 COPY ./config.json /config/config.json
 
-COPY ../cluster_config.json /app/cluster_config.json
+COPY ./cluster_config.json /config/cluster_config.json
 
 WORKDIR /app
 
