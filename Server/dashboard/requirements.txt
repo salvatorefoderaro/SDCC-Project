@@ -2,3 +2,4 @@ Flask
 requests>=2.7.0
 boto3
 botocore
+mysql-connector-python

@@ -5,6 +5,7 @@ from ssdp import gen_logger
 import minikubeservice
 import time
 import logging
+import json
 
 '''
 Modulo necessario per la comunicazione tra la rete interna (dispositivi) ed il cluster.
@@ -30,7 +31,7 @@ def readJson():
 def getExternalIp():
     global SERVICE_EXTERNAL_IP
     SERVICE_EXTERNAL_IP = minikubeservice.getServiceExternalIP("collectdataservice") 
-    while (SERVICE_EXTERNAL_IP == 'None' or SERVICE_EXTERNAL_IP == "<pending>"):
+    while (SERVICE_EXTERNAL_IP == 'None' or SERVICE_EXTERNAL_IP == '<pending>'):
         print("Waiting for cluster 'collect_data' ip...")
         time.sleep(EXTERNAL_IP_INTERVAL)   
         SERVICE_EXTERNAL_IP = minikubeservice.getServiceExternalIP("collectdataservice") 

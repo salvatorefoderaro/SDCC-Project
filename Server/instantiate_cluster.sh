@@ -1,7 +1,9 @@
 #!/bin/bash
 
-minikube start --driver=docker
+minikube start --driver=virtualbox
 minikube addons enable storage-provisioner
+cp cluster_config.json dashboard/cluster_config.json
+cp cluster_config.json s3_upload_dump/cluster_config.json
 eval $(minikube docker-env)
 cd check_devices_status && docker build -t checkdevicestatus:v1 .
 cd ../collect_data && docker build -t collectdata:v1 .
@@ -11,12 +13,12 @@ cd ../get_devices_stat && docker build -t getdevicesstat:v1 .
 cd ../s3_upload_dump && docker build -t uploads3:v1 .
 cd ../calculate_value && docker build -t calculatevalue:v1 .
 cd ../yaml
-docker pull mysql:latest
+docker pull mysql:5.7.5
 kubectl apply -f secret.yaml
 kubectl apply -f mysql-dump.yaml
 kubectl apply -f mysql-pv.yaml
 kubectl apply -f mysql-deployment.yaml
-sleep 20
+sleep 60
 kubectl apply -f ser_collect_data.yaml
 kubectl apply -f ser_dashboard.yaml
 kubectl apply -f ser_get_devices_stat.yaml

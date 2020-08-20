@@ -7,7 +7,7 @@ L'idea del progetto è quello di realizzare un'applicazione volta al paradigma f
 - **Lettura:** sensori che leggono i valori di umidità e di temperatura, inviando le letture al cluster
 - **Controllo:** sensori che controllano un sistema idrico, e che ricevono indicazioni sulla quantità di acqua da destinare ad un determinato gruppo di coltivazioni
 
-I singoli sensori producono ad intervalli di tempi regolari letture che vengono inviate al cluster e vengono memorizzate all'interno di un database locale. Per garantire la disponibilità dei dati, ad intervalli di tempo regolari viene eseguito il backup del database e caricato su S3 dal modulo **s3_upload_dump**. 
+I singoli sensori producono ad intervalli di tempi regolari letture che vengono inviate al cluster e vengono memorizzate all'interno di un database locale. Per garantire la disponibilità dei dati, ad intervalli di tempo regolari viene eseguito il backup del database che viene caricato su S3 dal modulo **s3_upload_dump**. 
 
 Il cluster offre una dashboard per l'utente, tramite la quale è possibile controllare lo stato dei dispositivi, la lista dei gruppi di coltivazioni ed aggiungere nuovi gruppi di coltivazioni.
 
@@ -65,7 +65,7 @@ https://www.cloudflare.com/learning/ddos/ssdp-ddos-attack/
   - Invia ogni tot di tempo le letture al Server
   - ***readJson()***
     - Funzione per la lettura del file *config.json*
-  - ***getMineIpAddress()**
+  - ***getMineIpAddress()***
     - Funzione per l'ottenimento del proprio indirizzo IP all'interno della rete locale
   - ***getClusterIpAddress()***
     - Funzione per l'avvio del client SSDP per l'ottenimento dell'indirizzo ip del *proxy* in esecuzione sul server
@@ -80,13 +80,17 @@ https://www.cloudflare.com/learning/ddos/ssdp-ddos-attack/
 
 #### **Proxy**
 
-**A cosa serve il proxy?** *Minikube* permette di avere un'istanza di Kuberneetes in esecuzione all'interno di una macchina virtuale. Il problema di questo approccio è che, nella configurazione della macchina virtuale, viene creata una rete esclusiva tra host e macchina virtuale. Questo significa che il cluster, all'interno della macchina virtuale, non è raggiungibile direttamente dalla rete locale. Per risolvere questo motivo è presente il proxy, che inoltra le richieste che arrivano dalla rete locale verso il cluster e che, anche, permette di inoltrare delle richieste dal cluster verso la rete interna.
+**A cosa serve il proxy?**
 
-Il proxy è raggiungibile tramite due endpoint, quello relativo alla **dashboard** e quello relativo al servizio **collect_data**. Il proxy, per il momento, si occupa solamente del secondo caso. Bisogna vedere se è necessaria un'implementazione anche della dashboard, o se la si vuole rendere "esclusiva" dell'host dove viene eseguito Minikube. Il proxy ha a disposizione una funzione che, effettuando il parse del risultato ottenuto dal terminale del comando *kubectl get services*, individua l'indirizzo ip esposto all'eserno dal servizio *collect_data*, a cui devono essere inoltrate tutte le richieste.
+*Minikube* permette di avere un'istanza di Kuberneetes in esecuzione all'interno di un container Docker. A differenza dell'approccio precedente, che utilizzava una macchina virtuale, utilizzando Docker il cluster può raggiungere la rete locale. Il problema è il trovare l'indirizzo IP esposto dal servizio *collect_data* del cluster è ottenibile solamente dall'host sul quale è in esecuzione il container. In questo modo tutte le richieste vengono inoltrate al *proxy*, che a sua volta le inoltra al cluster.
+
+Il cluster è raggiungibile tramite due endpoint, quello relativo alla **dashboard** e quello relativo al servizio **collect_data**. Il proxy, per il momento, si occupa solamente del secondo caso. Bisogna vedere se è necessaria un'implementazione anche della dashboard, o se la si vuole rendere "esclusiva" dell'host dove viene eseguito Minikube. Il proxy ha a disposizione una funzione che, effettuando il parse del risultato ottenuto dal terminale del comando *kubectl get services*, individua l'indirizzo IP esposto all'eserno dal servizio *collect_data*, a cui devono essere inoltrate tutte le richieste.
 
 - Modulo **proxy_server.py**
   - Si occupa della comunicazione tra la rete locale ed il cluster Kuberneetes. Questo in quanto il cluster viene avviato utilizzando **Minikube** in una macchina virtuale, con connessione di rete solo tra la macchina e l'host stesso. Il proxy è necessario per raggiungere la macchina virtuale dalla rete locale, o viceversa, raggiungere la rete locale da dentro il cluster.
   - Si occupa anche del server SSDP per essere rintracciato in automatico dai Client. Inoltre, trova in automatico l'indirizzo IP del cluster anche in caso di *caduta*.
+  - ***readJson()***
+    - Funzione per leggere il file *config.json*
   - ***getExternalIp()***
     - Funzione per l'ottenimento dell'indirizzo IP del servizio *collect_data* esposto da cluster **Minikube**
   - ***upnpServer()***
@@ -107,7 +111,7 @@ Il proxy è raggiungibile tramite due endpoint, quello relativo alla **dashboard
 #### **Cluster**
 
 - Modulo **instantiate_database**
-  - Si occupa dell'istanziazione del database, dunque creazione del db e delle tabelle necessarie. Trattandosi di un job, viene eseguito una sola volta.
+  - Si occupa dell'instanziazione del database, dunque creazione del db e delle tabelle necessarie. Trattandosi di un job, viene eseguito una sola volta.
 - Modulo **collect_data**
   - Si occupa della ricezione della lettura dei dati da parte dei vari client. Ogni lettura viene inserita all'interno del database
 - Modulo **check_devices_status**
@@ -131,17 +135,19 @@ Il proxy è raggiungibile tramite due endpoint, quello relativo alla **dashboard
 
 0. **Installo Minikube**
    1. cd Server && sh install_update_minikube.sh
-1. **Effettuo l'instanziazione del cluster**
-   1. cd Server && sh instantiate_cluster.sh
-      1. La password per l'utente *root* è necessaria per l'avvio del servizio *minikube tunnel*
-2. **Avvio la dashboard**
+1. **Installo Docker**
+   1. cd Server && sh install_docker.sh
+2. **Effettuo l'instanziazione del cluster**
+   1. cd Server && sh instantiate_cluster_docker_driver.sh
+      1. I privilegi dell'utente *sudo* sono necessari per l'avvio del servizio *minikube tunnel*
+3. **Avvio la dashboard**
    1. minikube dashboard
 
 - **Comandi utili:**
   - **Aggiornamento del deployment:**
     - *sh update_deployment.sh*
   - **Pulizia del cluster:**
-    - *sh clean_cluster.sh*
+    - *sh clean_cluster_without_delete.sh*
 
 ## **Avvio proxy**
 

@@ -25,7 +25,7 @@ spec:
         app: mysql
     spec:
       containers:
-      - image: mysql:8
+      - image: mysql:5.7.5
         name: mysql
         env:
           - name: MYSQL_ROOT_PASSWORD
@@ -43,6 +43,3 @@ spec:
       - name: mysql-persistent-storage
         persistentVolumeClaim:
           claimName: mysql-pv-claim
-      - name: mysql-persistent-storage-dump
-        persistentVolumeClaim:
-          claimName: mysql-pv-claim-dump
