@@ -227,6 +227,8 @@ def downloadFile():
 
     ### information from configS3
     BUCKET_NAME = "sdcc-test-bucket"
+    ACCESS_KEY_ID = "AKIA57G4V3XAZXYSWEYA"
+    ACCESS_SECRET_KEY = "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"
 
     try:
         s3 = boto3.resource(
@@ -248,6 +250,8 @@ def downloadFile():
 def getFileList():
 
     ### information from configS3   
+    ACCESS_KEY_ID = "AKIA57G4V3XAZXYSWEYA"
+    ACCESS_SECRET_KEY = "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"
     BUCKET_NAME = "sdcc-test-bucket"
 
 

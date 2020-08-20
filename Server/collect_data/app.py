@@ -46,25 +46,29 @@ def collectData():
 @app.route('/newDevice', methods=['POST'])
 def newDevice():
 
-    configFile = open("/config/config.json", "r")
-    json_object = json.load(configFile)
+    try:
 
-    db = mysql.connect(
-        host = json_object['host'],
-        user = json_object['user'],
-        passwd = json_object['passwd'],
-        database = json_object['database']
-    )
+        configFile = open("/config/config.json", "r")
+        json_object = json.load(configFile)
 
-    cursor = db.cursor()
+        db = mysql.connect(
+            host = json_object['host'],
+            user = json_object['user'],
+            passwd = json_object['passwd'],
+            database = json_object['database']
+        )
 
-    # Inserisco il dispositivo nel database
-    cursor.execute("INSERT INTO devices (id, ipAddress, ipPort, status, name, groupName, type) VALUES (" + str(request.json['id']) + ", \'" + str(request.json['ipAddress']) + "\'" + ", \'" + str(request.json['ipPort']) + "\',0,\'" + str(request.json['name']) + "\',NULL,\'" + str(request.json['type']) + "\') ON DUPLICATE KEY UPDATE status = 0, ipAddress =\'" + str(request.json['ipAddress']) +"\', name =\'" + str(request.json["name"]) + "\'")
+        cursor = db.cursor()
 
-    cursor.close()
-    db.commit()
+        # Inserisco il dispositivo nel database
+        cursor.execute("INSERT INTO devices (id, ipAddress, ipPort, status, name, groupName, type) VALUES (" + str(request.json['id']) + ", \'" + str(request.json['ipAddress']) + "\'" + ", \'" + str(request.json['ipPort']) + "\',0,\'" + str(request.json['name']) + "\',NULL,\'" + str(request.json['type']) + "\') ON DUPLICATE KEY UPDATE status = 0, ipAddress =\'" + str(request.json['ipAddress']) +"\', name =\'" + str(request.json["name"]) + "\'")
 
-    return "Ok"
-  
+        cursor.close()
+        db.commit()
+
+        return "Ok"
+    except (MySQLdb.Error, MySQLdb.Warning) as e:
+        return str(e)
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=8005, threaded=True)

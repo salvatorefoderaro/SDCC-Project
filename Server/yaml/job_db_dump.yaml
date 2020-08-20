@@ -7,11 +7,11 @@ spec:
     spec:
       containers:
       - name: mysql
-        image: mysql:latest
+        image: mysql:5.7.5
         command: ["/bin/sh","-c"]
-        args: ["mysqldump --single-transaction -u $MYSQL_USER $MYSQL_DB -h $MYSQL_HOST > /var/lib/mysql/dump/`date '+%Y%m%d'`.sql; mysql -u $MYSQL_USER -p$MYSQL_PWD $MYSQL_DB -e \"DELETE FROM lectures WHERE lettura < DATE_SUB(NOW(), INTERVAL $DAY_INTERVAL DAY)\""]
+        args: ["mysqldump --single-transaction -u $MYSQL_USER $MYSQL_DB -h $MYSQL_HOST > /var/lib/dump/`date '+%Y%m%d'`.sql; mysql -u $MYSQL_USER -p$MYSQL_PWD $MYSQL_DB -e \"DELETE FROM lectures WHERE lettura < DATE_SUB(NOW(), INTERVAL $DAY_INTERVAL DAY)\""]
         volumeMounts:
-        - mountPath: /var/lib/mysql/dump
+        - mountPath: /var/lib/dump
           name: mysql-persistent-storage-dump
         env :
         - name: MYSQL_USER

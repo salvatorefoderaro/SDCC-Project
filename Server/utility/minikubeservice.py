@@ -20,4 +20,4 @@ def getServiceExternalIP(serviceName):
     return 'None'
 
 if __name__ == "__main__":
-    print(getServiceExternalIP("dashboardservice"))
+    print(getServiceExternalIP("collectdataservice"))
