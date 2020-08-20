@@ -7,7 +7,7 @@ L'idea del progetto è quello di realizzare un'applicazione volta al paradigma f
 - **Lettura:** sensori che leggono i valori di umidità e di temperatura, inviando le letture al cluster
 - **Controllo:** sensori che controllano un sistema idrico, e che ricevono indicazioni sulla quantità di acqua da destinare ad un determinato gruppo di coltivazioni
 
-I singoli sensori producono ad intervalli di tempi regolari letture che vengono inviate al cluster e vengono memorizzate all'interno di un database locale. Per garantire la disponibilità dei dati, ad intervalli di tempo regolari viene eseguito il backup del database che viene caricato su S3 dal modulo **s3_upload_dump**. 
+I singoli di letturasensori producono ad intervalli di tempi regolari letture che vengono inviate al cluster e vengono memorizzate all'interno di un database locale. Per garantire la disponibilità dei dati, ad intervalli di tempo regolari viene eseguito il backup del database che viene caricato su S3 dal modulo **s3_upload_dump**. 
 
 Il cluster offre una dashboard per l'utente, tramite la quale è possibile controllare lo stato dei dispositivi, la lista dei gruppi di coltivazioni ed aggiungere nuovi gruppi di coltivazioni.
 
@@ -45,6 +45,8 @@ L'integrazione con i servizi **Amazon AWS** avviene tramite *S3*, per il backup 
   - https://kubernetes.io/docs/concepts/storage/persistent-volumes/
 - **PersistentVoumeClaim:**
   - https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims
+- **HPA (Horizontal Pod Autoscale)**
+  - https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
 
 ## **Possibili problemi di sicurezza**
 

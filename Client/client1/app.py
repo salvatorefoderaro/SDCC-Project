@@ -100,6 +100,12 @@ app = Flask(__name__) #create the Flask app
 def checkStatus():
     return "Ok"
 
+# Router per la get per controllare lo stato del dispositivo
+@app.route('/getEC2Value', methods=['GET'])
+def getEC2Value():
+    fakesensor.setValue(request.args.get("value"))
+    return "Ok"
+
 # Route per modificare la configurazione a runtime, magari tramite la dashboard
 @app.route('/editConfig', methods=['GET'])
 def editConfig():
@@ -142,23 +148,22 @@ def doSomeStuff():
         except requests.exceptions.RequestException as e:  # This is the correct syntax
             print("Errore durante l'inserimento del dispositivo.")
         
-    while (True):
-        if data['type'] == 'control':
-            dictToSend = {'id':data['id'], 'temperatura': 0, 'umidita': 0}
-        else:
+    if data['type'] == 'sensor':
+
+        while (True):
             dictToSend = {'id':data['id'], 'temperatura': fakesensor.getTemperature(), 'umidita': fakesensor.getUmidity()}
-        try:
-            result = requests.post('http://'+CLUSTER_IP_ADDRESS+':'+str(CLUSTER_PORT)+'/sendDataToCluster', json=dictToSend, timeout=3).text
-            if result == "Ok":
-                print("Misurazione inserita correttamente.")
-            elif result == "Not present":
-                print("Il dispositivo non e' registrato.")
-            else:
-                print("Errore durante la registrazione della misurazione.")
-        except requests.exceptions.RequestException as e:  # This is the correct syntax
-            logging.warning('Errore durante la registrazione della misurazione.')
-            getClusterIpAddress()
-        time.sleep(LECTURE_INTERVAL)
+            try:
+                result = requests.post('http://'+CLUSTER_IP_ADDRESS+':'+str(CLUSTER_PORT)+'/sendDataToCluster', json=dictToSend, timeout=3).text
+                if result == "Ok":
+                    print("Misurazione inserita correttamente.")
+                elif result == "Not present":
+                    print("Il dispositivo non e' registrato.")
+                else:
+                    print("Errore durante la registrazione della misurazione.")
+            except requests.exceptions.RequestException as e:  # This is the correct syntax
+                logging.warning('Errore durante la registrazione della misurazione.')
+                getClusterIpAddress()
+            time.sleep(LECTURE_INTERVAL)
 
 if __name__ == '__main__':
     thread = Thread(target = doSomeStuff)

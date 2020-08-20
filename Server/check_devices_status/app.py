@@ -31,7 +31,6 @@ def checkDevicesStatus():
     for x in myresult:
         # Effettuo una chiamata get e, in base alla risposta, aggiorno l stato del dispositivo
         try:
-
             res = requests.get('http://' + str(x[1]) + ':' + str(x[2]) +'/checkStatus', timeout=3)
             logging.info(res.text)
             if res.text != "Ok":

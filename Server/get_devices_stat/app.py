@@ -53,23 +53,23 @@ def getDevicesStat():
         else:
             dict[key].append({'id':x[0], 'temperatura':x[1], 'umidita':x[2], 'lettura':str(x[3]), 'ipAddress':x[4], 'ipPort':x[5], 'status':x[6], 'name':x[7], 'groupName':str(x[8])})
 
-    cursor.execute("select L.id, L.temperatura, L.umidita, L.lettura, D.ipAddress, D.ipPort, D.status, D.name, D.groupName FROM lectures as L JOIN devices as D on L.id = D.id WHERE lettura = (SELECT MAX(Lettura) FROM lectures WHERE id = L.id) and D.type='\control\'")
+    cursor.execute("select D.id, L.lettura, D.ipAddress, D.ipPort, D.status, D.name, D.groupName FROM devices as D JOIN lectures as L on L.id = D.id where type='\control\'")
 
     myresult = cursor.fetchall()
 
     for x in myresult:
-        if str(x[8]).replace(" ", "") == 'None':
+        if str(x[6]).replace(" ", "") == 'None':
             key = 'Default'
         else:
-            key = str(x[8]).replace(" ", "")
+            key = str(x[6]).replace(" ", "")
 
         if key not in keyList:
             keyList.append(key)
         if key not in dictControl:
             dictControl[key] = []
-            dictControl[key].append({'id':x[0], 'temperatura':x[1], 'umidita':x[2], 'lettura':str(x[3]), 'ipAddress':x[4], 'ipPort':x[5], 'status':x[6], 'name':x[7], 'groupName':str(x[8])})
+            dictControl[key].append({'id':x[0], 'lettura':str(x[1]), 'ipAddress':x[2], 'ipPort':x[3], 'status':x[4], 'name':x[5], 'groupName':str(x[6])})
         else:
-            dictControl[key].append({'id':x[0], 'temperatura':x[1], 'umidita':x[2], 'lettura':str(x[3]), 'ipAddress':x[4], 'ipPort':x[5], 'status':x[6], 'name':x[7], 'groupName':str(x[8])})
+            dictControl[key].append({'id':x[0], 'lettura':str(x[1]), 'ipAddress':x[2], 'ipPort':x[3], 'status':x[4], 'name':x[5], 'groupName':str(x[6])})
 
     jsonDict = {'list' : []}
 

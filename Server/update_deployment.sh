@@ -10,6 +10,7 @@ kubectl delete secrets mysql-secrets
 kubectl delete cronjobs checkstatusjob
 kubectl delete services getdevicesstatservice
 kubectl delete services dashboardservice
+kubectl delete services calculatevalueservice
 kubectl delete services collectdataservice
 kubectl delete services mysql
 kubectl delete deployment calculatevaluedeployment
@@ -40,4 +41,5 @@ kubectl apply -f dep_dashboard.yaml
 kubectl apply -f dep_get_devices_stat.yaml
 kubectl apply -f dep_calculate_value.yaml
 kubectl apply -f cronjob_check_devices_status.yaml
+kubectl apply -f ser_calculate_value.yaml
 minikube tunnel

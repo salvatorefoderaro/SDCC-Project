@@ -81,7 +81,7 @@ if __name__ == '__main__':
     getExternalIp()
 
     # Avvio il server SSDP
-    upnpServer = Server(9001, 'blockchain', 'main1111')
+    upnpServer = Server(9001, 'ssdp', 'cluster')
     upnpServer.start()
 
     # avvio flask
