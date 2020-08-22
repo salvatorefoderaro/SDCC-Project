@@ -6,7 +6,7 @@
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Jekyll v4.0.1">
-    <title>Starter Template · Bootstrap</title>
+    <title>Add groups - SDCC Project</title>
 
     <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/starter-template/">
 
@@ -55,19 +55,19 @@
   <form action="/addGroup" method="GET">
     <div class="form-group">
       <label for="exampleInputEmail1">Group name</label>
-      <input name="groupName" type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Group name">
+      <input name="groupName" type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Group name" required>
     </div>
     <div class="form-group">
       <label for="exampleInputPassword1">Parameter1</label>
-      <input name="parameter1" type="number" class="form-control" id="exampleInputPassword1" placeholder="Parameter 1">
+      <input name="parameter1" type="number" min="0"class="form-control" id="exampleInputPassword1" placeholder="Parameter 1" required>
     </div>
     <div class="form-group">
       <label for="exampleInputPassword1">Parameter2</label>
-      <input name="parameter2" type="number" class="form-control" id="exampleInputPassword1" placeholder="Parameter 2">
+      <input name="parameter2" type="number" min="0" class="form-control" id="exampleInputPassword1" placeholder="Parameter 2" required>
     </div>
     <div class="form-group">
       <label for="exampleInputPassword1">Parameter3</label>
-      <input name="parameter3" type="number" class="form-control" id="exampleInputPassword1" placeholder="Parameter 3">
+      <input name="parameter3" type="number" min="0" class="form-control" id="exampleInputPassword1" placeholder="Parameter 3" required>
     </div>
     <button type="submit" class="btn btn-primary">Add group</button>
   </form>

@@ -42,6 +42,7 @@ def instantiateDatabase():
     # cursor.execute("CREATE TABLE")
 
     cursor.execute("CREATE TABLE IF NOT EXISTS devicesGroups (groupName VARCHAR(100) PRIMARY KEY, p1 float, p2 float, p3 float)")
+    cursor.execute("INSERT into devicesGroups (groupName, p1, p2, p3) values (\'default\', 0, 0, 0) ON DUPLICATE KEY UPDATE p1 = 0, p2 = 0, p3 = 0")
     db.commit()
     cursor.execute("CREATE TABLE IF NOT EXISTS devices (id INT PRIMARY KEY, ipAddress VARCHAR(30), ipPort INT, status INT, name VARCHAR(100), groupName VARCHAR(100), type VARCHAR(100), FOREIGN KEY (groupName) REFERENCES devicesGroups(groupName))")
     db.commit()

@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: sendemail
+  name: sendemaildeployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sendemail
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: sendemail
+    spec:
+      containers:
+      - image: sendemail:v1
+        imagePullPolicy: Never
+        name: sendemail
+        ports:
+        - containerPort: 8081

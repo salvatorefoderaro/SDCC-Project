@@ -6,7 +6,7 @@
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Jekyll v4.0.1">
-    <title>Starter Template · Bootstrap</title>
+    <title>Home - SDCC Project</title>
 
     <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/starter-template/">
 
@@ -116,7 +116,7 @@
             <form action="/modifyDevice" method="GET">
               <div class="form-group">
                 <label for="exampleInputEmail">Nome</label>
-                <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="new_value" placeholder="Nome nuovo">
+                <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="new_value" placeholder="Nome nuovo" required>
                 <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="id" value={{ myString['list'][i]['devicesList'][j]['id'] }}>
                 <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="type" value="name">
                 <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="ip_address" value= {{ myString['list'][i]['devicesList'][j]['ipAddress'] }}>
@@ -134,7 +134,7 @@
             <form action="/modifyDevice" method="GET">
               <div class="form-group">
                 <label for="exampleInputEmail1">Gruppo</label>
-                <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="new_value" placeholder="Gruppo nuovo">
+                <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="new_value" placeholder="Gruppo nuovo" required>
                 <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="id" value={{ myString['list'][i]['devicesList'][j]['id'] }}>
                 <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="type" value="groupName">
                 <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="ip_address" value= {{ myString['list'][i]['devicesList'][j]['ipAddress'] }}>
@@ -152,7 +152,7 @@
             <form action="/modifyDevice" method="GET">
               <div class="form-group">
                 <label for="exampleInputEmail1">Intervallo lettura</label>
-                <input type="number" step="1" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="new_value" placeholder="Nuovo intervallo lettura">
+                <input type="number" min="5" step="1" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="new_value" placeholder="Nuovo intervallo lettura" required>
                 <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="id" value={{ myString['list'][i]['devicesList'][j]['id'] }}>
                 <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="type" value="lecture_interval">
                 <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="ip_address" value= {{ myString['list'][i]['devicesList'][j]['ipAddress'] }}>
@@ -205,9 +205,6 @@
               <li class="list-group-item">Indirizzo IP: {{ myString['list'][i]['controlList'][j]['ipAddress'] }} : {{ myString['list'][i]['controlList'][j]['ipPort']}}</li>
               <!-- <li class="list-group-item">Nome: {{ myString['list'][i]['controlList'][j]['name'] }}</li> -->
               <!-- <li class="list-group-item">Gruppo: {{ myString['list'][i]['controlList'][j]['groupName'] }}</li> -->
-              <li class="list-group-item">Ultima temperatura: {{ myString['list'][i]['controlList'][j]['temperatura'] }}</li>
-              <li class="list-group-item">Ultima umidità: {{ myString['list'][i]['controlList'][j]['umidita'] }}</li>
-              <li class="list-group-item">Ultima rilevazione: {{ myString['list'][i]['controlList'][j]['lettura'] }}</li>
             </ul>
     
             {% set name_collapse = "name_collapse" ~ myString['list'][i]['controlList'][j]['id'] %}
@@ -232,7 +229,7 @@
                 <form action="/modifyDevice" method="GET">
                   <div class="form-group">
                     <label for="exampleInputEmail">Nome</label>
-                    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="new_value" placeholder="Nome nuovo">
+                    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="new_value" placeholder="Nome nuovo" required>
                     <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="id" value={{ myString['list'][i]['controlList'][j]['id'] }}>
                     <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="type" value="name">
                     <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="ip_address" value= {{ myString['list'][i]['controlList'][j]['ipAddress'] }}>
@@ -250,7 +247,7 @@
                 <form action="/modifyDevice" method="GET">
                   <div class="form-group">
                     <label for="exampleInputEmail1">Gruppo</label>
-                    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="new_value" placeholder="Gruppo nuovo">
+                    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="new_value" placeholder="Gruppo nuovo" required>
                     <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="id" value={{ myString['list'][i]['controlList'][j]['id'] }}>
                     <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="type" value="groupName">
                     <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="ip_address" value= {{ myString['list'][i]['controlList'][j]['ipAddress'] }}>

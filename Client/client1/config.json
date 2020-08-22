@@ -1,1 +1,1 @@
-{"id": 1025, "name": "bb", "groupName": "FFF", "cluster_port": 5000, "search_interval": 5, "bcast_ip": "239.255.255.250", "bcast_port": 10000, "protocol": "blockchain", "networkid": "main1111", "mine_ip_port": 9003, "type": "sensor", "lecture_interval": 20}
+{"id": 1025, "name": "bb", "groupName": "FFF", "cluster_port": 5000, "search_interval": 5, "bcast_ip": "239.255.255.250", "bcast_port": 10000, "protocol": "ssdp", "networkid": "cluster", "mine_ip_port": 9003, "type": "sensor", "lecture_interval": 20}
