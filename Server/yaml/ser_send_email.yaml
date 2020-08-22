@@ -1,0 +1,14 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: sendemailservice
+spec:
+  selector:
+    app: sendemail
+  ports:
+  # Porta accessibile all'interno del cluster dagli altri Pod
+  - targetPort: 8081
+    
+    # Porta accessibile all'esterno
+    port: 8081
+  type: NodePort

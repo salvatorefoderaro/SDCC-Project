@@ -12,6 +12,8 @@ kubectl delete services getdevicesstatservice
 kubectl delete services dashboardservice
 kubectl delete services calculatevalueservice
 kubectl delete services collectdataservice
+kubectl delete services sendemailservice
+kubectl delete deployment sendemaildeployment
 kubectl delete services mysql
 kubectl delete deployment calculatevaluedeployment
 cp cluster_config.json dashboard/cluster_config.json
@@ -23,6 +25,7 @@ cd ../instantiate_database && docker build -t dbinstantiate:v1 .
 cd ../dashboard && docker build -t dashboard:v1 .
 cd ../get_devices_stat && docker build -t getdevicesstat:v1 .
 cd ../s3_upload_dump && docker build -t uploads3:v1 .
+cd ../send_email && docker build -t sendemail:v1 .
 cd ../calculate_value && docker build -t calculatevalue:v1 .
 cd ../yaml
 docker pull mysql:5.7.5
@@ -42,4 +45,6 @@ kubectl apply -f dep_get_devices_stat.yaml
 kubectl apply -f dep_calculate_value.yaml
 kubectl apply -f cronjob_check_devices_status.yaml
 kubectl apply -f ser_calculate_value.yaml
+kubectl apply -f ser_send_email.yaml
+kubectl apply -f dep_send_email.yaml
 minikube tunnel

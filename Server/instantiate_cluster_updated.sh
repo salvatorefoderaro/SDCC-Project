@@ -33,4 +33,6 @@ kubectl apply -f dep_calculate_value.yaml
 kubectl apply -f cronjob_check_devices_status.yaml
 kubectl apply -f dep_collect_data_hpa.yaml
 kubectl apply -f ser_calculate_value.yaml
+kubectl apply -f ser_send_email.yaml
+kubectl apply -f dep_send_email.yaml
 minikube tunnel

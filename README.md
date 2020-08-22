@@ -213,8 +213,8 @@ https://kubernetes.io/docs/tasks/run-application/run-single-instance-stateful-ap
 
 ## **Sviluppi futuri**
 
+https://www.amazon.it/compatibile-telecomando-automazione-regolatore-Manipolatore/dp/B084VPD5TM/
+
 https://github.com/clach04/python-tuya
 
 https://github.com/codetheweb/tuyapi
-
-https://www.amazon.it/compatibile-telecomando-automazione-regolatore-Manipolatore/dp/B084VPD5TM/
