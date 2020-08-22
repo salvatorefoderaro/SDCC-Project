@@ -31,6 +31,7 @@ def readJson():
 def getExternalIp():
     global SERVICE_EXTERNAL_IP
     SERVICE_EXTERNAL_IP = minikubeservice.getServiceExternalIP("collectdataservice") 
+    print(SERVICE_EXTERNAL_IP)
     while (SERVICE_EXTERNAL_IP == 'None' or SERVICE_EXTERNAL_IP == '<pending>'):
         print("Waiting for cluster 'collect_data' ip...")
         time.sleep(EXTERNAL_IP_INTERVAL)   

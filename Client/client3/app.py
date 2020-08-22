@@ -94,8 +94,6 @@ def getClusterIpAddress():
             except:
                 sock.close()
 
-
-
 # Router per la get per controllare lo stato del dispositivo
 @app.route('/checkStatus', methods=['GET'])
 def checkStatus():
