@@ -31,16 +31,16 @@ s3 = boto3.resource(
 ###################################
 
 def addToBucket():
-    #La funzione aggiunge l'immagine all'interno del bucket desiderato.
-    #imgPath: str --> path locale del file
-    #imgName: str --> nome del file una volta inserito all'interno del bucket.
 
     with open('/config/cluster_config.json') as config_file:
         data = json.load(config_file)
         FOLDER_NAME = data['folder_name']
         config_file.close()
 
-    list_of_files = glob.glob('dump/*') # * means all if need specific format then *.csv
+    # Ottengo la lista dei file presenti nella cartella 'dump'
+    list_of_files = glob.glob('dump/*') 
+
+    # Considero il file più recente
     latest_file = max(list_of_files, key=os.path.getctime)
     try:
         data = open(latest_file, 'rb')

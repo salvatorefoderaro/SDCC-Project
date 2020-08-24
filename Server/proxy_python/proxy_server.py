@@ -31,6 +31,7 @@ def readJson():
 def getExternalIp():
     global SERVICE_EXTERNAL_IP
     SERVICE_EXTERNAL_IP = minikubeservice.getServiceExternalIP("collectdataservice") 
+    print(SERVICE_EXTERNAL_IP)
     while (SERVICE_EXTERNAL_IP == 'None' or SERVICE_EXTERNAL_IP == '<pending>'):
         print("Waiting for cluster 'collect_data' ip...")
         time.sleep(EXTERNAL_IP_INTERVAL)   
@@ -68,13 +69,22 @@ def newDevice():
 # Invio la lettura del dispositivo al cluster
 @app.route('/sendDataToCluster', methods=['POST'])
 def sendDataToCluster():
-    dictToSend = {'id':request.json['id'], 'temperatura':request.json['temperatura'], 'umidita':request.json['umidita']}
-    try:
-        res = requests.post("http://" + str(SERVICE_EXTERNAL_IP) + ":"+ str(COLLECT_DATA_PORT) +"/collectData", json=dictToSend, timeout=10)
-        return res.text
-    except requests.exceptions.RequestException as e:  # This is the correct syntax
-        getExternalIp()
-        return "Not ok"
+    if request.json['type'] == 'sensor':
+        dictToSend = {'id':request.json['id'], 'temperatura':request.json['temperatura'], 'umidita':request.json['umidita'], 'type':request.json['type']}
+        try:
+            res = requests.post("http://" + str(SERVICE_EXTERNAL_IP) + ":"+ str(COLLECT_DATA_PORT) +"/collectData", json=dictToSend, timeout=10)
+            return res.text
+        except requests.exceptions.RequestException as e:  # This is the correct syntax
+            getExternalIp()
+            return "Not ok"
+    elif request.json['type'] == 'check_water':
+        dictToSend = {'id':request.json['id'], 'water_level':request.json['water_level'], 'type':request.json['type']}
+        try:
+            res = requests.post("http://" + str(SERVICE_EXTERNAL_IP) + ":"+ str(COLLECT_DATA_PORT) +"/collectData", json=dictToSend, timeout=10)
+            return res.text
+        except requests.exceptions.RequestException as e:  # This is the correct syntax
+            getExternalIp()
+            return "Not ok"       
 
 if __name__ == '__main__':   
     readJson()

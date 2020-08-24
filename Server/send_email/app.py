@@ -10,7 +10,7 @@ import smtplib
 app = Flask(__name__)
 
 '''
-Modulo che si occupa di regisrare i nuovi dispositivi e le registrazioni prodotte nel sengolo dai singoli dispositivi.
+Il modulo si occupa dell'inivio delle email nel caso in cui un dispositivo non dovesse rispondere al controllo sullo stato.
 '''
 
 @app.route('/sendEmail', methods=['GET'])
@@ -20,22 +20,25 @@ def collectData():
     device_id = str(request.args.get("deviceId"))
     device_ip = str(request.args.get("deviceIp"))
     device_port = str(request.args.get("devicePort"))
+    type = str(request.args.get("type"))
     FROM = gmail_user
     TO = ['salvatore.foderaro@gmail.com']
     SUBJECT = 'Dispositivo non funzionante - Cluster SSDC'
-    TEXT = 'Il sensore\n\nId: ' + device_id + '\n\nIndirizzo IP: ' + device_ip + '\n\nNumero di porta: ' + device_port + '\n\nrisulta non raggiungibile.'
 
-# Prepare actual message
+    if type == "error":
+        TEXT = 'Il sensore\n\nId: ' + device_id + '\n\nIndirizzo IP: ' + device_ip + '\n\nNumero di porta: ' + device_port + '\n\nrisulta non raggiungibile.'
+
+    # Preparo il messaggio
     message = """From: %s\nTo: %s\nSubject: %s\n\n%s
     """ % (FROM, ", ".join(TO), SUBJECT, TEXT)
 
+    # Effettuo l'invio del messaggio
     try:
         server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
         server.ehlo()
         server.login(gmail_user, gmail_password)
         server.sendmail(FROM, TO, message)       
         server.close()
-
         print ('Email sent!')
     except:
         print ('Something went wrong...')

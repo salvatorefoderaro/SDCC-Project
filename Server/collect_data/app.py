@@ -34,9 +34,12 @@ def collectData():
     if row == None:
         return "Not present"
 
-    # In caso positivo, aggiorno lo stato e registro la misurazione
-    cursor.execute("UPDATE devices SET status = 0 where id = " + str(request.json['id']))
-    cursor.execute("INSERT INTO lectures (id, temperatura, umidita, lettura) VALUES (" + str(request.json['id']) +"," + str(request.json['temperatura']) + "," + str(request.json['umidita'])+",now())")
+    cursor.execute("UPDATE devices SET status = 0, lettura=now() where id = " + str(request.json['id']))
+    if request.json['type'] == 'sensor':
+        cursor.execute("INSERT INTO lectures (id, temperatura, umidita, lettura) VALUES (" + str(request.json['id']) +"," + str(request.json['temperatura']) + "," + str(request.json['umidita'])+",now())")
+
+    elif request.json['type'] == 'check_water':
+        cursor.execute("INSERT INTO water_level (id, water_L, lettura) VALUES (" + str(request.json['id']) +"," + str(request.json['water_level']) + ",now()) ON DUPLICATE KEY UPDATE water_L =\'" + str(request.json['water_level']) +"\', lettura = now()")
 
     cursor.close()
     db.commit()
@@ -61,7 +64,7 @@ def newDevice():
         cursor = db.cursor()
 
         # Inserisco il dispositivo nel database
-        cursor.execute("INSERT INTO devices (id, ipAddress, ipPort, status, name, groupName, type) VALUES (" + str(request.json['id']) + ", \'" + str(request.json['ipAddress']) + "\'" + ", \'" + str(request.json['ipPort']) + "\',0,\'" + str(request.json['name']) + "\',\'default\',\'" + str(request.json['type']) + "\') ON DUPLICATE KEY UPDATE status = 0, ipAddress =\'" + str(request.json['ipAddress']) +"\', name =\'" + str(request.json["name"]) + "\'")
+        cursor.execute("INSERT INTO devices (id, ipAddress, ipPort, status, name, groupName, type) VALUES (" + str(request.json['id']) + ", \'" + str(request.json['ipAddress']) + "\'" + ", \'" + str(request.json['ipPort']) + "\',0,\'" + str(request.json['name']) + "\',\'default\',\'" + str(request.json['type']) + "\') ON DUPLICATE KEY UPDATE status = 0, ipAddress =\'" + str(request.json['ipAddress']) +"\', name =\'" + str(request.json["name"]) + "\', type =\'" + str(request.json["type"]) + "\'")
 
         cursor.close()
         db.commit()
