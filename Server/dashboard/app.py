@@ -65,7 +65,6 @@ def checkDevicesStatus():
                 
     cursor.close()
     db.commit()
-
     
     try:
         data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getDeviceStat").json()
@@ -102,7 +101,6 @@ def deleteGroup():
 # Funzione per l'aggiunta di un nuovo gruppo
 @app.route('/addGroup', methods=['GET'])
 def addGroup():
-
 
     groupName = str(request.args.get("groupName"))
     parameter1 = str(request.args.get("parameter1"))

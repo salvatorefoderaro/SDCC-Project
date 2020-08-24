@@ -31,12 +31,13 @@ def getDevicesStat():
 
     cursor = db.cursor()
 
-    dict = {}
     keyList = []
+
+    dict = {}
     dictControl = {}
+    dictWater = {}
 
-
-    cursor.execute("select L.id, L.temperatura, L.umidita, L.lettura, D.ipAddress, D.ipPort, D.status, D.name, D.groupName FROM lectures as L JOIN devices as D on L.id = D.id WHERE lettura = (SELECT MAX(Lettura) FROM lectures WHERE id = L.id) and D.type='\sensor\'")
+    cursor.execute("select L.id, L.temperatura, L.umidita, L.lettura, D.ipAddress, D.ipPort, D.status, D.name, D.groupName FROM lectures as L JOIN devices as D on L.id = D.id WHERE L.lettura = (SELECT MAX(Lettura) FROM lectures WHERE id = L.id) and D.type='\sensor\'")
 
     myresult = cursor.fetchall()
 
@@ -53,7 +54,7 @@ def getDevicesStat():
         else:
             dict[key].append({'id':x[0], 'temperatura':x[1], 'umidita':x[2], 'lettura':str(x[3]), 'ipAddress':x[4], 'ipPort':x[5], 'status':x[6], 'name':x[7], 'groupName':str(x[8])})
 
-    cursor.execute("select D.id, L.lettura, D.ipAddress, D.ipPort, D.status, D.name, D.groupName FROM devices as D JOIN lectures as L on L.id = D.id where type='\control\'")
+    cursor.execute("select D.id, D.lettura, D.ipAddress, D.ipPort, D.status, D.name, D.groupName FROM devices as D where type='\control\'")
 
     myresult = cursor.fetchall()
 
@@ -71,6 +72,24 @@ def getDevicesStat():
         else:
             dictControl[key].append({'id':x[0], 'lettura':str(x[1]), 'ipAddress':x[2], 'ipPort':x[3], 'status':x[4], 'name':x[5], 'groupName':str(x[6])})
 
+    cursor.execute("select D.id, W.lettura, D.ipAddress, D.ipPort, D.status, D.name, D.groupName, W.water_L FROM devices as D JOIN water_level as W on D.id = W.id")
+
+    myresult = cursor.fetchall()
+
+    for x in myresult:
+        if str(x[6]).replace(" ", "") == 'None':
+            key = 'Default'
+        else:
+            key = str(x[6]).replace(" ", "")
+
+        if key not in keyList:
+            keyList.append(key)
+        if key not in dictWater:
+            dictWater[key] = []
+            dictWater[key].append({'id':x[0], 'lettura':str(x[1]), 'ipAddress':x[2], 'ipPort':x[3], 'status':x[4], 'name':x[5], 'groupName':str(x[6]), 'water_level':str(x[7])})
+        else:
+            dictWater[key].append({'id':x[0], 'lettura':str(x[1]), 'ipAddress':x[2], 'ipPort':x[3], 'status':x[4], 'name':x[5], 'groupName':str(x[6]), 'water_level':str(x[7])})
+
     jsonDict = {'list' : []}
 
     for i in keyList:
@@ -82,7 +101,11 @@ def getDevicesStat():
             devicesControlList = dictControl[i]
         else:
             devicesControlList = []
-        singleDict = {'groupName' : i, 'devicesList' : devicesList, 'controlList' : devicesControlList}
+        if i in dictWater:
+            devicesWaterList = dictWater[i]
+        else:
+            devicesWaterList = []
+        singleDict = {'groupName' : i, 'devicesList' : devicesList, 'controlList' : devicesControlList, 'waterList': devicesWaterList}
         jsonDict['list'].append(singleDict)
 
     json_data = json.dumps(jsonDict)
@@ -127,6 +150,7 @@ def deleteDevice():
         cursor = db.cursor()
 
         cursor.execute("DELETE from lectures where id = " + request.args.get("id"))
+        cursor.execute("DELETE from water_level where id= " + request.args.get("id"))
         cursor.execute("DELETE from devices where id = " + request.args.get("id"))
         cursor.close()
         db.commit()

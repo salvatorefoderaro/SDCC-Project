@@ -20,10 +20,13 @@ def collectData():
     device_id = str(request.args.get("deviceId"))
     device_ip = str(request.args.get("deviceIp"))
     device_port = str(request.args.get("devicePort"))
+    type = str(request.args.get("type"))
     FROM = gmail_user
     TO = ['salvatore.foderaro@gmail.com']
     SUBJECT = 'Dispositivo non funzionante - Cluster SSDC'
-    TEXT = 'Il sensore\n\nId: ' + device_id + '\n\nIndirizzo IP: ' + device_ip + '\n\nNumero di porta: ' + device_port + '\n\nrisulta non raggiungibile.'
+
+    if type == "error":
+        TEXT = 'Il sensore\n\nId: ' + device_id + '\n\nIndirizzo IP: ' + device_ip + '\n\nNumero di porta: ' + device_port + '\n\nrisulta non raggiungibile.'
 
     # Preparo il messaggio
     message = """From: %s\nTo: %s\nSubject: %s\n\n%s

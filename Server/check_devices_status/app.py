@@ -35,12 +35,12 @@ def checkDevicesStatus():
             logging.info(res.text)
             if res.text != "Ok":
                 cursor.execute("UPDATE devices SET status = 100 WHERE id ="+str(x[0])+"")
-                res = requests.get('http://sendemailservice:8081/sendEmail?deviceId=' + str(x[0]) +'&deviceIp=' + str(x[1]) + '&devicePort=' + str(x[2]), timeout=5)
+                res = requests.get('http://sendemailservice:8081/sendEmail?deviceId=' + str(x[0]) +'&deviceIp=' + str(x[1]) + '&devicePort=' + str(x[2] +'&type=error'), timeout=5)
             else:
-                cursor.execute("UPDATE devices SET status = 0 WHERE id ="+str(x[0])+"")
+                cursor.execute("UPDATE devices SET status = 0, lettura=now() WHERE id ="+str(x[0])+"")
         except requests.exceptions.RequestException as e:  # This is the correct syntax
             cursor.execute("UPDATE devices SET status = 100 WHERE id ="+str(x[0])+"")
-            res = requests.get('http://sendemailservice:8081/sendEmail?deviceId=' + str(x[0]) +'&deviceIp=' + str(x[1]) + '&devicePort=' + str(x[2]), timeout=5)
+            res = requests.get('http://sendemailservice:8081/sendEmail?deviceId=' + str(x[0]) +'&deviceIp=' + str(x[1]) + '&devicePort=' + str(x[2]) + '&type=error', timeout=5)
                 
     cursor.close()
     db.commit()

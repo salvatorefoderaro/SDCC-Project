@@ -56,8 +56,14 @@ def getDevicesStat():
 
     for x in myresult:
         key = str(x[2]).replace(" ", "")
+        rows_count = cursor.execute("select W.water_L FROM water_level as W JOIN devices as D on W.id = D.id WHERE D.type=\'check_water\' and D.groupName=\'" + key + "\'")
+        if rows_count > 0:
+            myresult_nid = cursor.fetchall()
+            water_level = myresult_nid[0][0]
+        else:
+            water_level = 0
         keyList.append(key)
-        dictControl['groups_list'].append({'groupName':key, 'avgTemperatura':x[0], 'avgUmidita':x[1], 'p1':x[3], 'p2':str(x[4]), 'p3':x[5]})
+        dictControl['groups_list'].append({'groupName':key, 'avgTemperatura':x[0], 'avgUmidita':x[1], 'p1':x[3], 'p2':str(x[4]), 'p3':x[5], 'water_level': water_level})
         json_data = json.dumps(dictControl)
 
     return json_data
