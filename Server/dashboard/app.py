@@ -11,6 +11,8 @@ from botocore.client import Config
 FOLDER_NAME = ""
 SERVICE_IP = 0
 SERVICE_PORT = 0
+AWS_IP = ""
+AWS_PORT = 0
 
 '''
 Modulo per la dashboard di gestione dell'intero applicativo.
@@ -19,11 +21,13 @@ Modulo per la dashboard di gestione dell'intero applicativo.
 app = Flask(__name__)
 
 def readJson():
-    global FOLDER_NAME, SERVICE_IP, SERVICE_PORT
+    global FOLDER_NAME, SERVICE_IP, SERVICE_PORT, AWS_IP, AWS_PORT
     with open('/config/config.json') as config_file:
         data = json.load(config_file)
         SERVICE_IP = data['service_ip']
         SERVICE_PORT = data['service_port']
+        AWS_IP = data['aws_ip']
+        AWS_PORT = data['aws_port']
         config_file.close()
     with open('/config/cluster_config.json') as config_file:
         data = json.load(config_file)
@@ -107,12 +111,14 @@ def addGroup():
     parameter1 = str(request.args.get("parameter1"))
     parameter2 = str(request.args.get("parameter2"))
     parameter3 = str(request.args.get("parameter3"))
+    latCenter = str(request.args.get("latCenter"))
+    longCenter = str(request.args.get("longCenter"))
 
     response123 = False
 
 
     try:
-        res = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/addGroup?groupName='+groupName+'&parameter1=' + parameter1 + '&parameter2=' + parameter2 + '&parameter3=' + parameter3, timeout=5)
+        res = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/addGroup?groupName='+groupName+'&parameter1=' + parameter1 + '&parameter2=' + parameter2 + '&parameter3=' + parameter3 + '&longCenter=' + longCenter + '&latCenter=' + latCenter, timeout=5)
         response123 = True
         if res.text != "Ok":
             message = "Errore nell'aggiunta del gruppo."
@@ -129,6 +135,22 @@ def addGroup():
 @app.route('/deleteDevice', methods=['GET'])
 def deleteDevice():
 
+    dictec2 = {}
+
+    with open('weather.json') as config_file:
+        data_meteo = json.load(config_file)
+        config_file.close()
+
+
+    with open('ec2value.json') as config_file:
+        data_ec2 = json.load(config_file)
+        config_file.close()
+
+    for i in range(0, len(data_ec2['groups_list'])):
+        dictec2[data_ec2['groups_list'][i]['groupName']] = data_ec2['groups_list'][i]['ndvi_mean']
+     
+     
+
     new_value = str(request.args.get("new_value"))
     id = str(request.args.get("id"))
     type = str(request.args.get("type"))
@@ -136,6 +158,7 @@ def deleteDevice():
     port = str(request.args.get("port"))
 
     response123 = True
+    
 
     try:
         res = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/deleteDevice?ipAddress='+ip_address+'&ipPort=' + port + '&new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
@@ -147,11 +170,27 @@ def deleteDevice():
         return render_template('error_template.html', responseMessage=str(e))
 
     data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getDeviceStat").json()
-    return render_template('template_bootstrap.html', myString=data, response=response123)
+    return render_template('template_bootstrap.html', myString=data, weather=data_meteo, ndvi=dictec2, response=True)
 
 # Funzione per la modifica di un dispositivo
 @app.route('/modifyDevice', methods=['GET'])
 def modifyDevice():
+
+    dictec2 = {}
+
+    with open('weather.json') as config_file:
+        data_meteo = json.load(config_file)
+        config_file.close()
+
+
+    with open('ec2value.json') as config_file:
+        data_ec2 = json.load(config_file)
+        config_file.close()
+
+    for i in range(0, len(data_ec2['groups_list'])):
+        dictec2[data_ec2['groups_list'][i]['groupName']] = data_ec2['groups_list'][i]['ndvi_mean']
+     
+     
 
     new_value = str(request.args.get("new_value"))
     id = str(request.args.get("id"))
@@ -198,19 +237,20 @@ def modifyDevice():
     except requests.exceptions.RequestException as e:
         print(e)
         return render_template('error_template.html', responseMessage=str(e))
-    return render_template('template_bootstrap.html', myString=data, response=True)
+    return render_template('template_bootstrap.html', myString=data, weather=data_meteo, ndvi=dictec2, response=True)
 
 
 # Funzione per la visualizzazione della lista dei dispositivi
-@app.route('/',)
+@app.route('/')
 def indexRoute():
 
     dictec2 = {}
 
-    with open('weather.json') as config_file:
-        data_meteo = json.load(config_file)
-        config_file.close()
-
+    try:
+        data_meteo = requests.get("http://192.168.1.106:9000/weather_forecasts", timeout=5).json()
+    except requests.exceptions.RequestException as e:
+        print(str(e))
+        return render_template('error_template.html', responseMessage=str(e) + " Errore nell'ottenimento delle informazioni meteo." + " " + str(AWS_IP) + " " + str(AWS_PORT))
 
     with open('ec2value.json') as config_file:
         data_ec2 = json.load(config_file)
@@ -218,10 +258,10 @@ def indexRoute():
 
     for i in range(0, len(data_ec2['groups_list'])):
         dictec2[data_ec2['groups_list'][i]['groupName']] = data_ec2['groups_list'][i]['ndvi_mean']
-     
+
     try:
-        data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getDeviceStat").json()
-    except Exception as e:
+        data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getDeviceStat", timeout=5).json()
+    except requests.exceptions.RequestException as e:
         print(e)
         return render_template('error_template.html', responseMessage="Errore nell'ottenimento della lista dei dispositivi.")
     return render_template('template_bootstrap.html', myString=data, weather=data_meteo, ndvi=dictec2)

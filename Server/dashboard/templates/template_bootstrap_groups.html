@@ -28,6 +28,21 @@
           font-size: 3.5rem;
         }
       }
+
+            .scrolling-wrapper{
+	overflow-x: auto;
+}
+
+.card-block{
+	height: 250px;
+	background-color: #fff;
+	border: none;
+	transition: all 0.2s ease-in-out !important;
+	&:hover{
+		transform: translateY(-5px);
+		box-shadow: none;
+	}
+}
     </style>
     <!-- Custom styles for this template -->
     <link href="{{ url_for('static', filename='css/starter-template.css') }}" rel="stylesheet">
@@ -71,11 +86,14 @@
 
  <h2><a href="addGroupLink">Aggiungi gruppo.</a></h2>
 
+<div class="container-fluid">
+            <div class="scrolling-wrapper row flex-row flex-nowrap mt-4 pb-4">
+         
   {% for i in range(0, myString['list']|length ) %} 
 
-  <div class="card-deck">
+          <div class="col-5">
 
-      <div class="card" style="width: 18rem;">
+      <div class="card" >
           <div class="card-body">
           <h5 class="card-title"> {{ myString['list'][i]['groupName'] }}</h5>
         </div>
@@ -93,15 +111,12 @@
 
     </div>
 
-      {% if i % 3 == 0%}
-      </div>
-      <br><br>
-      <div class="card-deck">
-      {% endif %}
+</div>
       
-        </div>
 
   {% endfor %}
+           </div>
+           </div>
 
   {% endif %}
 

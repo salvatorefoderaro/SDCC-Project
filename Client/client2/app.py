@@ -68,7 +68,7 @@ def getMineIpAddress():
     MINE_IP_ADDRESS = IP
 
 # Client SSDP per l'ottenimento dell'indirizzo IP del cluster.
-def getClusterIpAddress():
+def getProxyIPAddress():
         global CLUSTER_IP_ADDRESS
         while True:
             try:
@@ -132,7 +132,7 @@ def editConfig():
 def doSomeStuff():
 
     # Ottengo l'indirizzo ip del cluster
-    getClusterIpAddress()
+    getProxyIPAddress()
 
     # Ottengo il mio indirizzo ip
     getMineIpAddress()
@@ -155,6 +155,7 @@ def doSomeStuff():
         
         except requests.exceptions.RequestException as e:  # This is the correct syntax
             print("Errore durante l'inserimento del dispositivo.")
+            getProxyIPAddress()
         
     # Se il dispositivo è un sensore...
     if TYPE == 'sensor':
@@ -182,42 +183,12 @@ def doSomeStuff():
                 logging.warning('Errore durante la registrazione della misurazione.')
                 
                 # Nel caso di errore, mi rimetto alla ricerca dell'indirizzo IP del cluster
-                getClusterIpAddress()
+                getProxyIPAddress()
             
             # Attendo prima di inviare la prossima lettura
             time.sleep(LECTURE_INTERVAL)
 
-    # Se il dispositivo è un sensore...
-    if TYPE == 'check_water':
-
-        # Invio ad intervallo di tempo regolari le letture di temperatura ed umidità
-        while (True):
-
-            # Preparo i dati da inviare
-            dictToSend = {'id':data['id'], 'water_level': fakesensor.getTemperature(), 'type': 'check_water'}
-            try:
-
-                # Effettuo la POST verso il proxy
-                result = requests.post('http://'+CLUSTER_IP_ADDRESS+':'+str(CLUSTER_PORT)+'/sendDataToCluster', json=dictToSend, timeout=3).text
-                
-                # Controllo il risultato
-                if result == "Ok":
-                    print("Misurazione inserita correttamente.")
-                
-                # Accade nel caso di errori, se il dispositivo non era stato precedentemente registrato
-                elif result == "Not present":
-                    print("Il dispositivo non e' registrato.")
-                else:
-                    print("Errore durante la registrazione della misurazione.")
-            except requests.exceptions.RequestException as e:  # This is the correct syntax
-                logging.warning('Errore durante la registrazione della misurazione.')
-                
-                # Nel caso di errore, mi rimetto alla ricerca dell'indirizzo IP del cluster
-                getClusterIpAddress()
-            
-            # Attendo prima di inviare la prossima lettura
-            time.sleep(LECTURE_INTERVAL)
-
+    
 
 if __name__ == '__main__':
     readJson()

@@ -61,6 +61,15 @@
             "air_humidity": 0.0,
             "clouds_percentage": 0.0,
             "wind_speed": 0.0
+        },
+        {
+            "day": "",
+            "description": "",
+            "temperatures": { "morning": 0.0, "daylight": 0.0, "evening": 0.0, "night": 0.0 },
+            "prob_of_precipitations": 0.0,
+            "air_humidity": 0.0,
+            "clouds_percentage": 0.0,
+            "wind_speed": 0.0
         }
     ]
 }

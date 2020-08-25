@@ -35,12 +35,7 @@ def collectData():
         return "Not present"
 
     cursor.execute("UPDATE devices SET status = 0, lettura=now() where id = " + str(request.json['id']))
-    if request.json['type'] == 'sensor':
-        cursor.execute("INSERT INTO lectures (id, temperatura, umidita, lettura) VALUES (" + str(request.json['id']) +"," + str(request.json['temperatura']) + "," + str(request.json['umidita'])+",now())")
-
-    elif request.json['type'] == 'check_water':
-        cursor.execute("INSERT INTO water_level (id, water_L, lettura) VALUES (" + str(request.json['id']) +"," + str(request.json['water_level']) + ",now()) ON DUPLICATE KEY UPDATE water_L =\'" + str(request.json['water_level']) +"\', lettura = now()")
-
+    cursor.execute("INSERT INTO lectures (id, temperatura, umidita, lettura) VALUES (" + str(request.json['id']) +"," + str(request.json['temperatura']) + "," + str(request.json['umidita'])+",now())")
     cursor.close()
     db.commit()
 

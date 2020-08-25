@@ -143,11 +143,12 @@
               <div class="card-body pb-3">
             
                 <!-- Title -->
-                <h4 class="card-title font-weight-bold">Warsaw</h4>
+                <!-- <h4 class="card-title font-weight-bold">Warsaw</h4> -->
                 <!-- Text -->
                 <p class="card-text">{{  weather['weather_forecasts'][i]['day'] }}</p>
                 <div class="d-flex justify-content-between">
-                  <p class="display-1 degree">23</p>
+                  <p class="display-1 degree">{{ weather['weather_forecasts'][i]['temperatures']['morning'] |int }}&deg;</p>
+                 <!-- <p class="display-1 degree">23</p> -->
                   {% if 'atmosphere' in weather['weather_forecasts'][i]['description'] %}
                   <i class="icon-atmosphere"></i>    
                   {% elif 'clear' in weather['weather_forecasts'][i]['description'] %}
@@ -164,7 +165,7 @@
                   <i class="icon-thunderstorm"></i>
                   {% endif %}                </div>
                 <div class="d-flex justify-content-between mb-4"><p>
-                  {{  weather['weather_forecasts'][i]['prob_of_precipitations'] }} Precipitazioni</p>
+                  {{  weather['weather_forecasts'][i]['prob_of_precipitations'] }}&percnt; Precipitazioni</p>
                   <p>{{  weather['weather_forecasts'][i]['wind_speed'] }} km/h Venti</p>
                 </div>
             
@@ -234,7 +235,7 @@
 
   {% for i in range(0, myString['list']|length ) %} 
 
-  <h2>Group name is: {{ myString['list'][i]['groupName'] }}</h2>
+  <p><h2>Group name is: {{ myString['list'][i]['groupName'] }}</h2>
 {% if ndvi[myString['list'][i]['groupName']] is defined%}
 
 <div class="card weather-card w-40">
@@ -243,7 +244,7 @@
   <div class="card-body pb-3">
 
     <!-- Title -->
-    <h4 class="card-title font-weight-bold">Qualità vegetazione</h4>
+    <h4 class="card-title font-weight-bold">Qualità vegetazion1e</h4>
     <!-- Text -->
     <div class="d-flex justify-content-between">
       <p class="display-1 degree">{{ ndvi[myString['list'][i]['groupName']] }}</p>
@@ -266,7 +267,7 @@
   {%for j in range(0, myString['list'][i]['devicesList']|length )%} 
   <div class="col-5">
 
-      <div class="card" >
+      <div class="card">
 
         {% if myString['list'][i]['devicesList'][j]['status'] == 0 %}
           <div class="card-body" style="background-color:green;">
@@ -340,7 +341,6 @@
 
         <div class="collapse" id= {{ lecture_collapse }}>
           <div class="card card-body">
-
             <form action="/modifyDevice" method="GET">
               <div class="form-group">
                 <label for="exampleInputEmail1">Intervallo lettura</label>
@@ -449,101 +449,10 @@
                   </div>
          </div>
         </p>
-    {% endif %}
-
-    {% if myString['list'][i]['waterList']|length > 0%}
-            <h3>Water list</h3>
-            <p>
-              <p>
-                <div class="container-fluid">
-                  <div class="scrolling-wrapper row flex-row flex-nowrap mt-4 pb-4">
-              {%for j in range(0, myString['list'][i]['waterList']|length )%} 
-              <div class="col-5">
-              <div class="card" >
-                {% if myString['list'][i]['waterList'][j]['status'] == 0 %}
-              <div class="card-body" style="background-color:green;">
-            {% else %}
-              <div class="card-body" style="background-color:red;">
-            {% endif %}
-                  <h5 class="card-title">{{ myString['list'][i]['waterList'][j]['name'] }}</h5>
-                </div>
-    
-                  <ul class="list-group list-group-flush">
-                  <li class="list-group-item">ID: {{ myString['list'][i]['waterList'][j]['id'] }}</li>
-                  <li class="list-group-item">Indirizzo IP: {{ myString['list'][i]['waterList'][j]['ipAddress'] }} : {{ myString['list'][i]['waterList'][j]['ipPort']}}</li>
-                  <li class="list-group-item">Livello acqua: {{ myString['list'][i]['waterList'][j]['water_level'] }}</li>
-                  <li class="list-group-item">Ultima rilevazione: {{ myString['list'][i]['waterList'][j]['lettura'] }}</li>
-                  <!-- <li class="list-group-item">Gruppo: {{ myString['list'][i]['waterList'][j]['groupName'] }}</li> -->
-                </ul>
-        
-                {% set name_collapse = "name_collapse" ~ myString['list'][i]['waterList'][j]['id'] %}
-                {% set group_collapse = "group_collapse" ~ myString['list'][i]['waterList'][j]['id'] %}
-                {% set lecture_collapse = "lecture_collapse" ~ myString['list'][i]['waterList'][j]['id'] %}
-                {% set link_name_collapse = "#name_collapse" ~ myString['list'][i]['waterList'][j]['id'] %}
-                {% set link_group_collapse = "#group_collapse" ~ myString['list'][i]['waterList'][j]['id'] %}
-                {% set link_lecture_collapse = "#lecture_collapse" ~ myString['list'][i]['waterList'][j]['id'] %}
-                {% set link_delete = "deleteDevice?id=" ~ myString['list'][i]['waterList'][j]['id'] %}
-        
-                <div class="card-body">
-                  {% if myString['list'][i]['waterList'][j]['status'] == 0 %}
-                  <a data-toggle="collapse" href= {{ link_name_collapse }} role="button" aria-expanded="false" aria-controls="nameCollapse" class="card-link">Modifica nome</a>
-                  <a data-toggle="collapse" href= {{ link_group_collapse }} role="button" aria-expanded="false" aria-controls="groupCollapse" class="card-link">Modifica gruppo</a>
-                  {% endif %}
-                  <a href={{ link_delete }} class="card-link">Elimina</a>
-                </div>
-        
-                <div class="collapse" id={{ name_collapse }}>
-                  <div class="card card-body">
-        
-                    <form action="/modifyDevice" method="GET">
-                      <div class="form-group">
-                        <label for="exampleInputEmail">Nome</label>
-                        <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="new_value" placeholder="Nome nuovo" required>
-                        <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="id" value={{ myString['list'][i]['waterList'][j]['id'] }}>
-                        <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="type" value="name">
-                        <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="ip_address" value= {{ myString['list'][i]['waterList'][j]['ipAddress'] }}>
-                        <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="port" value= {{ myString['list'][i]['waterList'][j]['ipPort'] }}>
-        
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-        
-                <div class="collapse" id= {{ group_collapse }}>
-                  <div class="card card-body">
-        
-                    <form action="/modifyDevice" method="GET">
-                      <div class="form-group">
-                        <label for="exampleInputEmail1">Gruppo</label>
-                        <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="new_value" placeholder="Gruppo nuovo" required>
-                        <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="id" value={{ myString['list'][i]['waterList'][j]['id'] }}>
-                        <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="type" value="groupName">
-                        <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="ip_address" value= {{ myString['list'][i]['waterList'][j]['ipAddress'] }}>
-                        <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="port" value= {{ myString['list'][i]['waterList'][j]['ipPort'] }}>
-        
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-              </div>
-              </div></div>
-        
-    
-        
-
-        
-              
-        
-                  {%endfor%} 
-                      </div>
-             </div>
-            </p>
-        {% endif %}
-            
+    {% endif %}        
 
   {%endfor%} 
+            </p>
           </div>
 
 

@@ -40,7 +40,7 @@ app = Flask(__name__)                   # Create the Flask app
 # REST API to compute Daily Water Plan and get results back to the user cluster.
 @app.route('/planning', methods = ['POST', 'GET'])
 def planning():
-
+    global TIC
     if request.method == 'POST':
         if TIC == True:
             return " Daily planning has already been computed! Check in Tomorrow!"
@@ -50,7 +50,8 @@ def planning():
         expire_day = datetime.fromtimestamp( request.args.get("expire") ).day
         if expire_day > today :
             REMAINING_DAYS = expire_day - today
-        else REMAINING_DAYS = expire_day
+        else:
+            REMAINING_DAYS = expire_day
         # Calculate the value of today's total water amount
         TODAY_WATER = WATER_CONTAINER/REMAINING_DAYS
         # Append sensors' informations on each reference-polygon's list
@@ -92,12 +93,13 @@ def planning():
 # REST API to get 7 days Weather Forecasting
 @app.route('/weather_forecasts')
 def weather_forecasts():
-    with open(dashboard_infos.json) as dash_infos:
+    with open('dashboard_infos.json') as dash_infos:
         data = json.load(dash_infos)
         dash_infos.close()
     counter = 0
+    print(len(SEVEN_DAYS_WEATHER_FORCASTS))
     for day in SEVEN_DAYS_WEATHER_FORCASTS:
-        data["weather_forecasts"][counter]["day"] = day.day
+        data["weather_forecasts"][counter]["day"] = day.day.strftime("%d/%m/%Y")
         data["weather_forecasts"][counter]["description"] = day.description
         data["weather_forecasts"][counter]["temperatures"]["morning"] = day.temperatures["morn"]
         data["weather_forecasts"][counter]["temperatures"]["daylight"] = day.temperatures["day"]
@@ -167,7 +169,7 @@ def keep_infos():
 
 # This function contains API call to the OpenWeatherAPI Server, to retrieve all polygons identifiers and main geometric features.
 def retrieve_polygons():
-    
+    global TOTAL_AREA
     for p in POLYGONS_INFOS:
 
         try:
@@ -180,7 +182,7 @@ def retrieve_polygons():
         p.set_id( data['id'] )
         p.set_center(data['center'])
         p.set_area(data['area'])
-        TOTAL_AREA = TOTAL_AREA + p.area
+        TOTAL_AREA += p.area
     
     for p in POLYGONS_INFOS:
         p.set_proportion = (p.area)/TOTAL_AREA
@@ -255,11 +257,12 @@ def weather_by_geocoordinates():
         logging.warning('Error retrieving weather infos about these coordinates from OpenWeatherMap Server.')
 
     forecasts = data['daily']
-
+    pprint(forecasts)
     for this_day in forecasts:
 
         weather_forecast = WeatherForecast( this_day['dt'], this_day['weather'][0]['description'],    this_day['temp'],   this_day['pop'],   
                                             this_day['clouds'], this_day['humidity'],    this_day['wind_speed'] )
+        
         SEVEN_DAYS_WEATHER_FORCASTS.append(weather_forecast)
 
 
@@ -273,20 +276,13 @@ def setup():
         get_satellite_img(p) 
     weather_by_geocoordinates()
 
-    #for i in SATELLITE_IMAGES:
-    #    i.print_all()
-    #for i in SEVEN_DAYS_WEATHER_FORCASTS:
-    #    i.print_all()
-
-
 
 
 if __name__ == '__main__':
 
-    thread = Thread(target = setup)
-    thread.start()
+    setup()
+    app.run(host='0.0.0.0', port=9000, debug=False)
     
-    app.run( debug = True )
     
     
     

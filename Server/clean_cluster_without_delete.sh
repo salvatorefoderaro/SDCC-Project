@@ -1,5 +1,6 @@
 #!/bin/bash
 
+clear
 kubectl delete deployment collectdatadeployment
 kubectl delete deployment dashboarddeployment
 kubectl delete deployment getdevicesstatdeployment

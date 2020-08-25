@@ -72,24 +72,6 @@ def getDevicesStat():
         else:
             dictControl[key].append({'id':x[0], 'lettura':str(x[1]), 'ipAddress':x[2], 'ipPort':x[3], 'status':x[4], 'name':x[5], 'groupName':str(x[6])})
 
-    cursor.execute("select D.id, W.lettura, D.ipAddress, D.ipPort, D.status, D.name, D.groupName, W.water_L FROM devices as D JOIN water_level as W on D.id = W.id")
-
-    myresult = cursor.fetchall()
-
-    for x in myresult:
-        if str(x[6]).replace(" ", "") == 'None':
-            key = 'Default'
-        else:
-            key = str(x[6]).replace(" ", "")
-
-        if key not in keyList:
-            keyList.append(key)
-        if key not in dictWater:
-            dictWater[key] = []
-            dictWater[key].append({'id':x[0], 'lettura':str(x[1]), 'ipAddress':x[2], 'ipPort':x[3], 'status':x[4], 'name':x[5], 'groupName':str(x[6]), 'water_level':str(x[7])})
-        else:
-            dictWater[key].append({'id':x[0], 'lettura':str(x[1]), 'ipAddress':x[2], 'ipPort':x[3], 'status':x[4], 'name':x[5], 'groupName':str(x[6]), 'water_level':str(x[7])})
-
     jsonDict = {'list' : []}
 
     for i in keyList:
@@ -101,11 +83,7 @@ def getDevicesStat():
             devicesControlList = dictControl[i]
         else:
             devicesControlList = []
-        if i in dictWater:
-            devicesWaterList = dictWater[i]
-        else:
-            devicesWaterList = []
-        singleDict = {'groupName' : i, 'devicesList' : devicesList, 'controlList' : devicesControlList, 'waterList': devicesWaterList}
+        singleDict = {'groupName' : i, 'devicesList' : devicesList, 'controlList' : devicesControlList}
         jsonDict['list'].append(singleDict)
 
     json_data = json.dumps(jsonDict)
@@ -183,7 +161,7 @@ def addGroup():
     cursor = db.cursor()
 
     try:
-        cursor.execute("INSERT INTO devicesGroups(groupName, p1, p2, p3) VALUES (\'" + str(request.args.get("groupName")) + "\'," + str(request.args.get("parameter1")) + ", " + str(request.args.get("parameter2")) + ", " + str(request.args.get("parameter3")) + ")")
+        cursor.execute("INSERT INTO devicesGroups (groupName, p1, p2, p3, latCenter, longCenter) VALUES (\'" + str(request.args.get("groupName")) + "\'," + str(request.args.get("parameter1")) + ", " + str(request.args.get("parameter2")) + ", " + str(request.args.get("parameter3")) + ", " + str(request.args.get("latCenter")) + ", " + str(request.args.get("longCenter")) + ")")
     except Exception as e:
         print(str(e))
 
