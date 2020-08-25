@@ -1,0 +1,19 @@
+{
+    "name": "Polygon D : GROUND VEGETABLES FIELD",
+    "geo_json": {
+        "type": "Feature",
+        "properties": {},
+        "geometry": {
+            "type": "Polygon",
+            "coordinates": [
+                [
+                    [-121.799927, 39.077055],
+                    [-121.792116, 39.077055],
+                    [-121.791859, 39.069797],
+                    [-121.800785, 39.069797],
+                    [-121.799927, 39.077055]
+                ]
+            ]
+        }
+    }
+}
