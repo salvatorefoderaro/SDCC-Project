@@ -1,0 +1,35 @@
+{
+    "groups_list": [{
+            "lat": 1,
+            "long": 2,
+            "groupName": "default",
+            "ndvi_img_url": "",
+            "ndvi_mean": "0.0",
+            "daily_water_unit": 0.0
+        },
+        {
+            "lat": 3,
+            "long": 4,
+            "groupName": "",
+            "ndvi_img_url": "",
+            "ndvi_mean": "",
+            "daily_water_unit": 0.0
+        },
+        {
+            "lat": 5,
+            "long": 6,
+            "groupName": "",
+            "ndvi_img_url": "",
+            "ndvi_mean": "",
+            "daily_water_unit": 0.0
+        },
+        {
+            "lat": 7,
+            "long": 8,
+            "groupName": "",
+            "ndvi_img_url": "",
+            "ndvi_mean": "",
+            "daily_water_unit": 0.0
+        }
+    ]
+}
