@@ -8,12 +8,11 @@
     <meta name="generator" content="Jekyll v4.0.1">
     <title>Home - SDCC Project</title>
 
-    <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/starter-template/">
 
     <!-- Bootstrap core CSS -->
 <link href="{{ url_for('static', filename='css/bootstrap.css') }}" rel="stylesheet">
 
-    <style>
+  <style>
       .bd-placeholder-img {
         font-size: 1.125rem;
         text-anchor: middle;
@@ -28,6 +27,70 @@
           font-size: 3.5rem;
         }
       }
+
+      .scrolling-wrapper{
+	overflow-x: auto;
+}
+
+.card-block{
+	height: 250px;
+	background-color: #fff;
+	border: none;
+	transition: all 0.2s ease-in-out !important;
+	&:hover{
+		transform: translateY(-5px);
+		box-shadow: none;
+	}
+}
+
+.icon-atmosphere {
+    background-image: url("{{ url_for('static', filename='img/atmosphere.png') }}");
+    background-position: center center;
+    width: 100px;
+    height: 100px;
+}
+
+.icon-clear {
+  background-image: url("{{ url_for('static', filename='img/clear.png') }}");
+    background-position: center center;
+    width: 100px;
+    height: 100px;
+}
+
+.icon-clouds {
+  background-image: url("{{ url_for('static', filename='img/clouds.png') }}");
+    background-position: center center;
+    width: 100px;
+    height: 100px;
+}
+
+.icon-drizzle {
+  background-image: url("{{ url_for('static', filename='img/drizzle.png') }}");
+    background-position: center center;
+    width: 100px;
+    height: 100px;
+}
+
+.icon-rain {
+  background-image: url("{{ url_for('static', filename='img/rain.png') }}");
+    background-position: center center;
+    width: 100px;
+    height: 100px;
+}
+
+.icon-snow {
+  background-image: url("{{ url_for('static', filename='img/snow.png') }}");
+    background-position: center center;
+    width: 100px;
+    height: 100px;
+}
+
+.icon-thunderstorm {
+  background-image: url("{{ url_for('static', filename='img/thunderstorm.png') }}");
+    background-position: center center;
+    width: 100px;
+    height: 100px;
+}
     </style>
     <!-- Custom styles for this template -->
     <link href="{{ url_for('static', filename='css/starter-template.css') }}" rel="stylesheet">
@@ -64,17 +127,146 @@
 
       <h2><a href="/checkDevicesStatus">Controlla manualmente lo stato dei dispositivi</a></h2>
 
+      <div class="container-fluid">
+        <div class="scrolling-wrapper row flex-row flex-nowrap mt-4 pb-4">
+          
+          {% for i in range(0, weather['weather_forecasts']|length ) %} 
+          {% set id = i|string %}
+          {% set weather_collapse = "weather_collapse" ~ id %}
+          {% set weather_collapse_link = "#weather_collapse" ~ id %}
+
+
+          <div class="col-5">
+            <div class="card weather-card">
+      
+              <!-- Card content -->
+              <div class="card-body pb-3">
+            
+                <!-- Title -->
+                <h4 class="card-title font-weight-bold">Warsaw</h4>
+                <!-- Text -->
+                <p class="card-text">{{  weather['weather_forecasts'][i]['day'] }}</p>
+                <div class="d-flex justify-content-between">
+                  <p class="display-1 degree">23</p>
+                  {% if 'atmosphere' in weather['weather_forecasts'][i]['description'] %}
+                  <i class="icon-atmosphere"></i>    
+                  {% elif 'clear' in weather['weather_forecasts'][i]['description'] %}
+                  <i class="icon-clear"></i>    
+                  {% elif 'clouds' in weather['weather_forecasts'][i]['description'] %}
+                  <i class="icon-clouds"></i>   
+                  {% elif 'drizzle' in weather['weather_forecasts'][i]['description'] %}
+                  <i class="icon-drizzle"></i>    
+                  {% elif 'rain' in weather['weather_forecasts'][i]['description'] %}
+                  <i class="icon-rain"></i>    
+                  {% elif 'snow' in weather['weather_forecasts'][i]['description'] %}
+                  <i class="icon-snow"></i>    
+                  {% elif 'thunderstorm' in weather['weather_forecasts'][i]['description'] %}
+                  <i class="icon-thunderstorm"></i>
+                  {% endif %}                </div>
+                <div class="d-flex justify-content-between mb-4"><p>
+                  {{  weather['weather_forecasts'][i]['prob_of_precipitations'] }} Precipitazioni</p>
+                  <p>{{  weather['weather_forecasts'][i]['wind_speed'] }} km/h Venti</p>
+                </div>
+            
+                <div class="collapse-content">
+            
+                  <div class="collapse" id="{{ weather_collapse }}">
+            
+                    <table class="table table-borderless table-sm mb-0">
+                      <tbody>
+                        <tr>
+                          <td class="font-weight-normal align-middle">Mattina</td>
+                          <td class="float-right font-weight-normal">
+                            <p class="mb-1">{{  weather['weather_forecasts'][i]['temperatures']['morning'] }}&deg;</p>
+                          </td>
+                          <td class="float-right mr-3">
+                            <i class="fas fa-sun fa-lg amber-text"></i>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td class="font-weight-normal align-middle">Giorno</td>
+                          <td class="float-right font-weight-normal">
+                            <p class="mb-1">{{  weather['weather_forecasts'][i]['temperatures']['daylight'] }}&deg;</p>
+                          </td>
+                          <td class="float-right mr-3">
+                            <i class="fas fa-cloud-sun-rain fa-lg text-info"></i>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td class="font-weight-normal align-middle">Sera</td>
+                          <td class="float-right font-weight-normal">
+                            <p class="mb-1">{{  weather['weather_forecasts'][i]['temperatures']['evening'] }}&deg;</p>
+                          </td>
+                          <td class="float-right mr-3">
+                            <i class="fas fa-sun fa-lg amber-text"></i>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td class="font-weight-normal align-middle">Notte</td>
+                          <td class="float-right font-weight-normal">
+                            <p class="mb-1">{{  weather['weather_forecasts'][i]['temperatures']['night'] }}&deg;</p>
+                          </td>
+                          <td class="float-right mr-3">
+                            <i class="fas fa-sun fa-lg amber-text"></i>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+            
+                  </div>
+            
+                  <hr class="">
+            
+                    <a class="btn btn-flat red-text p-1 my-1 mr-0 mml-1 deep-purple-text collapsed" data-toggle="collapse" href="{{ weather_collapse_link }}" aria-expanded="false" aria-controls="collapseExample">Mostra dettaglio</a>
+            
+                </div>
+            
+              </div>
+            
+            </div>    
+          </div>
+          {%endfor%} 
+
+          
+          </div>
+          
+        </div>
+
   {% for i in range(0, myString['list']|length ) %} 
 
   <h2>Group name is: {{ myString['list'][i]['groupName'] }}</h2>
-      
+{% if ndvi[myString['list'][i]['groupName']] is defined%}
+
+<div class="card weather-card w-40">
+
+  <!-- Card content -->
+  <div class="card-body pb-3">
+
+    <!-- Title -->
+    <h4 class="card-title font-weight-bold">Qualità vegetazione</h4>
+    <!-- Text -->
+    <div class="d-flex justify-content-between">
+      <p class="display-1 degree">{{ ndvi[myString['list'][i]['groupName']] }}</p>
+      <i class="icon-car"></i>
+    </div>
+
+  </div>
+
+</div>
+
+{% endif %}
+
+  <div>
   {% if myString['list'][i]['devicesList']|length > 0%}
 <p>
   <h3>Sensor list</h3>
-  <div class="card-deck">
-      {%for j in range(0, myString['list'][i]['devicesList']|length )%} 
 
-      <div class="card" style="width: 18rem;">
+  <div class="container-fluid">
+    <div class="scrolling-wrapper row flex-row flex-nowrap mt-4 pb-4">
+  {%for j in range(0, myString['list'][i]['devicesList']|length )%} 
+  <div class="col-5">
+
+      <div class="card" >
 
         {% if myString['list'][i]['devicesList'][j]['status'] == 0 %}
           <div class="card-body" style="background-color:green;">
@@ -166,32 +358,20 @@
 
     </div>
 
-      {% if j % 3 == 0%}
-      </div>
-  </div>
-  <br><br>
-      <div class="card-deck">
-
-
-      {% endif%}
-
-      
-
-          {%endfor%} 
-              </div>
+  {%endfor%} 
      </div>
+  </div>
       </p>
 {% endif %}
 
-
-<br><br>
 {% if myString['list'][i]['controlList']|length > 0%}
         <h3>Control list</h3>
         <p>
-        <div class="card-deck">
+          <div class="container-fluid">
+            <div class="scrolling-wrapper row flex-row flex-nowrap mt-4 pb-4">
           {%for j in range(0, myString['list'][i]['controlList']|length )%} 
-    
-          <div class="card" style="width: 18rem;">
+          <div class="col-5">
+          <div class="card">
             {% if myString['list'][i]['controlList'][j]['status'] == 0 %}
           <div class="card-body" style="background-color:green;">
         {% else %}
@@ -260,20 +440,10 @@
                 </form>
               </div>
             </div>
-    
-    
-
-    
-
-            {% if j % 3 == 2%}
           </div>
-      </div>
-          <div class="card-deck">
-    
-    
-          {% endif%}
-    
-          
+          </div>
+          </div>
+  
     
               {%endfor%} 
                   </div>
@@ -281,14 +451,15 @@
         </p>
     {% endif %}
 
-    <br><br>
     {% if myString['list'][i]['waterList']|length > 0%}
             <h3>Water list</h3>
             <p>
-            <div class="card-deck">
+              <p>
+                <div class="container-fluid">
+                  <div class="scrolling-wrapper row flex-row flex-nowrap mt-4 pb-4">
               {%for j in range(0, myString['list'][i]['waterList']|length )%} 
-        
-              <div class="card" style="width: 18rem;">
+              <div class="col-5">
+              <div class="card" >
                 {% if myString['list'][i]['waterList'][j]['status'] == 0 %}
               <div class="card-body" style="background-color:green;">
             {% else %}
@@ -356,18 +527,12 @@
                     </form>
                   </div>
                 </div>
-        
-        
-    
-        
-    
-                {% if j % 3 == 2%}
               </div>
-          </div>
-              <div class="card-deck">
+              </div></div>
         
+    
         
-              {% endif%}
+
         
               
         
@@ -379,9 +544,9 @@
             
 
   {%endfor%} 
+          </div>
 
 
 </main><!-- /.container -->
-<script src=" {{ url_for('static', filename='js/jquery-3.5.1.slim.min.js') }}"></script>
-      <script>window.jQuery || document.write('<script src="../assets/js/vendor/jquery.slim.min.js"><\/script>')</script><script src="{{ url_for('static', filename='js/bootstrap.bundle.js') }}"></script></body>
+<script src=" {{ url_for('static', filename='js/jquery-3.5.1.slim.min.js') }}"></script><script src="{{ url_for('static', filename='js/bootstrap.bundle.js') }}"></script></body>
 </html>

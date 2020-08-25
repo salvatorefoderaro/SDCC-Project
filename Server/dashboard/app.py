@@ -55,6 +55,7 @@ def checkDevicesStatus():
         # Effettuo una chiamata get e, in base alla risposta, aggiorno l stato del dispositivo
         try:
 
+
             res = requests.get('http://' + str(x[1]) + ':' + str(x[2]) +'/checkStatus', timeout=3)
             if res.text != "Ok":
                 cursor.execute("UPDATE devices SET status = 100 WHERE id ="+str(x[0])+"")
@@ -108,6 +109,7 @@ def addGroup():
     parameter3 = str(request.args.get("parameter3"))
 
     response123 = False
+
 
     try:
         res = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/addGroup?groupName='+groupName+'&parameter1=' + parameter1 + '&parameter2=' + parameter2 + '&parameter3=' + parameter3, timeout=5)
@@ -198,20 +200,36 @@ def modifyDevice():
         return render_template('error_template.html', responseMessage=str(e))
     return render_template('template_bootstrap.html', myString=data, response=True)
 
+
 # Funzione per la visualizzazione della lista dei dispositivi
 @app.route('/',)
 def indexRoute():
+
+    dictec2 = {}
+
+    with open('weather.json') as config_file:
+        data_meteo = json.load(config_file)
+        config_file.close()
+
+
+    with open('ec2value.json') as config_file:
+        data_ec2 = json.load(config_file)
+        config_file.close()
+
+    for i in range(0, len(data_ec2['groups_list'])):
+        dictec2[data_ec2['groups_list'][i]['groupName']] = data_ec2['groups_list'][i]['ndvi_mean']
      
     try:
         data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getDeviceStat").json()
     except Exception as e:
         print(e)
         return render_template('error_template.html', responseMessage="Errore nell'ottenimento della lista dei dispositivi.")
-    return render_template('template_bootstrap.html', myString=data)
+    return render_template('template_bootstrap.html', myString=data, weather=data_meteo, ndvi=dictec2)
 
 @app.route('/getGroupsList',)
 def getGroupsList():
      
+    
     try:
         data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getGroupsList").json()
     except Exception as e:
@@ -244,8 +262,11 @@ def downloadFile():
         print(e)
         return render_template('error_template.html', responseMessage="Errore nel download del file da S3.")
 
+
 @app.route('/getFileList')
 def getFileList():
+
+
 
     ### information from configS3   
     ACCESS_KEY_ID = "AKIA57G4V3XAZXYSWEYA"
@@ -269,6 +290,8 @@ def getFileList():
         return render_template('template_bootstrap_file.html', myString=file_key_list)
     except Exception as e:
         return render_template('error_template.html', responseMessage="Errore nell'ottenumento dei file da S3.")
+
+
 
 if __name__ == '__main__':
     readJson()
