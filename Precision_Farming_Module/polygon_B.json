@@ -1,0 +1,19 @@
+{
+    "name": "Polygon B : GREEN PLANTS FIELD",
+    "geo_json": {
+        "type": "Feature",
+        "properties": {},
+        "geometry": {
+            "type": "Polygon",
+            "coordinates": [
+                [
+                    [-121.82765, 39.077454],
+                    [-121.827822, 39.090038],
+                    [-121.822071, 39.089971],
+                    [-121.821299, 39.077721],
+                    [-121.82765, 39.077454]
+                ]
+            ]
+        }
+    }
+}
