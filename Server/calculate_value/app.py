@@ -46,27 +46,24 @@ def getDevicesStat():
     keyList = []
     dictControl = {}
 
-    dictControl['lat'] = LAT
-    dictControl['long'] = LONG
+    dictControl['water_container_volume'] = 3000
+    dictControl['expire'] = 0
     dictControl['groups_list'] = []
 
-    cursor.execute("select AVG(L.temperatura), AVG(L.umidita), D.groupName, G.p1, G.p2, G.p3 FROM lectures as L JOIN devices as D on L.id = D.id JOIN devicesGroups as G on D.groupName = G.groupName WHERE D.type=\'sensor\' GROUP BY D.groupName")
+    cursor.execute("select AVG(L.temperatura), AVG(L.umidita), D.groupName, G.latCenter, G.longCenter, G.p1, G.p2, G.p3 FROM lectures as L JOIN devices as D on L.id = D.id JOIN devicesGroups as G on D.groupName = G.groupName WHERE D.type=\'sensor\' GROUP BY D.groupName, G.latCenter, G.longCenter")
 
     myresult = cursor.fetchall()
 
     for x in myresult:
-        key = str(x[2]).replace(" ", "")
-        rows_count = cursor.execute("select W.water_L FROM water_level as W JOIN devices as D on W.id = D.id WHERE D.type=\'check_water\' and D.groupName=\'" + key + "\'")
-        if rows_count > 0:
-            myresult_nid = cursor.fetchall()
-            water_level = myresult_nid[0][0]
-        else:
-            water_level = 0
-        keyList.append(key)
-        dictControl['groups_list'].append({'groupName':key, 'avgTemperatura':x[0], 'avgUmidita':x[1], 'p1':x[3], 'p2':str(x[4]), 'p3':x[5], 'water_level': water_level})
-        json_data = json.dumps(dictControl)
-
-    return json_data
+        if x != 'default':
+            key = str(x[2])
+            keyList.append(key)
+            dictControl['groups_list'].append({'groupName':key, 'avgTemperatura':x[0], 'avgUmidita':x[1], 'p1':x[5], 'p2':x[6], 'p3':x[7], 'center':"[" + str(x[3]) + "," + str(x[4]) + "]"})
+            json_data = json.dumps(dictControl)
+    
+    result = requests.post('http://192.168.1.106:9000/planning', json=json_data, timeout=3).text
+   
+    return result
     
     # Ottengo la lista di tutti i sensori di controllo
     # Idealmente, ad ognuno di loro, per ogni gruppo, invio il valore ricevuto da EC2

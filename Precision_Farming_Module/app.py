@@ -99,7 +99,7 @@ def weather_forecasts():
     counter = 0
     print(len(SEVEN_DAYS_WEATHER_FORCASTS))
     for day in SEVEN_DAYS_WEATHER_FORCASTS:
-        data["weather_forecasts"][counter]["day"] = day.day
+        data["weather_forecasts"][counter]["day"] = day.day.strftime("%d/%m/%Y")
         data["weather_forecasts"][counter]["description"] = day.description
         data["weather_forecasts"][counter]["temperatures"]["morning"] = day.temperatures["morn"]
         data["weather_forecasts"][counter]["temperatures"]["daylight"] = day.temperatures["day"]
@@ -281,7 +281,7 @@ def setup():
 if __name__ == '__main__':
 
     setup()
-    app.run()
+    app.run(host='0.0.0.0', port=9000, debug=False)
     
     
     

@@ -4,5 +4,7 @@
     "passwd" : "password",
     "database" : "cluster",
     "service_ip" : "getdevicesstatservice",
-    "service_port" : 8020
+    "service_port" : 8020,
+    "aws_ip": "localhost",
+    "aws_port": 9000
 }

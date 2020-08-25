@@ -1,3 +1,4 @@
+clear
 sudo apt-get update
 sudo apt-get install apt-transport-https -y
 sudo apt-get upgrade
