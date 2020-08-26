@@ -2,7 +2,9 @@ class Polygon():
 
     def __init__(self):
         self.my_sensors = []
-        self.water_unit_coefficient = 1
+        self.water_unit_coefficient = 1.0
+        self.avg_soil_moisture = 0.0
+        self.avg_soil_temperature = 0.0
 
     def set_name(self, name):
         self.name = name
@@ -24,6 +26,9 @@ class Polygon():
 
     def set_water_unit(self, water_unit):
         self.water_unit = water_unit
+    
+    def set_water_unit_coefficient(self, water_unit_coefficient):
+        self.water_unit_coefficient = water_unit_coefficient
 
     def set_proportion(self, proportion):
         self.proportion = proportion
@@ -48,34 +53,34 @@ class Polygon():
             counter += 1
         self.avg_soil_moisture = M/counter
 
-    def evaluate_water_unit_coefficient():
+    def evaluate_water_unit_coefficient( self ):
 
-        if self.avg_soil_temperature >= 30 and self.avg_soil_moisture >= 35:
-            self.water_unit_coefficient = 0.25
+        if self.avg_soil_temperature >= 30.0 and self.avg_soil_moisture >= 35.0:
+            return  0.25
 
-        elif self.avg_soil_temperature >= 30 and self.avg_soil_moisture <= 25:
-            self.water_unit_coefficient = 1.0
+        elif self.avg_soil_temperature >= 30.0 and self.avg_soil_moisture <= 25.0:
+            return  1.0
 
-        elif self.avg_soil_temperature >= 30 and self.avg_soil_moisture in [25, 35]:
-            self.water_unit_coefficient = 0.75
+        elif self.avg_soil_temperature >= 30.0 and ( self.avg_soil_moisture >= 25.0 and self.avg_soil_moisture <= 35.0 ) :
+            return  0.75
 
-        elif self.avg_soil_temperature <= 15 and self.avg_soil_moisture >= 35:
-            self.water_unit_coefficient = 0.0
+        elif self.avg_soil_temperature <= 15.0 and self.avg_soil_moisture >= 35.0:
+            return  0.0
 
-        elif self.avg_soil_temperature <= 15 and self.avg_soil_moisture <= 25:
-            self.water_unit_coefficient = 0.5
+        elif self.avg_soil_temperature <= 15.0 and self.avg_soil_moisture <= 25.0:
+            return  0.5
         
-        elif self.avg_soil_temperature <= 15 and self.avg_soil_moisture in [25, 35]:
-            self.water_unit_coefficient = 0.2
+        elif self.avg_soil_temperature <= 15.0 and ( self.avg_soil_moisture >= 25.0 and self.avg_soil_moisture <= 35.0 ):
+            return  0.2
 
-        elif self.avg_soil_temperature in [15, 30] and self.avg_soil_moisture >= 35:
-            self.water_unit_coefficient = 0.2
+        elif ( self.avg_soil_temperature >= 15.0 and self.avg_soil_temperature <= 30.0 )  and self.avg_soil_moisture >= 35.0:
+            return  0.2
         
-        elif self.avg_soil_temperature in [15, 30] and self.avg_soil_moisture <= 25:
-            self.water_unit_coefficient = 0.8
+        elif ( self.avg_soil_temperature >= 15.0 and self.avg_soil_temperature <= 30.0 )  and self.avg_soil_moisture <= 25.0:
+            return  0.8
         
-        elif self.avg_soil_temperature in [15, 30] and self.avg_soil_moisture in [25, 35]:
-            self.water_unit_coefficient = 0.5
+        elif ( self.avg_soil_temperature >= 15.0 and self.avg_soil_temperature <= 30.0 ) and ( self.avg_soil_moisture >= 25.0 and self.avg_soil_moisture <= 35.0 ):
+            return  0.5
 
 
 
