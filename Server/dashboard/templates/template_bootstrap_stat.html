@@ -6,7 +6,7 @@
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Jekyll v4.0.1">
-    <title>Add Water Container - SDCC Project</title>
+    <title>Cluster Statistics - SDCC Project</title>
 
     <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/starter-template/">
 
@@ -28,6 +28,28 @@
           font-size: 3.5rem;
         }
       }
+
+            .scrolling-wrapper{
+	overflow-x: auto;
+}
+
+.card-block{
+	height: 250px;
+	background-color: #fff;
+	border: none;
+	transition: all 0.2s ease-in-out !important;
+	&:hover{
+		transform: translateY(-5px);
+		box-shadow: none;
+	}
+}
+
+.icon-water {
+  background-image: url("{{ url_for('static', filename='img/water-drop.png') }}");
+    background-position: center center;
+    width: 100px;
+    height: 100px;
+}
     </style>
     <!-- Custom styles for this template -->
     <link href="{{ url_for('static', filename='css/starter-template.css') }}" rel="stylesheet">
@@ -58,42 +80,60 @@
 
 <main role="main" class="container">
 
-  <form action="/addWaterContainer" method="GET">
-    <div class="form-group">
-        <div class="input-daterange input-group" id="datepicker">
-        <input type="text" class="input-sm form-control" name="start" placeholder="Data inizio..."/ required>
-        <span class="input-group-addon"> intervallo di tempo </span>
-        <input type="text" class="input-sm form-control" name="end" placeholder="Data fine..."/ required>
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <canvas id="chLine"></canvas>
+                    </div>
+                </div>
+            </div>
+         </div>     
     </div>
-    </div>
-    <div class="form-group">
-      <label for="exampleInputPassword5">Capienza totale (m3)</label>
-      <input name="water_value" type="number" step="any" class="form-control" id="exampleInputPassword5" placeholder="m3" required>
-    </div>
-    <button type="submit" class="btn btn-primary">Aggiungi programmazione</button>
-  </form>
+
 
 </main><!-- /.container -->
 <script src=" {{ url_for('static', filename='js/jquery-3.5.1.slim.min.js') }}"></script>
       <script>window.jQuery || document.write('<script src="../assets/js/vendor/jquery.slim.min.js"><\/script>')</script><script src="{{ url_for('static', filename='js/bootstrap.bundle.js') }}"></script></body>
-<!--  jQuery -->
-<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
 
-<!-- Isolated Version of Bootstrap, not needed if your site already uses Bootstrap -->
-<link rel="stylesheet" href="https://formden.com/static/cdn/bootstrap-iso.css" />
+      <script type="text/javascript" src="{{ url_for('static', filename='js/Chart.js') }}"></script>
 
-<!-- Bootstrap Date-Picker Plugin -->
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/js/bootstrap-datepicker.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker3.css"/>
-
-<script>
-
-    $('.input-daterange').datepicker({
-        format: "yyyy/mm/dd",
-        language: "it",
-        multidate: false,
-        autoclose: true
-    });
-
-</script>
+      <script>
+     var label_label = '{{ myString['label']|tojson }}';
+     var data_data1 = '{{ myString['data1']|tojson }}';
+     var data_data2 = '{{  myString['data2']|tojson }}';
+     var chartData = {
+  labels: {{ myString['label']|tojson }},
+  datasets: [{
+    data: {{ myString['data1']|tojson }},
+    label: 'Saved money'
+  },
+  {
+    data: {{  myString['data2']|tojson }},
+    label: 'Saved water'
+  }]
+};
+      
+      var chLine = document.getElementById("chLine");
+      if (chLine) {
+        new Chart(chLine, {
+        type: 'line',
+        data: chartData,
+        options: {
+          scales: {
+            yAxes: [{
+              ticks: {
+                beginAtZero: false
+              }
+            }]
+          },
+          legend: {
+            display: true
+          }
+        }
+        });
+      }
+      
+      </script>
 </html>

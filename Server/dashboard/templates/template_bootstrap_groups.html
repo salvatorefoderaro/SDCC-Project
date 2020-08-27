@@ -23,6 +23,13 @@
         user-select: none;
       }
 
+      .icon-field {
+  background-image: url("{{ url_for('static', filename='img/field.png') }}");
+    background-position: center center;
+    width: 100px;
+    height: 100px;
+}
+
       @media (min-width: 768px) {
         .bd-placeholder-img-lg {
           font-size: 3.5rem;
@@ -64,6 +71,9 @@
       <li class="nav-item">
         <a class="nav-link" href="/getWaterList">Gestione programmazione acqua</a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/getStat">Statistiche risparmio</a>
+      </li>
     </ul>
    </div>
 </nav>
@@ -93,8 +103,12 @@
 
       <div class="card" >
           <div class="card-body">
-          <h5 class="card-title"> {{ myString['list'][i]['groupName'] }}</h5>
-        </div>
+            <div class="d-flex justify-content-between">
+
+              <p class="display-4 degree">{{ myString['list'][i]['groupName'] }}</p>
+              <i class="icon-field"></i>
+            </div>
+          </div>
         <ul class="list-group list-group-flush">
           <li class="list-group-item">Parameter 1: {{ myString['list'][i]['parameter1'] }}</li>
           <li class="list-group-item">Parameter 2: {{ myString['list'][i]['parameter2'] }}</li>

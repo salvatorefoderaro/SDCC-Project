@@ -9,4 +9,4 @@ spec:
       - image: dbinstantiate:v1
         imagePullPolicy: Never
         name: dbinstantiate
-      restartPolicy: Never
+      restartPolicy: OnFailure

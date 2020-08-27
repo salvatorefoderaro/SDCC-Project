@@ -29,11 +29,8 @@ def connectToDb():
 def getDevicesStat():
 
     db = connectToDb()
-
     cursor = db.cursor()
-
     keyList = []
-
     dict = {}
     dictControl = {}
     dictWaterLevel = {}
@@ -46,6 +43,8 @@ def getDevicesStat():
         dictWaterLevel['currentValue'] = x[2]
         dictWaterLevel['totalValue'] = x[3]
         dictWaterLevel['percentage'] = int(((x[3]-x[2])/x[3])*100)
+        dictWaterLevel['today'] = datetime.today().strftime('%d-%m-%Y')
+
 
     cursor.execute("select L.id, L.temperatura, L.umidita, L.lettura, D.ipAddress, D.ipPort, D.status, D.name, D.groupName FROM lectures as L JOIN devices as D on L.id = D.id WHERE L.lettura = (SELECT MAX(Lettura) FROM lectures WHERE id = L.id) and D.type='\sensor\'")
 
@@ -95,6 +94,7 @@ def getDevicesStat():
             devicesControlList = []
         singleDict = {'groupName' : i, 'devicesList' : devicesList, 'controlList' : devicesControlList}
         jsonDict['list'].append(singleDict)
+
     jsonDict['water_level'] = dictWaterLevel
     json_data = json.dumps(jsonDict)
        
@@ -106,27 +106,30 @@ def getDevicesStat():
 @app.route('/editConfig', methods=['GET'])
 def editConfig():
 
-    db = connectToDb()
+    try:
+        db = connectToDb()
+        cursor = db.cursor()
 
-    cursor = db.cursor()
+        # Se la richiesta è di tipo nome, oltre a modificare il record nel db contatto anche il dispositivo per l'aggiornamento
+        # del file 'config.json'
+        if (request.args.get("type") == "name"):
+            cursor.execute("UPDATE devices SET name=\'"+ str(request.args.get("new_value")) + "\' where id = " + str(request.args.get("id")))
+        # Se devo modificare il gruppo di appartenenza di un dispositivo, controllo prima che il gruppo esista
+        # altrimenti fallirebbe il controllo sulla foreign key.
+        elif (request.args.get("type") == "groupName"):
+            cursor.execute("select * FROM devicesGroups WHERE groupName = \'" + str(request.args.get("new_value")) +"\'")
+            row = cursor.fetchone()
+            if row == None:
+                return "Group name not present."
+            cursor.execute("UPDATE devices SET groupName=\'"+ str(request.args.get("new_value")) +"\' where id = " + str(request.args.get("id")))
 
-    # Se la richiesta è di tipo nome, oltre a modificare il record nel db contatto anche il dispositivo per l'aggiornamento
-    # del file 'config.json'
-    if (request.args.get("type") == "name"):
-        cursor.execute("UPDATE devices SET name=\'"+ str(request.args.get("new_value")) + "\' where id = " + str(request.args.get("id")))
-    # Se devo modificare il gruppo di appartenenza di un dispositivo, controllo prima che il gruppo esista
-    # altrimenti fallirebbe il controllo sulla foreign key.
-    elif (request.args.get("type") == "groupName"):
-        cursor.execute("select * FROM devicesGroups WHERE groupName = \'" + str(request.args.get("new_value")) +"\'")
-        row = cursor.fetchone()
-        if row == None:
-            return "Group name not present."
-        cursor.execute("UPDATE devices SET groupName=\'"+ str(request.args.get("new_value")) +"\' where id = " + str(request.args.get("id")))
+        cursor.close()
+        db.commit()
+        return "Ok"
 
-    cursor.close()
-    db.commit()
-
-    return "Ok"
+    except mysql.Error as err:
+        print(str(err), flush=True)
+        return str(err)
 
 # Funzione per l'eliminazione di un dispositivo
 @app.route('/deleteDevice', methods=['GET'])
@@ -142,90 +145,110 @@ def deleteDevice():
         cursor.execute("DELETE from devices where id = " + request.args.get("id"))
         cursor.close()
         db.commit()
-    except Exception as e:
-        print(str(e))
-    print("Finitooooo")
-    return "Ok"
+        return "Ok"
+    except mysql.Error as err:
+        print(str(err), flush=True)
+        return str(err)
 
 # Funzione per l'eliminazione di un dispositivo
 @app.route('/deleteGroup', methods=['GET'])
 def deleteGroup():
 
-    db = connectToDb()
+    try:
+        db = connectToDb()
 
-    cursor = db.cursor()
+        cursor = db.cursor()
 
-    cursor.execute("DELETE from devicesGroups where groupName =\'" + str(request.args.get("groupName")) + "\'")
+        cursor.execute("DELETE from devicesGroups where groupName =\'" + str(request.args.get("groupName")) + "\'")
 
-    cursor.close()
-    db.commit()
+        cursor.close()
+        db.commit()
 
-    return "Ok"
+        return "Ok"
 
+    except mysql.Error as err:
+        print(str(err), flush=True)
+        return str(err)
     # Funzione per l'eliminazione di un dispositivo
 @app.route('/deleteContainer', methods=['GET'])
 def deleteContainer():
+    try: 
+        db = connectToDb()
 
-    db = connectToDb()
+        cursor = db.cursor()
 
-    cursor = db.cursor()
+        cursor.execute("DELETE from water_container where id =" + str(request.args.get("container_id")))
 
-    cursor.execute("DELETE from water_container where id =" + str(request.args.get("container_id")))
+        cursor.close()
+        db.commit()
 
-    cursor.close()
-    db.commit()
-
-    return "Ok"
-
+        return "Ok"
+    except mysql.Error as err:
+        print(str(err), flush=True)
+        return str(err)
 # Funzione per l'aggiunta di un nuovo gruppo
 @app.route('/addGroup', methods=['GET'])
 def addGroup():
 
-    db = connectToDb()
-
-    cursor = db.cursor()
-
-    try:
+    try: 
+        db = connectToDb()
+        cursor = db.cursor()
         cursor.execute("INSERT INTO devicesGroups (groupName, p1, p2, p3, latCenter, longCenter) VALUES (\'" + str(request.args.get("groupName")) + "\'," + str(request.args.get("parameter1")) + ", " + str(request.args.get("parameter2")) + ", " + str(request.args.get("parameter3")) + ", " + str(request.args.get("latCenter")) + ", " + str(request.args.get("longCenter")) + ")")
-    except Exception as e:
-        print(str(e))
+        cursor.close()
+        db.commit()
+        return "Ok"
 
-    cursor.close()
-    db.commit()
-
-    return "Ok"
+    except mysql.Error as err:
+        print(str(err), flush=True)
+        return str(err)
 
 @app.route('/addWaterContainer', methods=['GET'])
 def addWaterContainer():
 
-    db = connectToDb()
-
-    cursor = db.cursor()
-
-    try:
+    try: 
+        db = connectToDb()
+        cursor = db.cursor()
         cursor.execute("INSERT INTO water_container (startDate, endDate, currentValue, totalValue) VALUES (\'" + str(request.args.get("start")) + "\',\'" + str(request.args.get("end")) + "\', " + str(request.args.get("water_value")) + ", " + str(request.args.get("water_value")) + ")")
-    except Exception as e:
-        print(str(e))
+        cursor.close()
+        db.commit()
+        return "Ok"
+    except mysql.Error as err:
+        print(str(err), flush=True)
+        return str(err)
 
+# Funzione per l'ottenimento dei gruppi attualmente presenti.
+@app.route('/getStat', methods=['GET'])
+def getStat():
+
+    db = connectToDb()
+    cursor = db.cursor()
+    dict = {}
+    cursor.execute("select * from statistics")
+    myresult = cursor.fetchall()
+    label = []
+    data1 = []
+    data2 = []
+    for x in myresult:
+        label.append(x[0].strftime("%d-%m-%Y"))
+        data1.append(x[1])
+        data2.append(x[2])
+    dict['label'] = label
+    dict['data1'] = data1
+    dict['data2'] = data2
+    json_data = json.dumps(dict)
+       
     cursor.close()
-    db.commit()
-
-    return "Ok"
+    return json_data
 
 # Funzione per l'ottenimento dei gruppi attualmente presenti.
 @app.route('/getGroupsList', methods=['GET'])
 def getGroupsList():
 
     db = connectToDb()
-
     cursor = db.cursor()
-
     dict = {}
-
     cursor.execute("select * from devicesGroups")
-
     myresult = cursor.fetchall()
-
     jsonDict = {'list' : []}
 
     for x in myresult:
@@ -239,10 +262,8 @@ def getGroupsList():
     json_data = json.dumps(jsonDict)
        
     cursor.close()
-
-    print(json_data)
-
     return json_data
+
 
 # Funzione per l'ottenimento dei gruppi attualmente presenti.
 @app.route('/getWaterList', methods=['GET'])

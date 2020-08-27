@@ -187,6 +187,8 @@ Esercizio di stile, tanto non va la rete, non potendo mandare messaggi in broadc
 
 ## **Link utili**
 
+https://dev.mysql.com/doc/connector-python/en/connector-python-api-errors-error.html
+
 http://eureka2.github.io/ab-datepicker
 
 https://medium.com/@felipedutratine/kubernetes-on-local-with-minikube-tutorial-413475d587e6

@@ -24,7 +24,7 @@ spec:
           value: "mysql"
         - name: DAY_INTERVAL
           value: "1"
-      restartPolicy: Never
+      restartPolicy: OnFailure
       volumes:
       - name: mysql-persistent-storage-dump
         persistentVolumeClaim:
