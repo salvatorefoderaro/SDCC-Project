@@ -300,19 +300,10 @@ def setup():
         get_satellite_img(p) 
     weather_by_geocoordinates()
 
-    
-
-
-
-
 if __name__ == '__main__':
 
     setup()
-<<<<<<< Updated upstream
-    app.run(host='0.0.0.0', port=9000, debug=False)
-=======
-    app.run(host='0.0.0.0', debug=False, port = 5000)
->>>>>>> Stashed changes
+    app.run(host='0.0.0.0', debug=False, port = 9000)
     
     
     

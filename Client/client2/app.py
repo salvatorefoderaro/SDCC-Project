@@ -121,7 +121,7 @@ def editConfig():
             data["groupName"] = request.args.get("new_value")
         if (request.args.get("type") == "lecture_interval"):
             LECTURE_INTERVAL = int(request.args.get("new_value"))
-            data["lecture_interval"] = int(request.args.get("lecture_interval"))
+            data["lecture_interval"] = int(request.args.get("new_value"))
 
         json.dump(data, configFile)
         configFile.close()
@@ -177,6 +177,7 @@ def doSomeStuff():
                 # Accade nel caso di errori, se il dispositivo non era stato precedentemente registrato
                 elif result == "Not present":
                     print("Il dispositivo non e' registrato.")
+                    
                 else:
                     print("Errore durante la registrazione della misurazione.")
             except requests.exceptions.RequestException as e:  # This is the correct syntax
@@ -187,8 +188,6 @@ def doSomeStuff():
             
             # Attendo prima di inviare la prossima lettura
             time.sleep(LECTURE_INTERVAL)
-
-    
 
 if __name__ == '__main__':
     readJson()

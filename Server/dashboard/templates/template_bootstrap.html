@@ -109,13 +109,16 @@
       <li class="nav-item">
         <a class="nav-link" href="/getGroupsList">Gestione gruppi</a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/getWaterList">Gestione programmazione acqua</a>
+      </li>
     </ul>
    </div>
 </nav>
 
 <main role="main" class="container">
 
-  {% if response == true %}
+  {% if response == true  %}
   <div class="alert alert-success" role="alert">
     Modifica effettuata con successo!
   </div>
@@ -125,10 +128,67 @@
     </div>
       {% endif %}
 
-      <h2><a href="/checkDevicesStatus">Controlla manualmente lo stato dei dispositivi</a></h2>
-
-      <div class="container-fluid">
+            <div class="container-fluid">
         <div class="scrolling-wrapper row flex-row flex-nowrap mt-4 pb-4">
+
+    {% if myString['water_level']|length  %}
+
+                <div class="col-5">
+      <div class="card weather-card">
+
+        <!-- Card content -->
+        <div class="card-body pb-3">
+      
+          <!-- Title -->
+          <h4 class="card-title font-weight-bold">Acqua disponibile</h4>
+          <!-- Text -->
+          <p class="card-text"></p>
+          <div class="d-flex justify-content-between">
+
+            <p class="display-1 degree">{{ myString['water_level']['currentValue']}} m<sup>3</sup></p>
+            <i class="icon-water"></i>
+          </div>
+          <div class="progress">
+  <div class="progress-bar" role="progressbar" style="width: {{ myString['water_level']['percentage']}}%;" aria-valuenow="{{ myString['water_level']['currentValue']}}" aria-valuemin="0" aria-valuemax="{{ myString['water_level']['totalValue']}}">{{ myString['water_level']['percentage']}}%</div>
+  </div><br>
+          <div class="d-flex justify-content-between mb-4">
+            <b>Inizio:</b> {{ myString['water_level']['startDate']}}
+          </div>
+          <div class="d-flex justify-content-between mb-4">
+            <b>Fine:</b> {{ myString['water_level']['endDate']}}
+          </div>
+      
+        </div>
+      
+      </div>    
+    </div>
+
+
+    {% else %}
+
+
+                <div class="col-5">
+      <div class="card weather-card">
+
+        <!-- Card content -->
+        <div class="card-body pb-3">
+      
+          <!-- Title -->
+          <h4 class="card-title font-weight-bold">Acqua disponibile</h4>
+          <!-- Text -->
+          <p class="card-text"></p>
+          <div class="d-flex justify-content-between">
+            <p class="display-1 degree">Nessuna programmazione presente</p>
+            <i class="icon-water"></i>
+          </div>
+      
+        </div>
+      
+      </div>    
+    </div>
+
+
+    {% endif %}
           
           {% for i in range(0, weather['weather_forecasts']|length ) %} 
           {% set id = i|string %}
@@ -232,6 +292,15 @@
           </div>
           
         </div>
+        
+<p><div class="row justify-content-center">
+        <a href="/checkDevicesStatus" type="button" class="btn btn-primary btn-lg">Aggiorna lo stato dei dispositivi</a>
+</div></p>
+<p><div class="row justify-content-center">
+
+                <p><a href="/" type="button" class="btn btn-secondary btn-lg">Aggiorna le previsioni meteo</a>
+</div></p>
+
 
   {% for i in range(0, myString['list']|length ) %} 
 
@@ -244,7 +313,7 @@
   <div class="card-body pb-3">
 
     <!-- Title -->
-    <h4 class="card-title font-weight-bold">Qualità vegetazion1e</h4>
+    <h4 class="card-title font-weight-bold">Qualità vegetazione</h4>
     <!-- Text -->
     <div class="d-flex justify-content-between">
       <p class="display-1 degree">{{ ndvi[myString['list'][i]['groupName']] }}</p>
@@ -266,7 +335,6 @@
     <div class="scrolling-wrapper row flex-row flex-nowrap mt-4 pb-4">
   {%for j in range(0, myString['list'][i]['devicesList']|length )%} 
   <div class="col-5">
-
       <div class="card">
 
         {% if myString['list'][i]['devicesList'][j]['status'] == 0 %}
@@ -356,7 +424,9 @@
           </div>
         </div>
 
-    </div>
+    
+  </div>
+  </div>
 
   {%endfor%} 
      </div>
@@ -371,12 +441,12 @@
             <div class="scrolling-wrapper row flex-row flex-nowrap mt-4 pb-4">
           {%for j in range(0, myString['list'][i]['controlList']|length )%} 
           <div class="col-5">
-          <div class="card">
+           <div class="card">
             {% if myString['list'][i]['controlList'][j]['status'] == 0 %}
-          <div class="card-body" style="background-color:green;">
-        {% else %}
-          <div class="card-body" style="background-color:red;">
-        {% endif %}
+            <div class="card-body" style="background-color:green;">
+          {% else %}
+            <div class="card-body" style="background-color:red;">
+          {% endif %}
               <h5 class="card-title">{{ myString['list'][i]['controlList'][j]['name'] }}</h5>
             </div>
 
@@ -440,7 +510,7 @@
                 </form>
               </div>
             </div>
-          </div>
+
           </div>
           </div>
   

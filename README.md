@@ -187,6 +187,8 @@ Esercizio di stile, tanto non va la rete, non potendo mandare messaggi in broadc
 
 ## **Link utili**
 
+http://eureka2.github.io/ab-datepicker
+
 https://medium.com/@felipedutratine/kubernetes-on-local-with-minikube-tutorial-413475d587e6
 
 https://stackoverflow.com/questions/46180814/how-to-connect-to-minikube-services-from-outside

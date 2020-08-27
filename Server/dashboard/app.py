@@ -18,6 +18,7 @@ AWS_PORT = 0
 Modulo per la dashboard di gestione dell'intero applicativo.
 '''
 
+
 app = Flask(__name__)
 
 def readJson():
@@ -37,52 +38,67 @@ def readJson():
 @app.route('/checkDevicesStatus', methods=['GET'])
 def checkDevicesStatus():
 
-    configFile = open("/config/config.json", "r")
-    json_object = json.load(configFile)
+    dictec2 = {}
 
-    db = mysql.connect(
-        host = json_object['host'],
-        user = json_object['user'],
-        passwd = json_object['passwd'],
-        database = json_object['database']
-    )
+    try:
+        data_meteo = requests.get("http://192.168.1.106:5000/weather_forecasts", timeout=5).json()
+    except requests.exceptions.RequestException as e:
+        print(str(e))
+        return render_template('error_template.html', responseMessage=str(e) + " Errore nell'ottenimento delle informazioni meteo." + " " + str(AWS_IP) + " " + str(AWS_PORT))
 
-    cursor = db.cursor()
+    with open('ec2value.json') as config_file:
+        data_ec2 = json.load(config_file)
+        config_file.close()    
 
-    # Vengono selezionati tutti i dispositivi presenti nel database
-    cursor.execute("SELECT id, ipAddress, ipPort from devices")
+    with open('ec2value.json') as config_file:
+        data_ec2 = json.load(config_file)
+        config_file.close()
 
-    myresult = cursor.fetchall()
+    for i in range(0, len(data_ec2['groups_list'])):
+        dictec2[data_ec2['groups_list'][i]['groupName']] = data_ec2['groups_list'][i]['ndvi_mean']
 
-    # Per ogni singolo dispositivo...
-    for x in myresult:
-        # Effettuo una chiamata get e, in base alla risposta, aggiorno l stato del dispositivo
-        try:
-
-
-            res = requests.get('http://' + str(x[1]) + ':' + str(x[2]) +'/checkStatus', timeout=3)
-            if res.text != "Ok":
-                cursor.execute("UPDATE devices SET status = 100 WHERE id ="+str(x[0])+"")
-            else:
-                cursor.execute("UPDATE devices SET status = 0 WHERE id ="+str(x[0])+"")
-        except requests.exceptions.RequestException as e:  # This is the correct syntax
-            cursor.execute("UPDATE devices SET status = 100 WHERE id ="+str(x[0])+"")
-                
-    cursor.close()
-    db.commit()
-    
     try:
         data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getDeviceStat").json()
     except Exception as e:
         print(e)
         return render_template('error_template.html', responseMessage="Errore nell'ottenimento della lista dei dispositivi.")
-    return render_template('template_bootstrap.html', myString=data)
+    return render_template('template_bootstrap.html', myString=data, weather=data_meteo, ndvi=dictec2, response=True)
 
 # Funzione per l'aggiunta di un nuovo gruppo
 @app.route('/addGroupLink', methods=['GET'])
 def addGroupLink():
 
     return render_template('template_bootstrap_add_groups.html')
+
+
+# Funzione per l'aggiunta di un nuovo gruppo
+@app.route('/addWaterContainerLink', methods=['GET'])
+def addWaterContainerLink():
+
+    return render_template('template_bootstrap_add_water_container.html')
+
+@app.route('/deleteWaterContainer', methods=['GET'])
+def deleteWaterContainer():
+
+    container_id = str(request.args.get("container_id"))
+
+    try:
+        res = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/deleteContainer?container_id='+container_id, timeout=5)
+        response123 = True
+    except Exception as e:
+        print(e)
+        return render_template('error_template.html', responseMessage=str(e))
+
+    if res.text != "Ok":
+        return render_template('error_template.html', responseMessage=str("Errore nell'eliminazione della programmazione."))
+
+    try:
+        data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getWaterList").json()
+    except Exception as e:
+        print(e)
+        return render_template('error_template.html', responseMessage="Errore nell'ottenimento dello storico dei container.")
+    return render_template('template_bootstrap_groups_water_container.html', myString=data)
+    ##return render_template('template_bootstrap.html', myString=data)
 
 @app.route('/deleteGroup', methods=['GET'])
 def deleteGroup():
@@ -131,15 +147,48 @@ def addGroup():
     data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getGroupsList").json()
     return render_template('template_bootstrap_groups.html', myString=data, response=response123)
 
+# Funzione per l'aggiunta di un nuovo gruppo
+@app.route('/addWaterContainer', methods=['GET'])
+def addWaterContainer():
+
+    start = str(request.args.get("start"))
+    end = str(request.args.get("end"))
+    water_value = str(request.args.get("water_value"))
+
+    response123 = False
+
+    try:
+        res = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/addWaterContainer?start='+start+'&end=' + end + '&water_value=' + water_value, timeout=5)
+        response123 = True
+        if res.text != "Ok":
+            message = "Errore nell'aggiunta del gruppo."
+            return render_template('error_template.html', responseMessage=message)
+    except Exception as e:
+        print(e)
+        return render_template('error_template.html', responseMessage=str(e))
+
+
+    try:
+        data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getWaterList").json()
+    except Exception as e:
+        print(e)
+        return render_template('error_template.html', responseMessage="Errore nell'ottenimento dello storico dei container.")
+    return render_template('template_bootstrap_groups_water_container.html', myString=data)
+    ##return render_template('template_bootstrap.html', myString=data)
+
+
 # Funzione per l'eliminazione di un dispositivo
 @app.route('/deleteDevice', methods=['GET'])
 def deleteDevice():
 
     dictec2 = {}
 
-    with open('weather.json') as config_file:
-        data_meteo = json.load(config_file)
-        config_file.close()
+    try:
+        data_meteo = requests.get("http://192.168.1.106:5000/weather_forecasts", timeout=5).json()
+    except requests.exceptions.RequestException as e:
+        print(str(e))
+        return render_template('error_template.html', responseMessage=str(e) + " Errore nell'ottenimento delle informazioni meteo." + " " + str(AWS_IP) + " " + str(AWS_PORT))
+
 
 
     with open('ec2value.json') as config_file:
@@ -148,8 +197,6 @@ def deleteDevice():
 
     for i in range(0, len(data_ec2['groups_list'])):
         dictec2[data_ec2['groups_list'][i]['groupName']] = data_ec2['groups_list'][i]['ndvi_mean']
-     
-     
 
     new_value = str(request.args.get("new_value"))
     id = str(request.args.get("id"))
@@ -158,7 +205,6 @@ def deleteDevice():
     port = str(request.args.get("port"))
 
     response123 = True
-    
 
     try:
         res = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/deleteDevice?ipAddress='+ip_address+'&ipPort=' + port + '&new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
@@ -178,9 +224,11 @@ def modifyDevice():
 
     dictec2 = {}
 
-    with open('weather.json') as config_file:
-        data_meteo = json.load(config_file)
-        config_file.close()
+    try:
+        data_meteo = requests.get("http://192.168.1.106:5000/weather_forecasts", timeout=5).json()
+    except requests.exceptions.RequestException as e:
+        print(str(e))
+        return render_template('error_template.html', responseMessage=str(e) + " Errore nell'ottenimento delle informazioni meteo." + " " + str(AWS_IP) + " " + str(AWS_PORT))
 
 
     with open('ec2value.json') as config_file:
@@ -189,8 +237,6 @@ def modifyDevice():
 
     for i in range(0, len(data_ec2['groups_list'])):
         dictec2[data_ec2['groups_list'][i]['groupName']] = data_ec2['groups_list'][i]['ndvi_mean']
-     
-     
 
     new_value = str(request.args.get("new_value"))
     id = str(request.args.get("id"))
@@ -247,7 +293,7 @@ def indexRoute():
     dictec2 = {}
 
     try:
-        data_meteo = requests.get("http://192.168.1.106:9000/weather_forecasts", timeout=5).json()
+        data_meteo = requests.get("http://192.168.1.106:5000/weather_forecasts", timeout=5).json()
     except requests.exceptions.RequestException as e:
         print(str(e))
         return render_template('error_template.html', responseMessage=str(e) + " Errore nell'ottenimento delle informazioni meteo." + " " + str(AWS_IP) + " " + str(AWS_PORT))
@@ -258,7 +304,6 @@ def indexRoute():
 
     for i in range(0, len(data_ec2['groups_list'])):
         dictec2[data_ec2['groups_list'][i]['groupName']] = data_ec2['groups_list'][i]['ndvi_mean']
-
     try:
         data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getDeviceStat", timeout=5).json()
     except requests.exceptions.RequestException as e:
@@ -276,6 +321,17 @@ def getGroupsList():
         print(e)
         return render_template('error_template.html', responseMessage="Errore nell'ottenimento della lista dei dispositivi.")
     return render_template('template_bootstrap_groups.html', myString=data)
+    ##return render_template('template_bootstrap.html', myString=data)
+
+@app.route('/getWaterList',)
+def getWaterList():
+     
+    try:
+        data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getWaterList").json()
+    except Exception as e:
+        print(e)
+        return render_template('error_template.html', responseMessage="Errore nell'ottenimento dello storico dei container.")
+    return render_template('template_bootstrap_groups_water_container.html', myString=data)
     ##return render_template('template_bootstrap.html', myString=data)
 
 @app.route('/downloadFile', methods=['GET'])
