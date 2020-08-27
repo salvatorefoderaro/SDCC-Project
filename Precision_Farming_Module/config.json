@@ -1,0 +1,5 @@
+{
+    "appid": "4ff59f3f15eb9db7512fc7d24272f769",
+    "create_poly_url": "http://api.agromonitoring.com/agro/1.0/polygons?appid=",
+    "get_satellite_image_url": "http://api.agromonitoring.com/agro/1.0/image/search"
+}

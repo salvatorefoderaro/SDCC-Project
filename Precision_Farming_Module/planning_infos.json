@@ -1,0 +1,33 @@
+{
+    "saved_water": 0.0,
+    "groups_list": [{
+            "center": "",
+            "groupName": "",
+            "ndvi_img_url": "",
+            "ndvi_mean": "",
+            "daily_water_unit": 0.0
+        },
+        {
+            "center": "",
+            "groupName": "",
+            "ndvi_img_url": "",
+            "ndvi_mean": "",
+            "daily_water_unit": 0.0
+        },
+        {
+            "center": "",
+            "groupName": "",
+            "ndvi_img_url": "",
+            "ndvi_mean": "",
+            "daily_water_unit": 0.0
+        },
+        {
+            "center": "",
+            "groupName": "",
+            "ndvi_img_url": "",
+            "ndvi_mean": "",
+            "daily_water_unit": 0.0
+        }
+    ]
+
+}

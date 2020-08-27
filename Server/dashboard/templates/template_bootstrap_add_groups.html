@@ -46,6 +46,9 @@
       <li class="nav-item">
         <a class="nav-link" href="/getGroupsList">Gestione gruppi</a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/getWaterList">Gestione programmazione acqua</a>
+      </li>
     </ul>
    </div>
 </nav>
@@ -68,6 +71,14 @@
     <div class="form-group">
       <label for="exampleInputPassword1">Parameter3</label>
       <input name="parameter3" type="number" min="0" class="form-control" id="exampleInputPassword1" placeholder="Parameter 3" required>
+    </div>
+    <div class="form-group">
+      <label for="exampleInputPassword1">Parameter3</label>
+      <input name="latCenter" type="number" step="any" class="form-control" id="exampleInputPassword1" placeholder="Center Latitude" required>
+    </div>
+    <div class="form-group">
+      <label for="exampleInputPassword1">Parameter3</label>
+      <input name="longCenter" type="number" step="any" class="form-control" id="exampleInputPassword1" placeholder="Center Longitude" required>
     </div>
     <button type="submit" class="btn btn-primary">Add group</button>
   </form>

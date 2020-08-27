@@ -1,8 +1,10 @@
 #!/bin/bash
 
+cluster
 minikube start --driver=docker
 minikube addons enable storage-provisioner
 minikube addons enable metrics-server
+minikube addons enable freshpod
 eval $(minikube docker-env)
 cp cluster_config.json dashboard/cluster_config.json
 cp cluster_config.json s3_upload_dump/cluster_config.json
