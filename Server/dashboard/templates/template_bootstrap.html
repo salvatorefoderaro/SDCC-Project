@@ -43,6 +43,34 @@
 	}
 }
 
+.icon-ndvi0 {
+    background-image: url("{{ url_for('static', filename='img/ndvi0.png') }}");
+    background-position: center center;
+    width: 100px;
+    height: 100px;
+}
+
+.icon-ndvi1 {
+    background-image: url("{{ url_for('static', filename='img/ndvi1.png') }}");
+    background-position: center center;
+    width: 100px;
+    height: 100px;
+}
+
+.icon-ndvi2 {
+    background-image: url("{{ url_for('static', filename='img/ndvi2.png') }}");
+    background-position: center center;
+    width: 100px;
+    height: 100px;
+}
+
+.icon-ndvi3 {
+    background-image: url("{{ url_for('static', filename='img/ndvi3.png') }}");
+    background-position: center center;
+    width: 100px;
+    height: 100px;
+}
+
 .icon-atmosphere {
     background-image: url("{{ url_for('static', filename='img/atmosphere.png') }}");
     background-position: center center;
@@ -52,6 +80,13 @@
 
 .icon-clear {
   background-image: url("{{ url_for('static', filename='img/clear.png') }}");
+    background-position: center center;
+    width: 100px;
+    height: 100px;
+}
+
+.icon-water {
+  background-image: url("{{ url_for('static', filename='img/water-drop.png') }}");
     background-position: center center;
     width: 100px;
     height: 100px;
@@ -178,8 +213,14 @@
           <!-- Text -->
           <p class="card-text"></p>
           <div class="d-flex justify-content-between">
-            <p class="display-1 degree">Nessuna programmazione presente</p>
+            <p class="display-1 degree">0 m<sup>3</sup></p>
             <i class="icon-water"></i>
+          </div>
+
+          <div class="d-flex justify-content-between">
+            <div class="row justify-content-center">
+              <p><a href="addWaterContainerLink" type="button" class="btn btn-primary btn-lg">Aggiungi programmazione acqua</a></p>
+      </div>
           </div>
       
         </div>
@@ -304,9 +345,11 @@
 
   {% for i in range(0, myString['list']|length ) %} 
 
-  <p><h2>Group name is: {{ myString['list'][i]['groupName'] }}</h2>
+  <p><h2>{{ myString['list'][i]['groupName'] }}</h2>
 {% if ndvi[myString['list'][i]['groupName']] is defined%}
 
+<div class="row">
+  <div class="col-sm-6">
 <div class="card weather-card w-40">
 
   <!-- Card content -->
@@ -317,11 +360,52 @@
     <!-- Text -->
     <div class="d-flex justify-content-between">
       <p class="display-1 degree">{{ ndvi[myString['list'][i]['groupName']] }}</p>
-      <i class="icon-car"></i>
+      <i class="icon-ndvi0"></i>
     </div>
 
   </div>
 
+  <!-- Card content -->
+  <div class="card-body pb-3">
+
+    <!-- Title -->
+    <h4 class="card-title font-weight-bold">Qualità vegetazione</h4>
+    <!-- Text -->
+    <div class="d-flex justify-content-between">
+      <p class="display-1 degree">{{ ndvi[myString['list'][i]['groupName']] }}</p>
+      <i class="icon-ndvi1"></i>
+    </div>
+
+  </div>
+
+  <!-- Card content -->
+  <div class="card-body pb-3">
+
+    <!-- Title -->
+    <h4 class="card-title font-weight-bold">Qualità vegetazione</h4>
+    <!-- Text -->
+    <div class="d-flex justify-content-between">
+      <p class="display-1 degree">{{ ndvi[myString['list'][i]['groupName']] }}</p>
+      <i class="icon-ndvi2"></i>
+    </div>
+
+  </div>
+
+  <!-- Card content -->
+  <div class="card-body pb-3">
+
+    <!-- Title -->
+    <h4 class="card-title font-weight-bold">Qualità vegetazione</h4>
+    <!-- Text -->
+    <div class="d-flex justify-content-between">
+      <p class="display-1 degree">{{ ndvi[myString['list'][i]['groupName']] }}</p>
+      <i class="icon-ndvi3"></i>
+    </div>
+
+  </div>
+
+</div>
+  </div>
 </div>
 
 {% endif %}

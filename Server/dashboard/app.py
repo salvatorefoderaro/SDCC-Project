@@ -86,8 +86,8 @@ def deleteWaterContainer():
         res = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/deleteContainer?container_id='+container_id, timeout=5)
         response123 = True
     except Exception as e:
-        print(e)
         return render_template('error_template.html', responseMessage=str(e))
+
 
     if res.text != "Ok":
         return render_template('error_template.html', responseMessage=str("Errore nell'eliminazione della programmazione."))
