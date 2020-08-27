@@ -327,19 +327,7 @@ def setup():
         get_satellite_img(p) 
     weather_by_geocoordinates()
 
-    
-
-
-
-
 if __name__ == '__main__':
 
     setup()
     app.run(host='0.0.0.0', debug=False, port = 5000)
-    
-    
-    
-    
-
-
-
