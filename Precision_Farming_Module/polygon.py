@@ -5,6 +5,9 @@ class Polygon():
         self.water_unit_coefficient = 1.0
         self.avg_soil_moisture = 0.0
         self.avg_soil_temperature = 0.0
+    
+    def set_satellite_image( self, satellite_image ):
+        self.satellite_image = satellite_image
 
     def set_name(self, name):
         self.name = name
