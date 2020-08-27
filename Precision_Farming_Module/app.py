@@ -1,5 +1,5 @@
 from datetime import datetime, date, time, timezone, timedelta
-from WeatherForecast import WeatherForecast
+from WeatherForecast import WeatherForecast, Forecasts_Analyzer
 from satellite_image import Satellite_Image
 from flask import Flask, request
 from polygon import Polygon, Sensor
@@ -17,12 +17,12 @@ import logging
 
 
 # Global variables
-
+DAILY_PLAN = {}                         # Daily Water plan : computed once per day and stored into this runtime global dictionary
 WATER_CONTAINER = 0.0                   # Water residual volume within the container (m^3)
 REMAINING_DAYS = 0                      # Remaining days before water refill
 TODAY_WATER = 0.0                       # Total water volume reserved for today's computation
 WATER_PRICE = 1.40                      # Water price : euro/(m^3)
-SAVED_WATER = 0.0                       # Saved water volume for this day, after analysis and planning phases.
+SAVED_WATER = 0.0                       # Saved water volume for this day, after analysis and planning phases
 TOTAL_AREA = 0.0                        # Total fields' coverage (m^2)
 
 CREATE_POLY_URL = ""                    # URL to POST the desired polygon's geographic coordinates
@@ -42,7 +42,16 @@ app = Flask(__name__)                   # Create the Flask app
 def planning():
     if request.method == 'POST':
 
-        global  WATER_CONTAINER, REMAINING_DAYS, TODAY_WATER, SAVED_WATER, TOTAL_AREA, POLYGONS_INFOS, SEVEN_DAYS_WEATHER_FORCASTS
+        global  WATER_CONTAINER, REMAINING_DAYS, TODAY_WATER, SAVED_WATER, TOTAL_AREA
+        global  POLYGONS_INFOS, SEVEN_DAYS_WEATHER_FORCASTS, DAILY_PLAN, SATELLITE_IMAGES
+
+        # Check: if today's daily water plan has already been requested and computed, then return that one.
+        try:
+            if str(date.today()) == DAILY_PLAN["today"]:
+                return DAILY_PLAN
+        except KeyError as ke:
+            print(" Key error in DAILY_PLAN['today']    -->    New Plan is being computed...\n\n ")
+        
 
         args = request.get_json()
 
@@ -53,14 +62,13 @@ def planning():
 
         # Set the current value for water container's volume and update the remaining time before water refill.
         WATER_CONTAINER = args.get("water_container_volume")
-        print(WATER_CONTAINER)
+        
         # Evaluate the remaining days until the day of water refill, to compute the current day water plan.
         REMAINING_DAYS = evaluate_remaining_days( expire )
-        print(REMAINING_DAYS)
 
-        # Calculate the value of today's total water amount
+        # Calculate the value of today's total water amount.
         TODAY_WATER = WATER_CONTAINER/REMAINING_DAYS
-        print(TODAY_WATER)
+        
         # Append sensors' informations on each reference-polygon's list.
         group_list = args.get("groups_list")
         for elem in group_list:
@@ -69,27 +77,43 @@ def planning():
                     new_sensor = Sensor( polygon, elem["avgTemperatura"], elem["avgUmidita"])
                     polygon.add_sensor(new_sensor)
 
-        # Compute data analysis and planning to retrieve the daily water-unit, for each of the 3 irrigations, for each polygon.
+        # Compute the seven-days-forecast analysis and evaluate the coefficient value to be used as multiplicative factor in each polygon's 
+        # water unit amount of the day.
+        analyzer = Forecasts_Analyzer()
+        for f in SEVEN_DAYS_WEATHER_FORCASTS:
+            analyzer.add_forecast( f )
+        analyzer.evaluate_state()
+        analyzer.evaluate_coefficient()
+        WEATHER_COEFFICIENT = analyzer.coefficient
+
+        # Complete data analysis and planning retrieving the daily water-unit, for each of the 3 irrigations, for each polygon.
         for polygon in POLYGONS_INFOS:
             water_unit = ( TODAY_WATER * ( polygon.proportion ) ) / 3 
             polygon.calculate_avg_soil_moisture()
             polygon.calculate_avg_soil_temperature()
-            wuc = float( polygon.evaluate_water_unit_coefficient() )
-            polygon.set_water_unit_coefficient( float(wuc) )
-            polygon.set_water_unit( water_unit * float(wuc) )
+            WUC = float( polygon.evaluate_water_unit_coefficient() )
+            polygon.set_water_unit_coefficient( WUC )
+            polygon.set_water_unit( water_unit * WUC * WEATHER_COEFFICIENT )
             SAVED_WATER += ( ( water_unit - polygon.water_unit ) * 3 )
 
         # Write the json response of the planning phase and send it back to the user.
-        with open('planning_infos.json') as plan:
-            data = json.load(plan)
-            plan.close()
-        counter = 0
+        data = {}
+        data["today"] = date.today()
         data["saved_water"] = SAVED_WATER
+        data["saved_money"] = SAVED_WATER * WATER_PRICE
+        data["warning"] = analyzer.state
+        data["groups_list"] = []
         for p in POLYGONS_INFOS:
-            data["groups_list"][counter]["center"] = p.center
-            data["groups_list"][counter]["groupName"] = p.name
-            data["groups_list"][counter]["daily_water_unit"] = p.water_unit
-            counter += 1
+            new_elem = {}
+            new_elem["ndvi_img_url"] = p.satellite_image.ndvi_img_link
+            new_elem["ndvi_mean"] = p.satellite_image.ndvi_mean
+            new_elem["center"] = p.center
+            new_elem["groupName"] = p.name
+            new_elem["daily_water_unit"] = p.water_unit
+            data["groups_list"].append( new_elem )            
+
+        # Store today's plan to be returned in case of repeated calls.
+        DAILY_PLAN = data
 
         return data
     
@@ -229,6 +253,7 @@ def get_satellite_img( polygon ):
                                     data[0]['image']['truecolor'], data[0]['image']['ndvi'],  data[0]['image']['evi'],
                                     data[0]['stats']['ndvi'],      data[0]['stats']['evi'] )
     
+    
     try:
         # request API to the NDVI stats link, to get all informations to be used
         res = requests.get( satellite_img.ndvi_stats_link )
@@ -250,6 +275,7 @@ def get_satellite_img( polygon ):
 
 
     SATELLITE_IMAGES.append(satellite_img)
+    polygon.set_satellite_image( satellite_img )
 
 
 # This function contains API call to the OpenWeatherAPI Server, to retrieve 7 days weather forecasts.
@@ -278,6 +304,7 @@ def weather_by_geocoordinates():
         SEVEN_DAYS_WEATHER_FORCASTS.append(weather_forecast)
 
 
+# This function is used within the planning phase, to evaluate the precise number of remaining days before the water refill.
 def evaluate_remaining_days( expire ):
 
     today = date.today()
@@ -308,11 +335,7 @@ def setup():
 if __name__ == '__main__':
 
     setup()
-<<<<<<< Updated upstream
-    app.run(host='0.0.0.0', port=9000, debug=False)
-=======
     app.run(host='0.0.0.0', debug=False, port = 5000)
->>>>>>> Stashed changes
     
     
     
