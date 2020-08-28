@@ -4,8 +4,7 @@ import json
 import logging
 
 '''
-Modulo che si occupa di controllare lo stato di vita dei dispositivi, inviando una chiamata GET.
-In caso di risposta, verrà aggiornato lo stato del dispositivo come attivo, altrimenti come non attivo.
+The module contact each device, to check the status and update it on the dabase. This is needed for the dashboard.
 '''
 
 # Check the status of the cluster devices.
@@ -29,7 +28,7 @@ def checkDevicesStatus():
         myresult = cursor.fetchall()
 
         for x in myresult:
-            
+
             # For each devices, try to contact and check for response
             try:
                 res = requests.get('http://' + str(x[1]) + ':' + str(x[2]) +'/checkStatus', timeout=3)

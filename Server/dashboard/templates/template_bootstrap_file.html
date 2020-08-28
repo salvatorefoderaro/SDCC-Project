@@ -60,9 +60,9 @@
 
       <div class="list-group">
 
-  {% for i in range(0, myString|length) %} 
+  {% for i in range(0, dataToPlot|length) %} 
 
-    {% set download_link = "downloadFile?file_name=" ~ myString[i] %}    <a href={{ download_link }} class="list-group-item list-group-item-action">{{ myString[i] }}</a>
+    {% set download_link = "downloadFile?file_name=" ~ dataToPlot[i] %}    <a href={{ download_link }} class="list-group-item list-group-item-action">{{ dataToPlot[i] }}</a>
 
   {%endfor%} 
 

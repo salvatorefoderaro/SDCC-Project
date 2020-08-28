@@ -4,7 +4,7 @@ import mysql.connector as mysql
 import json
 
 '''
-Modulo che si occupa dell'instanziazione del database.
+The module instantiate the database, creating tables and inserting data.
 '''
 
 # Create and populate the database's table.

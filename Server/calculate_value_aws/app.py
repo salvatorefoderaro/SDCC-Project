@@ -9,7 +9,43 @@ from datetime import datetime
 import time
 
 '''
-Modulo per l'invio dei dati ad Amazon EC2 per il calcolo dei valori.
+The module prepare a JSON that is sent to AWS. AWS reply with a JSON containing infos about the daily water planning.
+
+The data sent have this model:
+
+{
+    "water_container_volume": 5000,
+    "expire": 0.0,
+    "groups_list": [{
+            "center": "[longitude,latitude]",
+            "groupName": "default",
+            "avgTemperatura": 21.49385959066843,
+            "avgUmidita": 56.084210632009466,
+            "p1": 0.0,
+            "p2": 0.0,
+            "p3": 0.0
+        }, ...
+    ]
+}
+
+The data received, this:
+
+{
+    "today": "date",
+    "warning": "",
+    "saved_water": 0.0,
+    "saved_money": 0.0,
+    "groups_list": [{
+            "center": "",
+            "groupName": "",
+            "ndvi_img_url": "",
+            "ndvi_mean": "",
+            "daily_water_unit": 0.0
+        }...
+    ]
+}
+
+
 '''
 
 LAT = 0
@@ -45,8 +81,8 @@ def connectToDb():
     return db
 
 # Build the json to be sent to EC2.
-@app.route('/calculateValueEC2', methods=['GET'])
-def calculateValueEC2():
+@app.route('/calculateValueAWS', methods=['GET'])
+def calculateValueAWS():
     while(True):
         try: 
             db = connectToDb()
@@ -56,7 +92,7 @@ def calculateValueEC2():
             dictControl = {}
             water_container_id = 0
 
-            # Get info about the last water c ontainer,
+            # Get info about the current water container,
             rows_count = cursor.execute("SELECT endDate, currentValue, id FROM water_container WHERE now() <= endDate ORDER BY endDate DESC LIMIT 1")
             myresult = cursor.fetchall()
 
@@ -89,7 +125,7 @@ def calculateValueEC2():
                 cursor.execute("INSERT into statistics (dayPeriod, moneySaved, waterSaved) VALUES (now(), " +  str(result['saved_money']) + "," + str(result['saved_water']) + ") ON DUPLICATE KEY UPDATE moneySaved ="+ str(result['saved_money']) + ", waterSaved ="+ str(result['saved_water'])) 
                 db.commit()
 
-                with open('dump/ec2value.json', 'w+') as f:
+                with open('dump/awsvalue.json', 'w+') as f:
                     json.dump(result, f)
 
                 # For each group, take the device of type 'control' and send info about how much water have to be done to the field.
@@ -115,7 +151,7 @@ def calculateValueEC2():
                 db.close()
                 return "Ok"
                 time.sleep(1200)
-                
+
         except (mysql.Error, requests.exceptions.RequestException) as err:
             print(str(err), flush=True)
             continue

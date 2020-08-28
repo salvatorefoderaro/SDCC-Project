@@ -100,17 +100,17 @@
       <script type="text/javascript" src="{{ url_for('static', filename='js/Chart.js') }}"></script>
 
       <script>
-     var label_label = '{{ myString['label']|tojson }}';
-     var data_data1 = '{{ myString['data1']|tojson }}';
-     var data_data2 = '{{  myString['data2']|tojson }}';
+     var label_label = '{{ dataToPlot['label']|tojson }}';
+     var data_data1 = '{{ dataToPlot['data1']|tojson }}';
+     var data_data2 = '{{  dataToPlot['data2']|tojson }}';
      var chartData = {
-  labels: {{ myString['label']|tojson }},
+  labels: {{ dataToPlot['label']|tojson }},
   datasets: [{
-    data: {{ myString['data1']|tojson }},
+    data: {{ dataToPlot['data1']|tojson }},
     label: 'Saved money (€)'
   },
   {
-    data: {{  myString['data2']|tojson }},
+    data: {{  dataToPlot['data2']|tojson }},
     label: 'Saved water (m3)'
   }]
 };

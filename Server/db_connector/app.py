@@ -6,7 +6,7 @@ from flask import request
 from datetime import datetime
 
 '''
-Modulo per la comunicazione tra la dashboard ed il database.
+Module to get infos from the db. The communication is made using JSON response.
 '''
 
 app = Flask(__name__)
