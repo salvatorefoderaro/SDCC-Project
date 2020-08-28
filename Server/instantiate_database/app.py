@@ -43,7 +43,6 @@ def instantiateDatabase():
         # cursor.execute("CREATE TABLE")
 
         cursor.execute("CREATE TABLE IF NOT EXISTS statistics (dayPeriod date PRIMARY KEY, moneySaved float, waterSaved float)")
-
         cursor.execute("CREATE TABLE IF NOT EXISTS devicesGroups (groupName VARCHAR(100) PRIMARY KEY, p1 float, p2 float, p3 float, latCenter DOUBLE, longCenter DOUBLE, ndvi_mean FLOAT)")
 
         cursor.execute("INSERT into devicesGroups (groupName, p1, p2, p3, latCenter, longCenter) values (\'default\', 0, 0, 0, 0, 0) ON DUPLICATE KEY UPDATE p1 = 0, p2 = 0, p3 = 0, latCenter = 0, longCenter = 0")

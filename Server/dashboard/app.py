@@ -107,7 +107,6 @@ def deleteWaterContainer():
 @app.route('/deleteGroup', methods=['GET'])
 def deleteGroup():
 
-
     groupName = str(request.args.get("groupName"))
     try:
         res = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/deleteGroup?groupName='+groupName, timeout=5)
@@ -284,11 +283,9 @@ def modifyDevice():
         return render_template('error_template.html', responseMessage=DEVICES_LIST_ERROR)
     return render_template('template_bootstrap.html', myString=data, weather=data_meteo, ndvi=dictec2, response=True)
 
-
 # Funzione per la visualizzazione della lista dei dispositivi
 @app.route('/')
 def indexRoute():
-
 
     try:
         data_meteo = requests.get('http://' + EC2_IP + ':' +EC2_PORT + '/weather_forecasts', timeout=5).json()
@@ -324,7 +321,6 @@ def getGroupsList():
 @app.route('/getWaterList',)
 def getWaterList():
      
-
     try:
         data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getWaterList").json()
     except requests.exceptions.RequestException as e:
@@ -336,8 +332,8 @@ def downloadFile():
 
     ### information from configS3
     BUCKET_NAME = "sdcc-test-bucket"
-    ACCESS_KEY_ID = ""
-    ACCESS_SECRET_KEY = ""
+    ACCESS_KEY_ID = "AKIA57G4V3XATK4JTZOB"
+    ACCESS_SECRET_KEY = "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"
 
     try:
         s3 = boto3.resource(
@@ -360,8 +356,8 @@ def downloadFile():
 def getFileList():
 
     ### information from configS3   
-    ACCESS_KEY_ID = ""
-    ACCESS_SECRET_KEY = ""
+    ACCESS_KEY_ID = "AKIA57G4V3XATK4JTZOB"
+    ACCESS_SECRET_KEY = "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"
     BUCKET_NAME = "sdcc-test-bucket"
 
 
@@ -377,7 +373,6 @@ def getFileList():
     
         for file in my_bucket.objects.filter(Prefix=FOLDER_NAME):
             file_key_list.append(file.key)
-
         return render_template('template_bootstrap_file.html', myString=file_key_list)
     except Exception as e:
         print(str(e), flush=True)

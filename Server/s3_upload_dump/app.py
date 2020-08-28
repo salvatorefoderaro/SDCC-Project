@@ -20,8 +20,8 @@ Modulo per il caricamento del dump del database nel bucket S3.
 
 
 BUCKET_NAME = "sdcc-test-bucket"
-ACCESS_KEY_ID = ""
-ACCESS_SECRET_KEY = ""
+ACCESS_KEY_ID = "AKIA57G4V3XATK4JTZOB"
+ACCESS_SECRET_KEY = "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"
 
 s3 = boto3.resource(
         's3',

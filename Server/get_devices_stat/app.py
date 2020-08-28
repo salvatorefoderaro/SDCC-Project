@@ -295,8 +295,6 @@ def getWaterList():
        
     cursor.close()
 
-    print(json_data)
-
     return json_data
 
 

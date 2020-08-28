@@ -46,7 +46,7 @@ def connectToDb():
 
 # Funzione che crea un json con le informazioni dei dispositivi presenti nella base di dati, e delle loro ultime attività.
 @app.route('/calculateValueEC2', methods=['GET'])
-def getDevicesStat():
+def calculateValueEC2():
     while(True):
         try: 
             db = connectToDb()

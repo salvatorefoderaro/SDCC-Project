@@ -60,7 +60,7 @@
   <div class="collapse navbar-collapse" id="navbarsExampleDefault">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item active">
-        <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+        <a class="nav-link" href="/">Home</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="/getFileList">Archivio dump</a>
@@ -72,7 +72,7 @@
         <a class="nav-link" href="/getWaterList">Gestione programmazione acqua</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/getStat">Statistiche risparmio</a>
+        <a class="nav-link" href="/getStat">Statistiche risparmio <span class="sr-only">(current)</span></a>
       </li>
     </ul>
    </div>
@@ -107,11 +107,11 @@
   labels: {{ myString['label']|tojson }},
   datasets: [{
     data: {{ myString['data1']|tojson }},
-    label: 'Saved money'
+    label: 'Saved money (€)'
   },
   {
     data: {{  myString['data2']|tojson }},
-    label: 'Saved water'
+    label: 'Saved water (m3)'
   }]
 };
       

@@ -14,7 +14,7 @@ Il modulo si occupa dell'inivio delle email nel caso in cui un dispositivo non d
 '''
 
 @app.route('/sendEmail', methods=['GET'])
-def collectData():
+def sendEmail():
     gmail_user = 'gnammeorg@gmail.com'
     gmail_password = '***'
     device_id = str(request.args.get("deviceId"))
