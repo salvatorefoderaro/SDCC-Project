@@ -9,7 +9,7 @@ import smtplib
 app = Flask(__name__)
 
 '''
-Il modulo si occupa dell'inivio delle email nel caso in cui un dispositivo non dovesse rispondere al controllo sullo stato.
+The module is needed to send e-mail. The configuration of smtplib is made for GMail.
 '''
 
 @app.route('/sendEmail', methods=['GET'])
@@ -24,14 +24,15 @@ def sendEmail():
     TO = ['salvatore.foderaro@gmail.com']
     SUBJECT = 'Dispositivo non funzionante - Cluster SSDC'
 
+    # Create the body of the message
     if type == "error":
         TEXT = 'Il sensore\n\nId: ' + device_id + '\n\nIndirizzo IP: ' + device_ip + '\n\nNumero di porta: ' + device_port + '\n\nrisulta non raggiungibile.'
 
-    # Preparo il messaggio
+    # Prepare the message
     message = """From: %s\nTo: %s\nSubject: %s\n\n%s
     """ % (FROM, ", ".join(TO), SUBJECT, TEXT)
 
-    # Effettuo l'invio del messaggio
+    # Send the message.
     try:
         server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
         server.ehlo()

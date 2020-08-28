@@ -14,7 +14,15 @@ import fakesensor
 import logging
 
 '''
-Modulo del singolo dispositivo IoT per la registrazione dei dati.
+Module for the single IoT device. Each device could be of 2 type:
+
+- Sensor
+    - Send, at regular interval of time, lectures to the cluster.
+- Control
+    - Receive, at regular interval of the time, info about how many water have to be "open" for the field.
+
+The module need to send data to the Proxy. The IP address of the proxy is discovered using the SSDP protocol.
+
 '''
 
 MINE_IP_ADDRESS = ""
@@ -34,7 +42,7 @@ CLUSTER_PORT = 0
 LECTURE_INTERVAL = 0
 TYPE = ""
 
-# Leggo il file 'config.json' e memorizzo i vari parametri in specifiche variabili.
+# Read the .json file to get the config.
 def readJson():
     global data, TYPE, SEARCH_INTERVAL, CLUSTER_PORT, BCAST_IP, BCAST_PORT, PROTOCOL, MINE_IP_PORT, NETWORK_ID, MINE_IP_PORT, DATA, NAME, GROUP_NAME, MINE_ID, LECTURE_INTERVAL
     with open('config.json') as config_file:
@@ -53,7 +61,7 @@ def readJson():
         TYPE = data['type']
         config_file.close()
 
-# Funzione per l'ottenimento del proprio indirizzo IP all'interno della rete
+# Get the device ip addres that need to be sent for the registration to the cluster.
 def getMineIpAddress():
     global MINE_IP_ADDRESS
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -67,12 +75,12 @@ def getMineIpAddress():
         s.close()
     MINE_IP_ADDRESS = IP
 
-# Client SSDP per l'ottenimento dell'indirizzo IP del cluster.
+# Get the proxy IP address using the SSDP protocol.
 def getProxyIPAddress():
         global CLUSTER_IP_ADDRESS
         while True:
             try:
-                # Invio in broadcast sulla rete locale il messaggio di discovery del server SSDP
+                # Send broadcast message.
                 SSDP_DISCOVER = ('M-SEARCH * HTTP/1.1\r\n' +
                             'HOST: 239.255.255.250:1900\r\n' +
                             'MAN: "ssdp:discover"\r\n' +
@@ -84,7 +92,7 @@ def getProxyIPAddress():
                 sock.sendto(SSDP_DISCOVER.encode('ASCII'), (BCAST_IP, BCAST_PORT))
                 sock.settimeout(3)
                 while True:
-                    # Attendo la risposta da parte del Server, andando a memorizzare il suo indirizzo IP.
+                    # Waiting for the reply of the server. After reply received, save the IP address.
                     data, addr = sock.recvfrom(1024)
                     print('Risposta SSDP ricevuta.')
                     CLUSTER_IP_ADDRESS = addr[0].split('\'')[0]
@@ -94,18 +102,18 @@ def getProxyIPAddress():
 
 app = Flask(__name__) #create the Flask app
 
-# Route per la GET per il controllo dello stato del dispositivo
+# Route to check the status of the device
 @app.route('/checkStatus', methods=['GET'])
 def checkStatus():
     return "Ok"
 
-# Route per la GET per il controllo della valvola
+# Route to get the value for the device of type 'control'
 @app.route('/getEC2Value', methods=['GET'])
 def getEC2Value():
     fakesensor.setValue(request.args.get("value"))
     return "Ok"
 
-# Route per la modifica della configurazione del dispositivo a runtime
+# Route for the edit of the configuration.
 @app.route('/editConfig', methods=['GET'])
 def editConfig():
     global LECTURE_INTERVAL
@@ -117,8 +125,10 @@ def editConfig():
 
         if (request.args.get("type") == "name"):
             data["name"] = request.args.get("new_value")
+            NAME = request.args.get("new_value")
         if (request.args.get("type") == "groupName"):
             data["groupName"] = request.args.get("new_value")
+            GROUP_NAME = request.args.get("new_value")
         if (request.args.get("type") == "lecture_interval"):
             LECTURE_INTERVAL = int(request.args.get("new_value"))
             data["lecture_interval"] = int(request.args.get("new_value"))
@@ -128,65 +138,64 @@ def editConfig():
 
     return "Ok"
 
-# Funzione per l'inserimento del dispositivo e delle letture.
+# Function that register the device and send the lecture to the proxy.
 def doSomeStuff():
 
-    # Ottengo l'indirizzo ip del cluster
     getProxyIPAddress()
-
-    # Ottengo il mio indirizzo ip
     getMineIpAddress()
     result = ""
 
+    # Till when the device is not correctly registered.
     while (result != "Ok"):
         
-        # Preparo il dizionario con i dati da inviare al cluster per la registrazione del dispositivo
+        # Build the content of the POST request.       
         dictToSend = {'id':MINE_ID, 'ipAddress': MINE_IP_ADDRESS, 'ipPort': MINE_IP_PORT, 'name': data['name'], 'type':data['type']}
-        try:
-            
-            # Invio i dati al proxy tramite chiamata POST
+        
+        try:    
+            # Send the request to the Proxy
             result = requests.post('http://'+CLUSTER_IP_ADDRESS+':'+ str(CLUSTER_PORT)+'/newDevice', json=dictToSend, timeout = 3).text
             
-            # Controllo la risposta da parte del proxy
+            # Check the reply
             if result == "Ok":
-                print('Dispositivo inserito correttamente.')
+                logging.info('Device registered correctly.')
             else:
                 raise(request.exceptions.RequestException)
         
         except requests.exceptions.RequestException as e:  # This is the correct syntax
-            print("Errore durante l'inserimento del dispositivo.")
+
+             # Connection error. Is the proxy down? Try searching for it...
+            logging.warning('Errore during the registration of the device.')
             getProxyIPAddress()
         
-    # Se il dispositivo è un sensore...
+    # If the device is a sensor, send the lectures.
     if TYPE == 'sensor':
 
         # Invio ad intervallo di tempo regolari le letture di temperatura ed umidità
         while (True):
 
-            # Preparo i dati da inviare
+            # Build the content of the POST request.       
             dictToSend = {'id':data['id'], 'temperatura': fakesensor.getTemperature(), 'umidita': fakesensor.getUmidity(), 'type': 'sensor'}
+           
             try:
-
-                # Effettuo la POST verso il proxy
+                # Send the request to the Proxy
                 result = requests.post('http://'+CLUSTER_IP_ADDRESS+':'+str(CLUSTER_PORT)+'/sendDataToCluster', json=dictToSend, timeout=3).text
                 
-                # Controllo il risultato
+                # Check the result
                 if result == "Ok":
-                    print("Misurazione inserita correttamente.")
-                
-                # Accade nel caso di errori, se il dispositivo non era stato precedentemente registrato
+                    logging.info("Measurement registered correctly.")    
                 elif result == "Not present":
-                    print("Il dispositivo non e' registrato.")
-                    
+                    logging.warning('Device not registered.')
                 else:
-                    print("Errore durante la registrazione della misurazione.")
+                    raise(requests.exceptions.RequestException)
+                    
             except requests.exceptions.RequestException as e:  # This is the correct syntax
-                logging.warning('Errore durante la registrazione della misurazione.')
-                
-                # Nel caso di errore, mi rimetto alla ricerca dell'indirizzo IP del cluster
+
+                 # Connection error. Is the PROXY down? Try searching for it...
+                logging.warning('Errore during the registration of the measurement.')
                 getProxyIPAddress()
+                continue
             
-            # Attendo prima di inviare la prossima lettura
+            # Wait till the next lecture
             time.sleep(LECTURE_INTERVAL)
 
 if __name__ == '__main__':

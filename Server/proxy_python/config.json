@@ -1,3 +1,5 @@
 {
-    "external_ip_interval": 20
+    "external_ip_interval": 20,
+    "collect_data_port": 30006,
+    "flask_port": 5500
 }

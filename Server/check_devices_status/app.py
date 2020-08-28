@@ -4,10 +4,10 @@ import json
 import logging
 
 '''
-Modulo che si occupa di controllare lo stato di vita dei dispositivi, inviando una chiamata GET.
-In caso di risposta, verrà aggiornato lo stato del dispositivo come attivo, altrimenti come non attivo.
+The module contact each device, to check the status and update it on the dabase. This is needed for the dashboard.
 '''
 
+# Check the status of the cluster devices.
 def checkDevicesStatus():
 
     configFile = open("/config/config.json", "r")
@@ -22,23 +22,25 @@ def checkDevicesStatus():
 
         cursor = db.cursor()
 
-        # Vengono selezionati tutti i dispositivi presenti nel database
+        # Select all the devices.
         cursor.execute("SELECT id, ipAddress, ipPort from devices")
 
         myresult = cursor.fetchall()
 
-        # Per ogni singolo dispositivo...
         for x in myresult:
-            # Effettuo una chiamata get e, in base alla risposta, aggiorno l stato del dispositivo
+
+            # For each devices, try to contact and check for response
             try:
                 res = requests.get('http://' + str(x[1]) + ':' + str(x[2]) +'/checkStatus', timeout=3)
                 logging.info(res.text)
-                if res.text != "Ok":
-                    cursor.execute("UPDATE devices SET status = 100 WHERE id ="+str(x[0])+"")
-                    res = requests.get('http://sendemailservice:8081/sendEmail?deviceId=' + str(x[0]) +'&deviceIp=' + str(x[1]) + '&devicePort=' + str(x[2] +'&type=error'), timeout=5)
-                else:
+
+                if res.text == "Ok":
                     cursor.execute("UPDATE devices SET status = 0, lettura=now() WHERE id ="+str(x[0])+"")
-            except requests.exceptions.RequestException as e:  # This is the correct syntax
+                else:
+                    raise(requests.exceptions.RequestException)
+            except requests.exceptions.RequestException as e:
+
+                # Set the device like 'non reachable' and send an e-mail to notify this event.
                 cursor.execute("UPDATE devices SET status = 100 WHERE id ="+str(x[0])+"")
                 res = requests.get('http://sendemailservice:8081/sendEmail?deviceId=' + str(x[0]) +'&deviceIp=' + str(x[1]) + '&devicePort=' + str(x[2]) + '&type=error', timeout=5)
                     
