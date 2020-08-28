@@ -102,7 +102,8 @@ def planning():
 
             else:
                 water_unit = ( TODAY_WATER * ( polygon.proportion ) ) / 3 
-                polygon.set_water_unit( water_unit )
+                polygon.set_water_unit( water_unit * WEATHER_COEFFICIENT )
+                SAVED_WATER += (( water_unit - polygon.water_unit ) * 3 )
 
         # Write the json response of the planning phase and send it back to the user.
         data = {}
