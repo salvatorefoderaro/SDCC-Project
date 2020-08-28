@@ -17,7 +17,7 @@ import logging
 
 
 # Global variables
-DAILY_PLAN = {}                         # Daily Water plan : computed once per day and stored into this runtime global dictionary
+DAILY_PLAN = { "today": 0.0 }           # Daily Water plan : computed once per day and stored into this runtime global dictionary
 WATER_CONTAINER = 0.0                   # Water residual volume within the container (m^3)
 REMAINING_DAYS = 0                      # Remaining days before water refill
 TODAY_WATER = 0.0                       # Total water volume reserved for today's computation
@@ -47,11 +47,29 @@ def planning():
 
         # Check: if today's daily water plan has already been requested and computed, then return that one.
         try:
-            if str(date.today()) == DAILY_PLAN["today"]:
-                return DAILY_PLAN
+            # CASE 1 : Daily plan has already been computed, and it is stored in a runtime global variable. 
+            if  datetime( date.today().year, date.today().month, date.today().day, 0, 0, 0, 0 ).timestamp()  == DAILY_PLAN["today"]:
+                data = dict(DAILY_PLAN)
+                data["today"] = date.today()
+                print("Received request refers to current Water Plan, which has already been computed.\nSending back Stored Daily Plan...\n")
+                return data
+            # CASE 2 : Daily plan has already been computed and dumped on local storage, but this server has been subject to system-crashes.
+            else:
+                print("Checking for plan dumps in local storage...\n")
+                with open('DAILY_PLAN.json') as fp:
+                    plan = json.load( fp )
+                    fp.close()
+                if datetime( date.today().year, date.today().month, date.today().day, 0, 0, 0, 0 ).timestamp() == plan["today"]:
+                    DAILY_PLAN = dict(plan)
+                    data = dict(plan)
+                    data["today"] = date.today()
+                    print("Sending back Stored Daily Plan...\n")
+                    return data
+
         except KeyError as ke:
-            print(" Key error in DAILY_PLAN['today']    -->    New Plan is being computed...\n\n ")
+            print("Key error!\n\n ")
         
+        print("New Plan is being computed...\n\n ")
 
         args = request.get_json()
 
@@ -122,7 +140,12 @@ def planning():
             data["groups_list"].append( new_elem )            
 
         # Store today's plan to be returned in case of repeated calls.
-        DAILY_PLAN = data
+        DAILY_PLAN = dict(data)
+        DAILY_PLAN["today"] = datetime( date.today().year, date.today().month, date.today().day, 0, 0, 0, 0 ).timestamp()
+
+        with open('DAILY_PLAN.json', 'w') as fp:
+            json.dump( DAILY_PLAN , fp ) 
+            fp.close()
 
         return data
     
