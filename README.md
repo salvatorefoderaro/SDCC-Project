@@ -28,19 +28,23 @@ L'integrazione con i servizi **Amazon AWS** avviene tramite *S3*, per il backup 
 
 ## **Altri servizi utilizzati**
 
+- **Docker**
+  - Necessario per la creazione dei container
 - **Minikube**
   - Necessario per avere un'istanza locale di testing per Kuberneetes
 - **Kuberneetes**
   - Necessario per l'orchestrazione dei container
-- **Docker**
-  - Necessario per la creazione dei container
 
 ## **Cosa è stato utilizzato, di offerto, da Kuberneetes?**
 
 - **Deployment:**
+  - https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
 - **Job:**
+  - https://kubernetes.io/docs/concepts/workloads/controllers/job/
 - **ChronJob:**
+  - https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/
 - **Service:**
+  - https://kubernetes.io/docs/concepts/services-networking/service/
 - **PersistentVolume:**
   - https://kubernetes.io/docs/concepts/storage/persistent-volumes/
 - **PersistentVoumeClaim:**
