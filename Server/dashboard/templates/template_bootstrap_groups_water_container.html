@@ -111,7 +111,7 @@
           <p class="card-text"></p>
           <div class="d-flex justify-content-between">
 
-            <p class="display-1 degree">{{ myString['list'][i]['currentValue']}} m<sup>3</sup></p>
+            <p class="display-1 degree">{{ "%.3f"|format(myString['list'][i]['currentValue']) }} m<sup>3</sup></p>
             <i class="icon-water"></i>
           </div>
           <div class="progress">

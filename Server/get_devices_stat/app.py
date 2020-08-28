@@ -257,6 +257,8 @@ def getGroupsList():
         dict['parameter1'] = x[1]
         dict['parameter2'] = x[2]
         dict['parameter3'] = x[3]
+        dict['latCenter'] = x[4]
+        dict['longCenter'] = x[5]
         jsonDict['list'].append(dict)
 
     json_data = json.dumps(jsonDict)

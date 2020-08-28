@@ -1,6 +1,0 @@
-{
-    "host" : "mysql",
-    "user" : "root",
-    "passwd" : "password",
-    "database" : "cluster"
-}

@@ -112,7 +112,10 @@
         <ul class="list-group list-group-flush">
           <li class="list-group-item">Parameter 1: {{ myString['list'][i]['parameter1'] }}</li>
           <li class="list-group-item">Parameter 2: {{ myString['list'][i]['parameter2'] }}</li>
-          <li class="list-group-item">Parameter3: {{ myString['list'][i]['parameter3'] }}</li>
+          <li class="list-group-item">Parameter 3: {{ myString['list'][i]['parameter3'] }}</li>
+          <li class="list-group-item">Center latitude: {{ myString['list'][i]['latCenter'] }}</li>
+          <li class="list-group-item">Center longitude: {{ myString['list'][i]['longCenter'] }}</li>
+
         </ul>
 
         {% set link_delete = "deleteGroup?groupName=" ~ myString['list'][i]['groupName'] %}
