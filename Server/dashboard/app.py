@@ -18,7 +18,7 @@ SERVICE_PORT = 0
 EC2_IP = ""
 EC2_PORT = ""
 CONTAINER_HISTORY_ERROR = "Errore nell'ottenimento dello storico dei container."
-METEO_INFO_HERROR = "Errore nell'ottenimento delle informazioni meteo."
+METEO_INFO_ERROR = "Errore nell'ottenimento delle informazioni meteo."
 DEVICES_LIST_ERROR = "Errore nell'ottenimento della lista dei dispositivi."
 ADD_GROUP_ERROR = "Errore nell'aggiunta del gruppo."
 DELETE_GROUP_ERROR = "Errore nell'eliminazione del gruppo."
@@ -59,7 +59,7 @@ def readJson():
 def checkDevicesStatus():
 
     try:
-        errorMessage = METEO_INFO_HERROR
+        errorMessage = METEO_INFO_ERROR
         data_meteo = requests.get('http://' + EC2_IP + ':' +EC2_PORT + '/weather_forecasts', timeout=5).json()
 
         if os.path.isfile('dump/ec2value.json'): 
@@ -209,7 +209,7 @@ def deleteDevice():
         if res.text != "Ok":
             raise(requests.exceptions.RequestException)
 
-        errorMessage = METEO_INFO_HERROR
+        errorMessage = METEO_INFO_ERROR
         data_meteo = requests.get('http://' + EC2_IP + ':' +EC2_PORT + '/weather_forecasts', timeout=5).json()
 
         errorMessage = GROUP_LIST_ERROR
@@ -262,7 +262,7 @@ def modifyDevice():
                 errorMessage = "Errore nella modifica del dispositivo."
                 raise(requests.exceptions.RequestException)
 
-        errorMessage = METEO_INFO_HERROR
+        errorMessage = METEO_INFO_ERROR
         data_meteo = requests.get('http://' + EC2_IP + ':' +EC2_PORT + '/weather_forecasts', timeout=5).json()
 
         errorMessage = DEVICES_LIST_ERROR
@@ -278,7 +278,7 @@ def modifyDevice():
 def indexRoute():
 
     try:
-        errorMessage = METEO_INFO_HERROR
+        errorMessage = METEO_INFO_ERROR
         data_meteo = requests.get('http://' + EC2_IP + ':' +EC2_PORT + '/weather_forecasts', timeout=5).json()
 
         if os.path.isfile('dump/ec2value.json'): 

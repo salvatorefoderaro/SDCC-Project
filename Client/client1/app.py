@@ -34,7 +34,7 @@ CLUSTER_PORT = 0
 LECTURE_INTERVAL = 0
 TYPE = ""
 
-# Leggo il file 'config.json' e memorizzo i vari parametri in specifiche variabili.
+# Read the .json file to get the config.
 def readJson():
     global data, TYPE, SEARCH_INTERVAL, CLUSTER_PORT, BCAST_IP, BCAST_PORT, PROTOCOL, MINE_IP_PORT, NETWORK_ID, MINE_IP_PORT, DATA, NAME, GROUP_NAME, MINE_ID, LECTURE_INTERVAL
     with open('config.json') as config_file:

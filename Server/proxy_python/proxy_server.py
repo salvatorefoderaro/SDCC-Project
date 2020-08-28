@@ -11,23 +11,25 @@ import json
 Modulo necessario per la comunicazione tra la rete interna (dispositivi) ed il cluster.
 '''
 
-app = Flask(__name__) #create the Flask app
+app = Flask(__name__) 
 
-COLLECT_DATA_PORT = 30006
-FLASK_PORT = 5500
 EXTERNAL_IP_INTERVAL = 0
+COLLECT_DATA_PORT = 0
+FLASK_PORT = 0
 
 logger = gen_logger('sample')
 
 # Funzione per la lettura del file 'config.json'
 def readJson():
-    global EXTERNAL_IP_INTERVAL
+    global EXTERNAL_IP_INTERVAL, COLLECT_DATA_PORT, FLASK_PORT
     with open('config.json') as config_file:
         data = json.load(config_file)
         EXTERNAL_IP_INTERVAL = data['external_ip_interval']
+        COLLECT_DATA_PORT = data['collect_data_port']
+        FLASK_PORT = data['flask_port']
         config_file.close()
 
-# Ottengo l'indirizzo ip del servizio esposto dal cluster
+# Get the IP of the 'collect_data' service.
 def getExternalIp():
     global SERVICE_EXTERNAL_IP
     SERVICE_EXTERNAL_IP = minikubeservice.getServiceExternalIP("collectdataservice") 
@@ -36,62 +38,36 @@ def getExternalIp():
         time.sleep(EXTERNAL_IP_INTERVAL)   
         SERVICE_EXTERNAL_IP = minikubeservice.getServiceExternalIP("collectdataservice") 
 
-# Modifico la configurazione di un dispositivo
-@app.route('/editConfig', methods=['GET'])
-def editConfig():
-    try:
-        res = requests.get("http://"+ str(request.args.get("ipAddress"))+":"+ str(request.args.get("ipPort")) + "/editConfig?type=" + str(request.args.get("type")) + "&new_value=" + str(request.args.get("new_value")), timeout=3)
-        return res.text
-    except requests.exceptions.RequestException as e:
-        return "Dead"
-
-# Controllo lo stato di un dispositivo
-@app.route('/checkStatus', methods=['GET'])
-def checkstatus():
-    try:
-        res = requests.get("http://"+ str(request.args.get("ipAddress"))+":"+ str(request.args.get("ipPort")) + "/checkStatus", timeout=3)
-        return res.text
-    except requests.exceptions.RequestException as e:
-        return "Dead"
-
-# Aggiungo un dispositivo al cluster
+# Route to add a new device to the cluster. Send to the cluster the received POST content.
 @app.route('/newDevice', methods=['POST'])
 def newDevice():
-    dictToSend = {'id':request.json['id'], 'ipAddress':request.json['ipAddress'], 'ipPort':request.json['ipPort'], 'name':request.json['name'], 'type' : request.json['type']}
+    
     try:
-        res = requests.post("http://" + str(SERVICE_EXTERNAL_IP) + ":" + str(COLLECT_DATA_PORT) +"/newDevice", json=dictToSend, timeout=10)
+        res = requests.post("http://" + str(SERVICE_EXTERNAL_IP) + ":" + str(COLLECT_DATA_PORT) +"/newDevice", json=request.json, timeout=10)
         return res.text
     except requests.exceptions.RequestException as e:  # This is the correct syntax
         getExternalIp()
         return "Not ok"
 
-# Invio la lettura del dispositivo al cluster
+# Route to send data to the cluster. Send to the cluster the received POST content.
 @app.route('/sendDataToCluster', methods=['POST'])
 def sendDataToCluster():
-    if request.json['type'] == 'sensor':
-        dictToSend = {'id':request.json['id'], 'temperatura':request.json['temperatura'], 'umidita':request.json['umidita'], 'type':request.json['type']}
-        try:
-            res = requests.post("http://" + str(SERVICE_EXTERNAL_IP) + ":"+ str(COLLECT_DATA_PORT) +"/collectData", json=dictToSend, timeout=10)
-            return res.text
-        except requests.exceptions.RequestException as e:  # This is the correct syntax
-            getExternalIp()
-            return "Not ok"
-    elif request.json['type'] == 'check_water':
-        dictToSend = {'id':request.json['id'], 'water_level':request.json['water_level'], 'type':request.json['type']}
-        try:
-            res = requests.post("http://" + str(SERVICE_EXTERNAL_IP) + ":"+ str(COLLECT_DATA_PORT) +"/collectData", json=dictToSend, timeout=10)
-            return res.text
-        except requests.exceptions.RequestException as e:  # This is the correct syntax
-            getExternalIp()
-            return "Not ok"       
+
+    try:
+        res = requests.post("http://" + str(SERVICE_EXTERNAL_IP) + ":"+ str(COLLECT_DATA_PORT) +"/collectData", json=reqeust.json, timeout=10)
+        return res.text
+    except requests.exceptions.RequestException as e:  
+        getExternalIp()
+        return "Not ok"
+    
 
 if __name__ == '__main__':   
     readJson()
     getExternalIp()
 
-    # Avvio il server SSDP
+    # Start SSDP server
     ssdpServer = Server(9001, 'ssdp', 'cluster')
     ssdpServer.start()
 
-    # avvio flask
+    # Run Flask
     app.run(host='0.0.0.0', debug=True, port=FLASK_PORT, threaded=True) #run app in debug mode on port 5000
