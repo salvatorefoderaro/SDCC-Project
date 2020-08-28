@@ -98,17 +98,18 @@ def calculateValueEC2():
                     myresult = cursor.fetchall()
                     for y in myresult:
                         control_water_unit = x['daily_water_unit'] / len(myresult)
-                        try:
-                            res = requests.get('http://' + str(y[1]) + ':' + str(y[2]) +'/getEC2Value?daily_water_unit=' + str(x['daily_water_unit']), timeout=3)
-                            if res.text == "Ok":
-                                cursor.execute("UPDATE water_container SET currentValue = currentValue - "+str(control_water_unit) +" WHERE id = " + str(water_container_id))
-                                db.commit()
-                        except requests.exceptions.RequestException as e:  # This is the correct syntax
-                            print("To do...")
-
+                        if control_water_unit == 0:
+                            try:
+                                res = requests.get('http://' + str(y[1]) + ':' + str(y[2]) +'/getEC2Value?daily_water_unit=' + str(x['daily_water_unit']), timeout=3)
+                                if res.text == "Ok":
+                                    cursor.execute("UPDATE water_container SET currentValue = currentValue - "+str(control_water_unit) +" WHERE id = " + str(water_container_id))
+                                    db.commit()
+                            except requests.exceptions.RequestException as e:  # This is the correct syntax
+                                print("To do...")
                 cursor.close()
                 db.close()
                 return "Ok"
+                time.sleep(1200)
         except (mysql.Error, requests.exceptions.RequestException) as err:
             print(str(err), flush=True)
             continue

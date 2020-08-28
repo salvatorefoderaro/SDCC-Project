@@ -30,6 +30,11 @@ GROUP_LIST_ERROR = "Errore nell'ottenimento della lista dei gruppi."
 ERROR_GET_S3_FILE = "Errore nell'ottenimento della lista dei file."
 ERROR_DOWNLOAD_S3_FILE = "Errore nel download dei file da S3."
 
+BUCKET_NAME = "sdcc-test-bucket"
+ACCESS_KEY_ID = "AKIA57G4V3XAXOJRI7HS"
+ACCESS_SECRET_KEY = "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"
+
+
 '''
 Modulo per la dashboard di gestione dell'intero applicativo.
 '''
@@ -54,26 +59,26 @@ def readJson():
 def checkDevicesStatus():
 
     try:
+        errorMessage = METEO_INFO_HERROR
         data_meteo = requests.get('http://' + EC2_IP + ':' +EC2_PORT + '/weather_forecasts', timeout=5).json()
-    except requests.exceptions.RequestException as e:
-        return render_template('error_template.html', responseMessage=METEO_INFO_HERROR)
 
-    if os.path.isfile('dump/ec2value.json'): 
-        dictec2 = {}
-        with open('dump/ec2value.json') as config_file:
-            data_ec2 = json.load(config_file)
-            config_file.close()
+        if os.path.isfile('dump/ec2value.json'): 
+            dictec2 = {}
+            with open('dump/ec2value.json') as config_file:
+                data_ec2 = json.load(config_file)
+                config_file.close()
 
-        for i in range(0, len(data_ec2['groups_list'])):
-            dictec2[data_ec2['groups_list'][i]['groupName']] = round(data_ec2['groups_list'][i]['ndvi_mean'], 4)
-    else:
-        dictec2 = None
+            for i in range(0, len(data_ec2['groups_list'])):
+                dictec2[data_ec2['groups_list'][i]['groupName']] = round(data_ec2['groups_list'][i]['ndvi_mean'], 4)
+        else:
+            dictec2 = None
 
-    try:
+        errorMessage = DEVICES_LIST_ERROR
         data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getDeviceStat").json()
+
     except requests.exceptions.RequestException as e:
-        return render_template('error_template.html', responseMessage=DEVICES_LIST_ERROR)
-    return render_template('template_bootstrap.html', myString=data, weather=data_meteo, ndvi=dictec2, response=True)
+        return render_template('error_template.html', responseMessage=errorMessage)
+    return render_template('template_bootstrap.html', myString=data, weather=data_meteo, ndvi=dictec2)
 
 # Funzione per l'aggiunta di un nuovo gruppo
 @app.route('/addGroupLink', methods=['GET'])
@@ -91,35 +96,34 @@ def deleteWaterContainer():
     container_id = str(request.args.get("container_id"))
 
     try:
+        errorMessage = ERROR_DELETE_CONTAINER
         res = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/deleteContainer?container_id='+container_id, timeout=5)
-    except requests.exceptions.RequestException as e:
-        return render_template('error_template.html', responseMessage=ERROR_DELETE_CONTAINER)
 
-    if res.text != "Ok":
-        return render_template('error_template.html', responseMessage=ERROR_DELETE_CONTAINER)
-
-    try:
+        if res.text != "Ok":
+            raise(requests.exceptions.RequestException)
+        
+        errorMessage = CONTAINER_HISTORY_ERROR
         data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getWaterList").json()
     except requests.exceptions.RequestException as e:
-        return render_template('error_template.html', responseMessage=CONTAINER_HISTORY_ERROR)
-    return render_template('template_bootstrap_groups_water_container.html', myString=data)
+        return render_template('error_template.html', responseMessage=errorMessage)
+    return render_template('template_bootstrap_groups_water_container.html', myString=data,response=True)
 
 @app.route('/deleteGroup', methods=['GET'])
 def deleteGroup():
 
     groupName = str(request.args.get("groupName"))
     try:
+        errorMessage = DELETE_GROUP_ERROR
         res = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/deleteGroup?groupName='+groupName, timeout=5)
-    except requests.exceptions.RequestException as e:
-        return render_template('error_template.html', responseMessage=DELETE_GROUP_ERROR)
 
-    if res.text != "Ok":
-        return render_template('error_template.html', responseMessage=DELETE_GROUP_ERROR)
-
-    try:
+        if res.text != "Ok":
+            raise(requests.exceptions.RequestException)
+        
+        errorMessage = GROUP_LIST_ERROR
         data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getGroupsList").json()
+
     except requests.exceptions.RequestException as e:
-        return render_template('error_template.html', responseMessage=GROUP_LIST_ERROR)
+        return render_template('error_template.html', responseMessage=errorMessage)
     return render_template('template_bootstrap_groups.html', myString=data, response=True)
 
 # Funzione per l'aggiunta di un nuovo gruppo
@@ -134,16 +138,16 @@ def addGroup():
     longCenter = str(request.args.get("longCenter"))
 
     try:
+        errorMessage = ADD_GROUP_ERROR
         res = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/addGroup?groupName='+groupName+'&parameter1=' + parameter1 + '&parameter2=' + parameter2 + '&parameter3=' + parameter3 + '&longCenter=' + longCenter + '&latCenter=' + latCenter, timeout=5)
         if res.text != "Ok":
             return render_template('error_template.html', responseMessage=ADD_GROUP_ERROR)
-    except requests.exceptions.RequestException as e:
-        return render_template('error_template.html', responseMessage=ADD_GROUP_ERROR)
-
-    try:
+        
+        errorMessage = GROUP_LIST_ERROR
         data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getGroupsList").json()
     except requests.exceptions.RequestException as e:
-        return render_template('error_template.html', responseMessage=GROUP_LIST_ERROR)
+        return render_template('error_template.html', responseMessage=errorMessage)
+
     return render_template('template_bootstrap_groups.html', myString=data, response=True)
 
 # Funzione per l'aggiunta di un nuovo gruppo
@@ -155,132 +159,118 @@ def addWaterContainer():
     water_value = str(request.args.get("water_value"))
 
     try:
+        errorMessage = ERROR_ADD_CONTAINER
         res = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/addWaterContainer?start='+start+'&end=' + end + '&water_value=' + water_value, timeout=5)
         if res.text != "Ok":
-            return render_template('error_template.html', responseMessage=ERROR_ADD_CONTAINER)
-    except requests.exceptions.RequestException as e:
-        return render_template('error_template.html', responseMessage=ERROR_ADD_CONTAINER)
+            raise(requests.exceptions.RequestException)
 
-    try:
+        errorMessage = CONTAINER_HISTORY_ERROR
         data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getWaterList").json()
     except requests.exceptions.RequestException as e:
-        return render_template('error_template.html', responseMessage=CONTAINER_HISTORY_ERROR)
+        return render_template('error_template.html', responseMessage=errorMessage)
 
-    return render_template('template_bootstrap_groups_water_container.html', myString=data)
+    return render_template('template_bootstrap_groups_water_container.html', myString=data, response=True)
 
 # Funzione per l'aggiunta di un nuovo gruppo
 @app.route('/getStat', methods=['GET'])
 def getStat():
 
     try:
+        errorMessage = ERROR_ADD_CONTAINER
         res = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/getStat', timeout=5).json()
     except requests.exceptions.RequestException as e:
-        return render_template('error_template.html', responseMessage=ERROR_ADD_CONTAINER)
+        return render_template('error_template.html', responseMessage=errorMessage)
     return render_template('template_bootstrap_stat.html', myString=res)
 
 # Funzione per l'eliminazione di un dispositivo
 @app.route('/deleteDevice', methods=['GET'])
 def deleteDevice():
 
-    if os.path.isfile('dump/ec2value.json'): 
-        dictec2 = {}
-        with open('dump/ec2value.json') as config_file:
-            data_ec2 = json.load(config_file)
-            config_file.close()
-
-        for i in range(0, len(data_ec2['groups_list'])):
-            dictec2[data_ec2['groups_list'][i]['groupName']] = round(data_ec2['groups_list'][i]['ndvi_mean'], 4)
-    else:
-        dictec2 = None
-
-    new_value = str(request.args.get("new_value"))
-    id = str(request.args.get("id"))
-    type = str(request.args.get("type"))
-    ip_address = str(request.args.get("ip_address"))
-    port = str(request.args.get("port"))
-
     try:
+        if os.path.isfile('dump/ec2value.json'): 
+            dictec2 = {}
+            with open('dump/ec2value.json') as config_file:
+                data_ec2 = json.load(config_file)
+                config_file.close()
+
+            for i in range(0, len(data_ec2['groups_list'])):
+                dictec2[data_ec2['groups_list'][i]['groupName']] = round(data_ec2['groups_list'][i]['ndvi_mean'], 4)
+        else:
+            dictec2 = None
+
+        new_value = str(request.args.get("new_value"))
+        id = str(request.args.get("id"))
+        type = str(request.args.get("type"))
+        ip_address = str(request.args.get("ip_address"))
+        port = str(request.args.get("port"))
+
+        errorMessage = ERROR_DELETE_DEVICE
         res = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/deleteDevice?ipAddress='+ip_address+'&ipPort=' + port + '&new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
         if res.text != "Ok":
-            return render_template('error_template.html', responseMessage = ERROR_DELETE_DEVICE)
-    except requests.exceptions.RequestException as e:
-        return render_template('error_template.html', responseMessage=ERROR_DELETE_DEVICE)
+            raise(requests.exceptions.RequestException)
 
-    try:
+        errorMessage = METEO_INFO_HERROR
         data_meteo = requests.get('http://' + EC2_IP + ':' +EC2_PORT + '/weather_forecasts', timeout=5).json()
-    except requests.exceptions.RequestException as e:
-        return render_template('error_template.html', responseMessage=METEO_INFO_HERROR)
 
-    try:
+        errorMessage = GROUP_LIST_ERROR
         data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getGroupsList").json()
     except requests.exceptions.RequestException as e:
-        return render_template('error_template.html', responseMessage=GROUP_LIST_ERROR)
+        return render_template('error_template.html', responseMessage=errorMessage)
     return render_template('template_bootstrap.html', myString=data, weather=data_meteo, ndvi=dictec2, response=True)
 
 # Funzione per la modifica di un dispositivo
 @app.route('/modifyDevice', methods=['GET'])
 def modifyDevice():
 
-    if os.path.isfile('dump/ec2value.json'): 
-        dictec2 = {}
-        with open('dump/ec2value.json') as config_file:
-            data_ec2 = json.load(config_file)
-            config_file.close()
+    try: 
+        if os.path.isfile('dump/ec2value.json'): 
+            dictec2 = {}
+            with open('dump/ec2value.json') as config_file:
+                data_ec2 = json.load(config_file)
+                config_file.close()
 
-        for i in range(0, len(data_ec2['groups_list'])):
-            dictec2[data_ec2['groups_list'][i]['groupName']] = round(data_ec2['groups_list'][i]['ndvi_mean'], 4)
-    else:
-        dictec2 = None
+            for i in range(0, len(data_ec2['groups_list'])):
+                dictec2[data_ec2['groups_list'][i]['groupName']] = round(data_ec2['groups_list'][i]['ndvi_mean'], 4)
+        else:
+            dictec2 = None
 
-    new_value = str(request.args.get("new_value"))
-    id = str(request.args.get("id"))
-    type = str(request.args.get("type"))
-    ip_address = str(request.args.get("ip_address"))
-    port = str(request.args.get("port"))
-    
-    if type == "lecture_interval":     
-        try:
+        new_value = str(request.args.get("new_value"))
+        id = str(request.args.get("id"))
+        type = str(request.args.get("type"))
+        ip_address = str(request.args.get("ip_address"))
+        port = str(request.args.get("port"))
+        
+        if type == "lecture_interval":     
+            errorMessage = ERROR_EDIT_DEVICE
             res = requests.get('http://' + str(ip_address) + ':' +str(port) +'/editConfig?new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
-            print(res.text)
             if (res.text != "Ok"):
-                raise(Exception)
-        except requests.exceptions.RequestException as e:
-            print(e)
-            return render_template('error_template.html', responseMessage=ERROR_EDIT_DEVICE)
-    
-    else:
-        if type =="name":
-            try:
+                raise(requests.exceptions.RequestException)
+        
+        else:
+            if type =="name":
+                errorMessage = ERROR_EDIT_DEVICE
                 res = requests.get('http://' + str(ip_address) + ':' +str(port) +'/editConfig?new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
-                print(res.text)
                 if (res.text != "Ok"):
-                    raise(Exception)
-            except requests.exceptions.RequestException as e:
-                print(e)
-                return render_template('error_template.html', responseMessage=ERROR_EDIT_DEVICE)
-                
-        try:
+                    raise(requests.exceptions.RequestException)
+            
+            errorMessage = "Errore nella modifica del dispositivo."
             res = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/editConfig?ipAddress='+ip_address+'&ipPort=' + port + '&new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
-            print(res.text)
             if (res.text == "Group name not present."):
                 errorMessage = "Il gruppo indicato non è presente. Aggiungerlo prima."
-                raise(Exception)
+                raise(requests.exceptions.RequestException)
             elif (res.text != "Ok"):
                 errorMessage = "Errore nella modifica del dispositivo."
-                raise(Exception)
-        except requests.exceptions.RequestException as e:
-            return render_template('error_template.html', responseMessage=errorMessage)
+                raise(requests.exceptions.RequestException)
 
-    try:
+        errorMessage = METEO_INFO_HERROR
         data_meteo = requests.get('http://' + EC2_IP + ':' +EC2_PORT + '/weather_forecasts', timeout=5).json()
-    except requests.exceptions.RequestException as e:
-        return render_template('error_template.html', responseMessage=METEO_INFO_HERROR)
 
-    try:
+        errorMessage = DEVICES_LIST_ERROR
         data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getDeviceStat").json()
+        
     except requests.exceptions.RequestException as e:
-        print(e)
-        return render_template('error_template.html', responseMessage=DEVICES_LIST_ERROR)
+        return render_template('error_template.html', responseMessage=errorMessage)
+
     return render_template('template_bootstrap.html', myString=data, weather=data_meteo, ndvi=dictec2, response=True)
 
 # Funzione per la visualizzazione della lista dei dispositivi
@@ -288,34 +278,35 @@ def modifyDevice():
 def indexRoute():
 
     try:
+        errorMessage = METEO_INFO_HERROR
         data_meteo = requests.get('http://' + EC2_IP + ':' +EC2_PORT + '/weather_forecasts', timeout=5).json()
-    except requests.exceptions.RequestException as e:
-        return render_template('error_template.html', responseMessage=METEO_INFO_HERROR)
 
-    if os.path.isfile('dump/ec2value.json'): 
-        dictec2 = {}
-        with open('dump/ec2value.json') as config_file:
-            data_ec2 = json.load(config_file)
-            config_file.close()
+        if os.path.isfile('dump/ec2value.json'): 
+            dictec2 = {}
+            with open('dump/ec2value.json') as config_file:
+                data_ec2 = json.load(config_file)
+                config_file.close()
 
-        for i in range(0, len(data_ec2['groups_list'])):
-            dictec2[data_ec2['groups_list'][i]['groupName']] = round(data_ec2['groups_list'][i]['ndvi_mean'], 4)
-    else:
-        dictec2 = None
-    
-    try:
+            for i in range(0, len(data_ec2['groups_list'])):
+                dictec2[data_ec2['groups_list'][i]['groupName']] = round(data_ec2['groups_list'][i]['ndvi_mean'], 4)
+                dictec2['warning'] = data_ec2['warning']
+        else:
+            dictec2 = None
+        
+        errorMessage = DEVICES_LIST_ERROR
         data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getDeviceStat", timeout=5).json()
     except requests.exceptions.RequestException as e:
-        return render_template('error_template.html', responseMessage=DEVICES_LIST_ERROR)
+        return render_template('error_template.html', responseMessage=errorMessage)
     return render_template('template_bootstrap.html', myString=data, weather=data_meteo, ndvi=dictec2)
 
 @app.route('/getGroupsList',)
 def getGroupsList():
      
     try:
+        errorMessage = GROUP_LIST_ERROR
         data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getGroupsList").json()
     except requests.exceptions.RequestException as e:
-        return render_template('error_template.html', responseMessage=GROUP_LIST_ERROR)
+        return render_template('error_template.html', responseMessage=errorMessage)
     return render_template('template_bootstrap_groups.html', myString=data)
 
 @app.route('/getWaterList',)
@@ -323,17 +314,13 @@ def getWaterList():
      
     try:
         data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getWaterList").json()
+        errorMessage = GROUP_LIST_ERROR
     except requests.exceptions.RequestException as e:
-        return render_template('error_template.html', responseMessage=GROUP_LIST_ERROR)
+        return render_template('error_template.html', responseMessage=errorMessage)
     return render_template('template_bootstrap_groups_water_container.html', myString=data)
 
 @app.route('/downloadFile', methods=['GET'])
 def downloadFile():
-
-    ### information from configS3
-    BUCKET_NAME = "sdcc-test-bucket"
-    ACCESS_KEY_ID = "AKIA57G4V3XATK4JTZOB"
-    ACCESS_SECRET_KEY = "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"
 
     try:
         s3 = boto3.resource(
@@ -354,12 +341,6 @@ def downloadFile():
 
 @app.route('/getFileList')
 def getFileList():
-
-    ### information from configS3   
-    ACCESS_KEY_ID = "AKIA57G4V3XATK4JTZOB"
-    ACCESS_SECRET_KEY = "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"
-    BUCKET_NAME = "sdcc-test-bucket"
-
 
     try:
         s3 = boto3.resource(

@@ -15,63 +15,78 @@ Modulo che si occupa di regisrare i nuovi dispositivi e le registrazioni prodott
 @app.route('/collectData', methods=['POST'])
 def collectData():
 
-    configFile = open("/config/config.json", "r")
-    json_object = json.load(configFile)
+    if request.method != 'POST':
+        return "Wrong request method."
 
-    try:
-        db = mysql.connect(
-            host = json_object['host'],
-            user = json_object['user'],
-            passwd = json_object['passwd'],
-            database = json_object['database']
-        )
+    elif  ('id' or 'temperatura' or 'umidita' or 'type') not in request.json:
+        return "Wrong request."
 
-        cursor = db.cursor()
+    else:
+        configFile = open("/config/config.json", "r")
+        json_object = json.load(configFile)
 
-        # Controllo se il dispositivo è attualmente presente nella base dati
-        cursor.execute("select * FROM devices WHERE id = " + str(request.json['id']))
-        
-        row = cursor.fetchone()
-        if row == None:
-            return "Not present"
+        try:
+            db = mysql.connect(
+                host = json_object['host'],
+                user = json_object['user'],
+                passwd = json_object['passwd'],
+                database = json_object['database']
+            )
 
-        cursor.execute("UPDATE devices SET status = 0, lettura=now() where id = " + str(request.json['id']))
-        cursor.execute("INSERT INTO lectures (id, temperatura, umidita, lettura) VALUES (" + str(request.json['id']) +"," + str(request.json['temperatura']) + "," + str(request.json['umidita'])+",now())")
-        cursor.close()
-        db.commit()
 
-        return "Ok"
-    except mysql.connector.Error as err:
-        print(str(err), flush=True)
-        return str(err)
+            cursor = db.cursor()
+
+            # Controllo se il dispositivo è attualmente presente nella base dati
+            cursor.execute("select * FROM devices WHERE id = " + str(request.json['id']))
+            
+            row = cursor.fetchone()
+            if row == None:
+                return "Not present"
+
+            cursor.execute("UPDATE devices SET status = 0, lettura=now() where id = " + str(request.json['id']))
+            cursor.execute("INSERT INTO lectures (id, temperatura, umidita, lettura) VALUES (" + str(request.json['id']) +"," + str(request.json['temperatura']) + "," + str(request.json['umidita'])+",now())")
+            cursor.close()
+            db.commit()
+
+            return "Ok"
+        except mysql.Error as err:
+            print(str(err), flush=True)
+            return str(err)
 
 @app.route('/newDevice', methods=['POST'])
 def newDevice():
 
-    try:
+    if request.method != 'POST':
+        return "Wrong request method."
 
-        configFile = open("/config/config.json", "r")
-        json_object = json.load(configFile)
+    elif  ('id' or 'ipPort' or 'ipAddress' or 'name' or 'type') not in request.json:
+        return "Wrong request."
 
-        db = mysql.connect(
-            host = json_object['host'],
-            user = json_object['user'],
-            passwd = json_object['passwd'],
-            database = json_object['database']
-        )
+    else:
+        try:
 
-        cursor = db.cursor()
+            configFile = open("/config/config.json", "r")
+            json_object = json.load(configFile)
 
-        # Inserisco il dispositivo nel database
-        cursor.execute("INSERT INTO devices (id, ipAddress, ipPort, status, name, groupName, type) VALUES (" + str(request.json['id']) + ", \'" + str(request.json['ipAddress']) + "\'" + ", \'" + str(request.json['ipPort']) + "\',0,\'" + str(request.json['name']) + "\',\'default\',\'" + str(request.json['type']) + "\') ON DUPLICATE KEY UPDATE status = 0, ipAddress =\'" + str(request.json['ipAddress']) +"\', name =\'" + str(request.json["name"]) + "\', type =\'" + str(request.json["type"]) + "\'")
+            db = mysql.connect(
+                host = json_object['host'],
+                user = json_object['user'],
+                passwd = json_object['passwd'],
+                database = json_object['database']
+            )
 
-        cursor.close()
-        db.commit()
+            cursor = db.cursor()
 
-        return "Ok"
-    except mysql.connector.Error as err:
-        print(str(err), flush=True)
-        return str(err)
+            # Inserisco il dispositivo nel database
+            cursor.execute("INSERT INTO devices (id, ipAddress, ipPort, status, name, groupName, type) VALUES (" + str(request.json['id']) + ", \'" + str(request.json['ipAddress']) + "\'" + ", \'" + str(request.json['ipPort']) + "\',0,\'" + str(request.json['name']) + "\',\'default\',\'" + str(request.json['type']) + "\') ON DUPLICATE KEY UPDATE status = 0, ipAddress =\'" + str(request.json['ipAddress']) +"\', name =\'" + str(request.json["name"]) + "\', type =\'" + str(request.json["type"]) + "\'")
+
+            cursor.close()
+            db.commit()
+
+            return "Ok"
+        except mysql.Error as err:
+            print(str(err), flush=True)
+            return str(err)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=8005, threaded=True)

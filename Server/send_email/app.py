@@ -2,7 +2,6 @@
 
 from flask import Flask
 import requests
-import mysql.connector as mysql
 from flask import request
 import json
 import smtplib

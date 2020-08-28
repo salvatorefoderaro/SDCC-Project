@@ -14,7 +14,7 @@ Modulo necessario per la comunicazione tra la rete interna (dispositivi) ed il c
 app = Flask(__name__) #create the Flask app
 
 COLLECT_DATA_PORT = 30006
-FLASK_PORT = 5000
+FLASK_PORT = 5500
 EXTERNAL_IP_INTERVAL = 0
 
 logger = gen_logger('sample')

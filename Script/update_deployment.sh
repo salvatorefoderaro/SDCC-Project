@@ -6,7 +6,7 @@ kubectl delete deployment collectdatadeployment
 kubectl delete deployment dashboarddeployment
 kubectl delete deployment getdevicesstatdeployment
 kubectl delete job dbinstantiate
-kubectl delete job jobdbdump
+kubectl delete cronjobs jobdbdump
 kubectl delete job uploads3job
 kubectl delete cronjobs checkstatusjob
 kubectl delete deployment sendemaildeployment
