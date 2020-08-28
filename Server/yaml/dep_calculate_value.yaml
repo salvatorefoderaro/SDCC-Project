@@ -21,3 +21,10 @@ spec:
         name: calculatevalue
         ports:
         - containerPort: 8070
+        volumeMounts:
+        - name: mysql-persistent-storage-dump
+          mountPath: /app/dump
+      volumes:
+      - name: mysql-persistent-storage-dump
+        persistentVolumeClaim:
+          claimName: mysql-pv-claim-dump

@@ -113,6 +113,13 @@
     height: 100px;
 }
 
+.icon-field {
+  background-image: url("{{ url_for('static', filename='img/field.png') }}");
+    background-position: center center;
+    width: 100px;
+    height: 100px;
+}
+
 .icon-snow {
   background-image: url("{{ url_for('static', filename='img/snow.png') }}");
     background-position: center center;
@@ -146,6 +153,9 @@
       </li>
       <li class="nav-item">
         <a class="nav-link" href="/getWaterList">Gestione programmazione acqua</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/getStat">Statistiche risparmio</a>
       </li>
     </ul>
    </div>
@@ -186,11 +196,16 @@
           <div class="progress">
   <div class="progress-bar" role="progressbar" style="width: {{ myString['water_level']['percentage']}}%;" aria-valuenow="{{ myString['water_level']['currentValue']}}" aria-valuemin="0" aria-valuemax="{{ myString['water_level']['totalValue']}}">{{ myString['water_level']['percentage']}}%</div>
   </div><br>
+  <div class="d-flex justify-content-between mb-4">
+    <b>Acqua totale:</b> {{ myString['water_level']['totalValue']}}
+  </div>          <div class="d-flex justify-content-between mb-4">
+    <b>Data odierna:</b> {{ myString['water_level']['today']}}
+  </div>
           <div class="d-flex justify-content-between mb-4">
-            <b>Inizio:</b> {{ myString['water_level']['startDate']}}
+            <b>Data inizio:</b> {{ myString['water_level']['startDate']}}
           </div>
           <div class="d-flex justify-content-between mb-4">
-            <b>Fine:</b> {{ myString['water_level']['endDate']}}
+            <b>Data fine:</b> {{ myString['water_level']['endDate']}}
           </div>
       
         </div>
@@ -342,11 +357,15 @@
                 <p><a href="/" type="button" class="btn btn-secondary btn-lg">Aggiorna le previsioni meteo</a>
 </div></p>
 
+<h1>Lista gruppi</h1>
+
 
   {% for i in range(0, myString['list']|length ) %} 
 
-  <p><h2>{{ myString['list'][i]['groupName'] }}</h2>
-{% if ndvi[myString['list'][i]['groupName']] is defined%}
+  <i class="icon-field"></i>
+  <p><h2>{{ myString['list'][i]['groupName'] }}</h2>                </p>
+  <i class="icon-field"></i>
+{% if ndvi is not none and ndvi[myString['list'][i]['groupName']] is defined %}
 
 <div class="row">
   <div class="col-sm-6">
@@ -359,55 +378,28 @@
     <h4 class="card-title font-weight-bold">Qualità vegetazione</h4>
     <!-- Text -->
     <div class="d-flex justify-content-between">
-      <p class="display-1 degree">{{ ndvi[myString['list'][i]['groupName']] }}</p>
+      {% if ndvi[myString['list'][i]['groupName']] >= -1 and ndvi[myString['list'][i]['groupName']] < 0 %}
       <i class="icon-ndvi0"></i>
-    </div>
-
-  </div>
-
-  <!-- Card content -->
-  <div class="card-body pb-3">
-
-    <!-- Title -->
-    <h4 class="card-title font-weight-bold">Qualità vegetazione</h4>
-    <!-- Text -->
-    <div class="d-flex justify-content-between">
-      <p class="display-1 degree">{{ ndvi[myString['list'][i]['groupName']] }}</p>
+      {% elif ndvi[myString['list'][i]['groupName']] >= 0 and ndvi[myString['list'][i]['groupName']] < 0.33 %}
       <i class="icon-ndvi1"></i>
-    </div>
 
-  </div>
-
-  <!-- Card content -->
-  <div class="card-body pb-3">
-
-    <!-- Title -->
-    <h4 class="card-title font-weight-bold">Qualità vegetazione</h4>
-    <!-- Text -->
-    <div class="d-flex justify-content-between">
-      <p class="display-1 degree">{{ ndvi[myString['list'][i]['groupName']] }}</p>
+      {% elif ndvi[myString['list'][i]['groupName']] >= 0.33 and ndvi[myString['list'][i]['groupName']] < 0.66 %}
       <i class="icon-ndvi2"></i>
-    </div>
 
-  </div>
-
-  <!-- Card content -->
-  <div class="card-body pb-3">
-
-    <!-- Title -->
-    <h4 class="card-title font-weight-bold">Qualità vegetazione</h4>
-    <!-- Text -->
-    <div class="d-flex justify-content-between">
-      <p class="display-1 degree">{{ ndvi[myString['list'][i]['groupName']] }}</p>
+      {% elif ndvi[myString['list'][i]['groupName']] >= 0.66 and ndvi[myString['list'][i]['groupName']] <= 1 %}
       <i class="icon-ndvi3"></i>
+
+      {% endif %}
+      <p class="display-4 degree">{{ ndvi[myString['list'][i]['groupName']] }}</p>
     </div>
 
   </div>
 
-</div>
-  </div>
+
 </div>
 
+  </div>
+</div>
 {% endif %}
 
   <div>

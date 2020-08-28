@@ -18,28 +18,32 @@ def collectData():
     configFile = open("/config/config.json", "r")
     json_object = json.load(configFile)
 
-    db = mysql.connect(
-        host = json_object['host'],
-        user = json_object['user'],
-        passwd = json_object['passwd'],
-        database = json_object['database']
-    )
+    try:
+        db = mysql.connect(
+            host = json_object['host'],
+            user = json_object['user'],
+            passwd = json_object['passwd'],
+            database = json_object['database']
+        )
 
-    cursor = db.cursor()
+        cursor = db.cursor()
 
-    # Controllo se il dispositivo è attualmente presente nella base dati
-    cursor.execute("select * FROM devices WHERE id = " + str(request.json['id']))
-    
-    row = cursor.fetchone()
-    if row == None:
-        return "Not present"
+        # Controllo se il dispositivo è attualmente presente nella base dati
+        cursor.execute("select * FROM devices WHERE id = " + str(request.json['id']))
+        
+        row = cursor.fetchone()
+        if row == None:
+            return "Not present"
 
-    cursor.execute("UPDATE devices SET status = 0, lettura=now() where id = " + str(request.json['id']))
-    cursor.execute("INSERT INTO lectures (id, temperatura, umidita, lettura) VALUES (" + str(request.json['id']) +"," + str(request.json['temperatura']) + "," + str(request.json['umidita'])+",now())")
-    cursor.close()
-    db.commit()
+        cursor.execute("UPDATE devices SET status = 0, lettura=now() where id = " + str(request.json['id']))
+        cursor.execute("INSERT INTO lectures (id, temperatura, umidita, lettura) VALUES (" + str(request.json['id']) +"," + str(request.json['temperatura']) + "," + str(request.json['umidita'])+",now())")
+        cursor.close()
+        db.commit()
 
-    return "Ok"
+        return "Ok"
+    except mysql.connector.Error as err:
+        print(str(err), flush=True)
+        return str(err)
 
 @app.route('/newDevice', methods=['POST'])
 def newDevice():
@@ -65,8 +69,9 @@ def newDevice():
         db.commit()
 
         return "Ok"
-    except (MySQLdb.Error, MySQLdb.Warning) as e:
-        return str(e)
+    except mysql.connector.Error as err:
+        print(str(err), flush=True)
+        return str(err)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=8005, threaded=True)

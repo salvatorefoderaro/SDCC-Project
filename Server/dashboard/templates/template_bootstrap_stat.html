@@ -6,7 +6,7 @@
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Jekyll v4.0.1">
-    <title>Download from S3 - SDCC Project</title>
+    <title>Cluster Statistics - SDCC Project</title>
 
     <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/starter-template/">
 
@@ -28,6 +28,28 @@
           font-size: 3.5rem;
         }
       }
+
+            .scrolling-wrapper{
+	overflow-x: auto;
+}
+
+.card-block{
+	height: 250px;
+	background-color: #fff;
+	border: none;
+	transition: all 0.2s ease-in-out !important;
+	&:hover{
+		transform: translateY(-5px);
+		box-shadow: none;
+	}
+}
+
+.icon-water {
+  background-image: url("{{ url_for('static', filename='img/water-drop.png') }}");
+    background-position: center center;
+    width: 100px;
+    height: 100px;
+}
     </style>
     <!-- Custom styles for this template -->
     <link href="{{ url_for('static', filename='css/starter-template.css') }}" rel="stylesheet">
@@ -41,7 +63,7 @@
         <a class="nav-link" href="/">Home</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/getFileList">Archivio dump <span class="sr-only">(current)</span></a>
+        <a class="nav-link" href="/getFileList">Archivio dump</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="/getGroupsList">Gestione gruppi</a>
@@ -50,25 +72,68 @@
         <a class="nav-link" href="/getWaterList">Gestione programmazione acqua</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/getStat">Statistiche risparmio</a>
+        <a class="nav-link" href="/getStat">Statistiche risparmio <span class="sr-only">(current)</span></a>
       </li>
     </ul>
    </div>
 </nav>
+
 <main role="main" class="container">
-<h2>Archivio dump database</h2>
 
-      <div class="list-group">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <canvas id="chLine"></canvas>
+                    </div>
+                </div>
+            </div>
+         </div>     
+    </div>
 
-  {% for i in range(0, myString|length) %} 
-
-    {% set download_link = "downloadFile?file_name=" ~ myString[i] %}    <a href={{ download_link }} class="list-group-item list-group-item-action">{{ myString[i] }}</a>
-
-  {%endfor%} 
-
-</div>
 
 </main><!-- /.container -->
 <script src=" {{ url_for('static', filename='js/jquery-3.5.1.slim.min.js') }}"></script>
       <script>window.jQuery || document.write('<script src="../assets/js/vendor/jquery.slim.min.js"><\/script>')</script><script src="{{ url_for('static', filename='js/bootstrap.bundle.js') }}"></script></body>
+
+      <script type="text/javascript" src="{{ url_for('static', filename='js/Chart.js') }}"></script>
+
+      <script>
+     var label_label = '{{ myString['label']|tojson }}';
+     var data_data1 = '{{ myString['data1']|tojson }}';
+     var data_data2 = '{{  myString['data2']|tojson }}';
+     var chartData = {
+  labels: {{ myString['label']|tojson }},
+  datasets: [{
+    data: {{ myString['data1']|tojson }},
+    label: 'Saved money (€)'
+  },
+  {
+    data: {{  myString['data2']|tojson }},
+    label: 'Saved water (m3)'
+  }]
+};
+      
+      var chLine = document.getElementById("chLine");
+      if (chLine) {
+        new Chart(chLine, {
+        type: 'line',
+        data: chartData,
+        options: {
+          scales: {
+            yAxes: [{
+              ticks: {
+                beginAtZero: false
+              }
+            }]
+          },
+          legend: {
+            display: true
+          }
+        }
+        });
+      }
+      
+      </script>
 </html>

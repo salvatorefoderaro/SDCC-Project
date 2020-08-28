@@ -1,4 +1,5 @@
 import boto3
+import botocore
 from botocore.client import Config
 import glob
 import os
@@ -19,8 +20,8 @@ Modulo per il caricamento del dump del database nel bucket S3.
 
 
 BUCKET_NAME = "sdcc-test-bucket"
-ACCESS_KEY_ID = "AKIA57G4V3XAZXYSWEYA"
-ACCESS_SECRET_KEY = "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"
+ACCESS_KEY_ID = "AKIA57G4V3XATK4JTZOB"
+ACCESS_SECRET_KEY = "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"
 
 s3 = boto3.resource(
         's3',
@@ -31,16 +32,16 @@ s3 = boto3.resource(
 ###################################
 
 def addToBucket():
+    #La funzione aggiunge l'immagine all'interno del bucket desiderato.
+    #imgPath: str --> path locale del file
+    #imgName: str --> nome del file una volta inserito all'interno del bucket.
 
     with open('/config/cluster_config.json') as config_file:
         data = json.load(config_file)
         FOLDER_NAME = data['folder_name']
         config_file.close()
 
-    # Ottengo la lista dei file presenti nella cartella 'dump'
-    list_of_files = glob.glob('dump/*') 
-
-    # Considero il file più recente
+    list_of_files = glob.glob('dump/*') # * means all if need specific format then *.csv
     latest_file = max(list_of_files, key=os.path.getctime)
     try:
         data = open(latest_file, 'rb')

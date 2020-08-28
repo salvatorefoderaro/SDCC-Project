@@ -12,7 +12,7 @@ spec:
         volumeMounts:
         - name: mysql-persistent-storage-dump
           mountPath: /app/dump
-      restartPolicy: Never
+      restartPolicy: OnFailure
       volumes:
       - name: mysql-persistent-storage-dump
         persistentVolumeClaim:

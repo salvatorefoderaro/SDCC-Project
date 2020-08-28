@@ -2,5 +2,7 @@
     "host" : "mysql",
     "user" : "root",
     "passwd" : "password",
-    "database" : "cluster"
+    "database" : "cluster",
+    "ec2_ip": "192.168.1.106",
+    "ec2_port": "9000"
 }

@@ -14,7 +14,7 @@ Il modulo si occupa dell'inivio delle email nel caso in cui un dispositivo non d
 '''
 
 @app.route('/sendEmail', methods=['GET'])
-def collectData():
+def sendEmail():
     gmail_user = 'gnammeorg@gmail.com'
     gmail_password = '***'
     device_id = str(request.args.get("deviceId"))
@@ -39,10 +39,10 @@ def collectData():
         server.login(gmail_user, gmail_password)
         server.sendmail(FROM, TO, message)       
         server.close()
-        print ('Email sent!')
-    except:
-        print ('Something went wrong...')
-
+        return 0
+    except smtplib.SMTPException as e:
+        print(str(e), flush=True)
+        return str(e)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=8081, threaded=True)
