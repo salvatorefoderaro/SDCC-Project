@@ -5,6 +5,7 @@ class Polygon():
         self.water_unit_coefficient = 1.0
         self.avg_soil_moisture = 0.0
         self.avg_soil_temperature = 0.0
+        self.to_plan = False
     
     def set_satellite_image( self, satellite_image ):
         self.satellite_image = satellite_image
@@ -14,6 +15,9 @@ class Polygon():
     
     def set_groupName(self,groupName):
         self.groupName = groupName
+
+    def set_to_plan( self ):
+        self.to_plan = True
     
     def set_id(self, id):
         self.id = id

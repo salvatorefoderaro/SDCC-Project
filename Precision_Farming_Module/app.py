@@ -28,7 +28,7 @@ TOTAL_AREA = 0.0                        # Total fields' coverage (m^2)
 CREATE_POLY_URL = ""                    # URL to POST the desired polygon's geographic coordinates
 GET_SATELLITE_IMG_URL = ""              # URL to GET satellite data about the polygon associated to the ID
 APPID = ""                              # User credential to access OpenWeatherAPI Server
-POLYGONS_INFOS = []                     # List of Polygon objects
+POLYGONS_INFOS = []                     # List of all Polygon objects
 SATELLITE_IMAGES = []                   # List of Satellite_Image objects
 SEVEN_DAYS_WEATHER_FORCASTS = []        # List of WeatherForecast objects
 
@@ -68,16 +68,18 @@ def planning():
 
         # Calculate the value of today's total water amount.
         TODAY_WATER = WATER_CONTAINER/REMAINING_DAYS
-        
+    
         # Append sensors' informations on each reference-polygon's list.
         group_list = args.get("groups_list")
+
         for elem in group_list:
             for polygon in POLYGONS_INFOS:
                 if elem["center"] == polygon.center:
                     new_sensor = Sensor( polygon, elem["avgTemperatura"], elem["avgUmidita"])
                     polygon.add_sensor(new_sensor)
+                    polygon.set_to_plan()
 
-        # Compute the seven-days-forecast analysis and evaluate the coefficient value to be used as multiplicative factor in each polygon's 
+        # Compute the seven-days-forecast analysis and evaluate the coefficient value to be used as multiplicative factor in each polygon's.
         # water unit amount of the day.
         analyzer = Forecasts_Analyzer()
         for f in SEVEN_DAYS_WEATHER_FORCASTS:
@@ -88,13 +90,19 @@ def planning():
 
         # Complete data analysis and planning retrieving the daily water-unit, for each of the 3 irrigations, for each polygon.
         for polygon in POLYGONS_INFOS:
-            water_unit = ( TODAY_WATER * ( polygon.proportion ) ) / 3 
-            polygon.calculate_avg_soil_moisture()
-            polygon.calculate_avg_soil_temperature()
-            WUC = float( polygon.evaluate_water_unit_coefficient() )
-            polygon.set_water_unit_coefficient( WUC )
-            polygon.set_water_unit( water_unit * WUC * WEATHER_COEFFICIENT )
-            SAVED_WATER += ( ( water_unit - polygon.water_unit ) * 3 )
+
+            if polygon.to_plan == True:
+                water_unit = ( TODAY_WATER * ( polygon.proportion ) ) / 3 
+                polygon.calculate_avg_soil_moisture()
+                polygon.calculate_avg_soil_temperature()
+                WUC = float( polygon.evaluate_water_unit_coefficient() )
+                polygon.set_water_unit_coefficient( WUC )
+                polygon.set_water_unit( water_unit * WUC * WEATHER_COEFFICIENT )
+                SAVED_WATER += ( ( water_unit - polygon.water_unit ) * 3 )
+
+            else:
+                water_unit = ( TODAY_WATER * ( polygon.proportion ) ) / 3 
+                polygon.set_water_unit( water_unit )
 
         # Write the json response of the planning phase and send it back to the user.
         data = {}

@@ -1,5 +1,5 @@
 {
-    "water_container_volume": 3000,
+    "water_container_volume": 5000,
     "expire": 0.0,
     "groups_list": [{
             "center": "[longitude,latitude]",

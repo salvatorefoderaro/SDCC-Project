@@ -33,7 +33,7 @@ def getplan():
         j.close()
 
     data["water_container_volume"] = 6000
-    data["expire"] = datetime(2020, 9, 30, 0, 0, 0, 0 ).timestamp()
+    data["expire"] = datetime(2020, 9, 28, 0, 0, 0, 0 ).timestamp()
     counter = 0
     for elem in data["groups_list"]:
         elem["center"] = POLYGONS_INFOS[counter].center
