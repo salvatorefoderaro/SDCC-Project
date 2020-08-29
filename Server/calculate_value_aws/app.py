@@ -105,7 +105,7 @@ def calculateValueAWS():
                 dictControl['groups_list'] = []
 
                 # Select AVG value for each group that need to be sent.
-                cursor.execute("select AVG(L.temperatura), AVG(L.umidita), D.groupName, G.latCenter, G.longCenter, G.p1, G.p2, G.p3 FROM lectures as L JOIN devices as D on L.id = D.id JOIN devicesGroups as G on D.groupName = G.groupName WHERE D.type=\'sensor\' GROUP BY D.groupName, G.latCenter, G.longCenter")
+                cursor.execute("select AVG(L.temperature), AVG(L.humidity), D.groupName, G.latCenter, G.longCenter, G.p1, G.p2, G.p3 FROM lectures as L JOIN devices as D on L.id = D.id JOIN devicesGroups as G on D.groupName = G.groupName WHERE D.type=\'sensor\' GROUP BY D.groupName, G.latCenter, G.longCenter")
 
                 myresult = cursor.fetchall()
 
@@ -113,7 +113,7 @@ def calculateValueAWS():
                     key = str(x[2])             
                     if key != 'default':
                         keyList.append(key)
-                        dictControl['groups_list'].append({'groupName':key, 'avgTemperatura':x[0], 'avgUmidita':x[1], 'p1':x[5], 'p2':x[6], 'p3':x[7], 'center': [x[3], x[4]]})
+                        dictControl['groups_list'].append({'groupName':key, 'avgtemperature':x[0], 'avghumidity':x[1], 'p1':x[5], 'p2':x[6], 'p3':x[7], 'center': [x[3], x[4]]})
                 
                 # Dump the data to JSON.
                 json_data = json.dumps(dictControl)

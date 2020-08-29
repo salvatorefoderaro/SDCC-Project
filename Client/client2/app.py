@@ -174,7 +174,7 @@ def doSomeStuff():
         while (True):
 
             # Build the content of the POST request.       
-            dictToSend = {'id':data['id'], 'temperatura': fakesensor.getTemperature(), 'umidita': fakesensor.getUmidity(), 'type': 'sensor'}
+            dictToSend = {'id':data['id'], 'temperature': fakesensor.getTemperature(), 'humidity': fakesensor.getUmidity(), 'type': 'sensor'}
            
             try:
                 # Send the request to the Proxy

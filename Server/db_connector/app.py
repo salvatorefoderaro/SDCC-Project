@@ -47,7 +47,7 @@ def getDevicesStat():
         dictWaterLevel['today'] = datetime.today().strftime('%d-%m-%Y')
 
     # Get info about the devices with type 'sensor'
-    cursor.execute("select L.id, L.temperatura, L.umidita, L.lettura, D.ipAddress, D.ipPort, D.status, D.name, D.groupName FROM lectures as L JOIN devices as D on L.id = D.id WHERE L.lettura = (SELECT MAX(Lettura) FROM lectures WHERE id = L.id) and D.type='\sensor\'")
+    cursor.execute("select L.id, L.temperature, L.humidity, L.lastLecture, D.ipAddress, D.ipPort, D.status, D.name, D.groupName FROM lectures as L JOIN devices as D on L.id = D.id WHERE L.lastLecture = (SELECT MAX(lastLecture) FROM lectures WHERE id = L.id) and D.type='\sensor\'")
 
     myresult = cursor.fetchall()
 
@@ -60,12 +60,12 @@ def getDevicesStat():
             keyList.append(key)
         if key not in dict:
             dict[key] = []
-            dict[key].append({'id':x[0], 'temperatura':x[1], 'umidita':x[2], 'lettura':str(x[3]), 'ipAddress':x[4], 'ipPort':x[5], 'status':x[6], 'name':x[7], 'groupName':str(x[8])})
+            dict[key].append({'id':x[0], 'temperature':x[1], 'humidity':x[2], 'lastLecture':str(x[3]), 'ipAddress':x[4], 'ipPort':x[5], 'status':x[6], 'name':x[7], 'groupName':str(x[8])})
         else:
-            dict[key].append({'id':x[0], 'temperatura':x[1], 'umidita':x[2], 'lettura':str(x[3]), 'ipAddress':x[4], 'ipPort':x[5], 'status':x[6], 'name':x[7], 'groupName':str(x[8])})
+            dict[key].append({'id':x[0], 'temperature':x[1], 'humidity':x[2], 'lastLecture':str(x[3]), 'ipAddress':x[4], 'ipPort':x[5], 'status':x[6], 'name':x[7], 'groupName':str(x[8])})
 
     # Get info about the devices with type 'control'
-    cursor.execute("select D.id, D.lettura, D.ipAddress, D.ipPort, D.status, D.name, D.groupName FROM devices as D where type='\control\'")
+    cursor.execute("select D.id, D.lastLecture, D.ipAddress, D.ipPort, D.status, D.name, D.groupName FROM devices as D where type='\control\'")
 
     myresult = cursor.fetchall()
 
@@ -79,9 +79,9 @@ def getDevicesStat():
             keyList.append(key)
         if key not in dictControl:
             dictControl[key] = []
-            dictControl[key].append({'id':x[0], 'lettura':str(x[1]), 'ipAddress':x[2], 'ipPort':x[3], 'status':x[4], 'name':x[5], 'groupName':str(x[6])})
+            dictControl[key].append({'id':x[0], 'lastLecture':str(x[1]), 'ipAddress':x[2], 'ipPort':x[3], 'status':x[4], 'name':x[5], 'groupName':str(x[6])})
         else:
-            dictControl[key].append({'id':x[0], 'lettura':str(x[1]), 'ipAddress':x[2], 'ipPort':x[3], 'status':x[4], 'name':x[5], 'groupName':str(x[6])})
+            dictControl[key].append({'id':x[0], 'lastLecture':str(x[1]), 'ipAddress':x[2], 'ipPort':x[3], 'status':x[4], 'name':x[5], 'groupName':str(x[6])})
 
     # Build the json for sending.
     jsonDict = {'list' : []}

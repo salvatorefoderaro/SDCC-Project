@@ -1,10 +1,10 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: getdevicesstatservice
+  name: dbconnectorservice
 spec:
   selector:
-    app: getdevicesstat
+    app: dbconnector
   ports:
   - protocol: "TCP"
     # Port accessible inside cluster

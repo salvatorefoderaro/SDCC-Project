@@ -35,7 +35,7 @@ def checkDevicesStatus():
                 logging.info(res.text)
 
                 if res.text == "Ok":
-                    cursor.execute("UPDATE devices SET status = 0, lettura=now() WHERE id ="+str(x[0])+"")
+                    cursor.execute("UPDATE devices SET status = 0, lastLecture=now() WHERE id ="+str(x[0])+"")
                 else:
                     raise(requests.exceptions.RequestException)
             except requests.exceptions.RequestException as e:

@@ -11,24 +11,23 @@ import botocore.exceptions
 import os.path
 from datetime import datetime
 
-
 FOLDER_NAME = ""
 SERVICE_IP = 0
 SERVICE_PORT = 0
 EC2_IP = ""
 EC2_PORT = ""
-CONTAINER_HISTORY_ERROR = "Errore nell'ottenimento dello storico dei container."
-METEO_INFO_ERROR = "Errore nell'ottenimento delle informazioni meteo."
-DEVICES_LIST_ERROR = "Errore nell'ottenimento della lista dei dispositivi."
-ADD_GROUP_ERROR = "Errore nell'aggiunta del gruppo."
-DELETE_GROUP_ERROR = "Errore nell'eliminazione del gruppo."
-ERROR_DELETE_CONTAINER = "Errore nell'eliminazione del container."
-ERROR_ADD_CONTAINER = "Errore nell'aggiunta del conteiner."
-ERROR_DELETE_DEVICE = "Errore nell'eliminazione del dispositivo."
-ERROR_EDIT_DEVICE = "Errore nella modifica del dispositivo."
-GROUP_LIST_ERROR = "Errore nell'ottenimento della lista dei gruppi."
-ERROR_GET_S3_FILE = "Errore nell'ottenimento della lista dei file."
-ERROR_DOWNLOAD_S3_FILE = "Errore nel download dei file da S3."
+CONTAINER_HISTORY_ERROR = "Error getting container history."
+METEO_INFO_ERROR = "Error getting meteo info."
+DEVICES_LIST_ERROR = "Error getting devices list."
+ADD_GROUP_ERROR = "Error adding group."
+DELETE_GROUP_ERROR = "Error deleting group."
+ERROR_DELETE_CONTAINER = "Error deleting container."
+ERROR_ADD_CONTAINER = "Error adding container."
+ERROR_DELETE_DEVICE = "Error deleting device."
+ERROR_EDIT_DEVICE = "Error editing device."
+GROUP_LIST_ERROR = "Error getting groups list."
+ERROR_GET_S3_FILE = "Error downloading file from S3."
+ERROR_DOWNLOAD_S3_FILE = "Error getting file list from S3."
 
 BUCKET_NAME = "sdcc-test-bucket"
 ACCESS_KEY_ID = "AKIA57G4V3XAXOJRI7HS"
@@ -341,6 +340,7 @@ def downloadFile():
         file_name_save = file_name_save[len(file_name_save)-1]
         s3.Bucket(BUCKET_NAME).download_file(file_key, file_name_save)
         return send_file(file_name_save, as_attachment=True)
+
 
     except Exception as e:
         print(str(e), flush=True)
