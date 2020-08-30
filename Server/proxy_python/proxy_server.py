@@ -19,6 +19,7 @@ app = Flask(__name__)
 EXTERNAL_IP_INTERVAL = 0
 COLLECT_DATA_PORT = 0
 FLASK_PORT = 0
+SERVICE_EXTERNAL_IP = ""
 
 logger = gen_logger('sample')
 
@@ -34,7 +35,7 @@ def readJson():
 
 # Get the IP of the 'collect_data' service.
 # Run the terminal command 'kubectl get services' and parse it in the 'minikubeservice' module
-def getExternalIp():
+def getCollectDataIP():
     global SERVICE_EXTERNAL_IP
     SERVICE_EXTERNAL_IP = minikubeservice.getServiceExternalIP("collectdataservice") 
     while (SERVICE_EXTERNAL_IP == 'None' or SERVICE_EXTERNAL_IP == '<pending>'):
@@ -46,30 +47,30 @@ def getExternalIp():
 @app.route('/newDevice', methods=['POST'])
 def newDevice():
     try:
-        res = requests.post("http://" + str(SERVICE_EXTERNAL_IP) + ":" + str(COLLECT_DATA_PORT) +"/newDevice", json=request.json, timeout=10)
-        return res.text
+        responnse = requests.post("http://" + str(SERVICE_EXTERNAL_IP) + ":" + str(COLLECT_DATA_PORT) +"/newDevice", json=request.json, timeout=10)
+        return responnse.text
     except requests.exceptions.RequestException as e:  # This is the correct syntax
         
         # Connection error. Is the cluster down? Try searching for it...
-        getExternalIp()
+        getCollectDataIP()
         return "Not ok"
 
 # Route to send data to the cluster. Send to the cluster the received POST content.
 @app.route('/sendDataToCluster', methods=['POST'])
 def sendDataToCluster():
     try:
-        res = requests.post("http://" + str(SERVICE_EXTERNAL_IP) + ":"+ str(COLLECT_DATA_PORT) +"/collectData", json=reqeust.json, timeout=10)
-        return res.text
+        responnse = requests.post("http://" + str(SERVICE_EXTERNAL_IP) + ":"+ str(COLLECT_DATA_PORT) +"/collectData", json=reqeust.json, timeout=10)
+        return responnse.text
     except requests.exceptions.RequestException as e:  
        
         # Connection error. Is the cluster down? Try searching for it...      
-        getExternalIp()
+        getCollectDataIP()
         return "Not ok"
     
 
 if __name__ == '__main__':   
     readJson()
-    getExternalIp()
+    getCollectDataIP()
 
     # Start SSDP server
     ssdpServer = Server(9001, 'ssdp', 'cluster')

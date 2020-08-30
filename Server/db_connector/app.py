@@ -36,9 +36,9 @@ def getDevicesStat():
     dictWaterLevel = {}
 
     # Get info about the water_container.
-    rows_count = cursor.execute("SELECT startDate, endDate, currentValue, totalValue FROM water_container WHERE now() <= endDate  ORDER BY endDate DESC LIMIT 1")
-    myresult = cursor.fetchall()
-    for x in myresult:
+    cursor.execute("SELECT startDate, endDate, currentValue, totalValue FROM water_container WHERE now() <= endDate  ORDER BY endDate DESC LIMIT 1")
+    queryResult = cursor.fetchall()
+    for x in queryResult:
         dictWaterLevel['startDate'] = x[0].strftime("%d-%m-%Y")
         dictWaterLevel['endDate'] = x[1].strftime("%d-%m-%Y")
         dictWaterLevel['currentValue'] = x[2]
@@ -49,9 +49,9 @@ def getDevicesStat():
     # Get info about the devices with type 'sensor'
     cursor.execute("select L.id, L.temperature, L.humidity, L.lastLecture, D.ipAddress, D.ipPort, D.status, D.name, D.groupName FROM lectures as L JOIN devices as D on L.id = D.id WHERE L.lastLecture = (SELECT MAX(lastLecture) FROM lectures WHERE id = L.id) and D.type='\sensor\'")
 
-    myresult = cursor.fetchall()
+    queryResult = cursor.fetchall()
 
-    for x in myresult:
+    for x in queryResult:
         if str(x[8]).replace(" ", "") == 'None':
             key = 'Default'
         else:
@@ -67,9 +67,9 @@ def getDevicesStat():
     # Get info about the devices with type 'control'
     cursor.execute("select D.id, D.lastLecture, D.ipAddress, D.ipPort, D.status, D.name, D.groupName FROM devices as D where type='\control\'")
 
-    myresult = cursor.fetchall()
+    queryResult = cursor.fetchall()
 
-    for x in myresult:
+    for x in queryResult:
         if str(x[6]).replace(" ", "") == 'None':
             key = 'Default'
         else:
@@ -123,6 +123,7 @@ def editConfig():
             cursor.execute("select * FROM devicesGroups WHERE groupName = \'" + str(request.args.get("new_value")) +"\'")
             row = cursor.fetchone()
             
+            # Check if the result exists
             if row == None:
                 return "Group name not present."
 
@@ -233,11 +234,11 @@ def getStat():
     cursor = db.cursor()
     dict = {}
     cursor.execute("select * from statistics")
-    myresult = cursor.fetchall()
+    queryResult = cursor.fetchall()
     label = []
     data1 = []
     data2 = []
-    for x in myresult:
+    for x in queryResult:
         label.append(x[0].strftime("%d-%m-%Y"))
         data1.append(x[1])
         data2.append(x[2])
@@ -257,10 +258,10 @@ def getGroupsList():
     cursor = db.cursor()
     dict = {}
     cursor.execute("select * from devicesGroups")
-    myresult = cursor.fetchall()
+    queryResult = cursor.fetchall()
     jsonDict = {'list' : []}
 
-    for x in myresult:
+    for x in queryResult:
         dict = {}
         dict['groupName'] = x[0]
         dict['parameter1'] = x[1]
@@ -285,13 +286,13 @@ def getWaterList():
 
     dict = {}
 
-    rows_count = cursor.execute("SELECT startDate, endDate, currentValue, totalValue, id FROM water_container ORDER BY endDate DESC")
+    cursor.execute("SELECT startDate, endDate, currentValue, totalValue, id FROM water_container ORDER BY endDate DESC")
 
-    myresult = cursor.fetchall()
+    queryResult = cursor.fetchall()
 
     jsonDict = {'list' : []}
 
-    for x in myresult:
+    for x in queryResult:
         dict = {}
         dict['startDate'] = x[0].strftime("%d-%m-%Y")
         dict['endDate'] = x[1].strftime("%d-%m-%Y")

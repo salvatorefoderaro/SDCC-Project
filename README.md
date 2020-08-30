@@ -73,9 +73,9 @@ https://www.cloudflare.com/learning/ddos/ssdp-ddos-attack/
     - Funzione per la lettura del file *config.json*
   - ***getMineIpAddress()***
     - Funzione per l'ottenimento del proprio indirizzo IP all'interno della rete locale
-  - ***getClusterIpAddress()***
+  - ***getProxyIPAddress()***
     - Funzione per l'avvio del client SSDP per l'ottenimento dell'indirizzo ip del *proxy* in esecuzione sul server
-  - ***doSomeStuff()***
+  - ***sendData()***
     - Funzione per la registrazione del dispositivo e, successivamente, l'invio periodico delle misure registrate
 
 **Gestione dei guasti**
@@ -97,7 +97,7 @@ Il cluster è raggiungibile tramite due endpoint, quello relativo alla **dashboa
   - Si occupa anche del server SSDP per essere rintracciato in automatico dai Client. Inoltre, trova in automatico l'indirizzo IP del cluster anche in caso di *caduta*.
   - ***readJson()***
     - Funzione per leggere il file *config.json*
-  - ***getExternalIp()***
+  - ***getCollectDataIP()***
     - Funzione per l'ottenimento dell'indirizzo IP del servizio *collect_data* esposto da cluster **Minikube**
   - ***upnpServer()***
     - Funzione per l'avvio del server SSDP
@@ -118,11 +118,13 @@ Il cluster è raggiungibile tramite due endpoint, quello relativo alla **dashboa
 
 - Modulo **instantiate_database**
   - Si occupa dell'instanziazione del database, dunque creazione del db e delle tabelle necessarie. Trattandosi di un job, viene eseguito una sola volta.
+- Modulo **calculate_value**
+  - Si occupa dell'aggregazione dei dati dal database e della generazione del JSON da inviare ad AWS per la computazione della programmazione delle irrigazioni. Ricevuta la risposta da AWS, inoltra la quantità di acqua necessaria ad ogni singolo dispositivo di controllo.
 - Modulo **collect_data**
   - Si occupa della ricezione della lettura dei dati da parte dei vari client. Ogni lettura viene inserita all'interno del database
 - Modulo **check_devices_status**
   - Si occupa di andare ad interrogare periodicamente tutti i client, per vedere chi è ancora up e chi invece no. Trattandosi di un chronjob, viene eseguito ad intervalli regolari di tempo.
-- Modulo **get_devices_stat**
+- Modulo **db_connector**
   - Si occupa della comunicazione con il database per la Dashboard. Da rinominare in qualcos'altro
 - Modulo **dashboard**
   - Si occupa di fornire la dashboard all'utente
@@ -135,45 +137,71 @@ Il cluster è raggiungibile tramite due endpoint, quello relativo alla **dashboa
 
 - Tramite il numero di repliche ed altri meccanismi interni, viene gestito in automatico da Kuberneetes.
 
+### **Tabella indirizzamento**
+
+#### **Cluster**
+
+| Nome servizio         | Porta interna | Porta esterna |
+|-----------------------|---------------|---------------|
+| calculatevalueservice | 8070          | x         |
+| collectdataservice    | 8005          | 30006         |
+| dashboardservice      | 8010          | 300010        |
+| dbconnectorservice    | 8020          | x             |
+| sendemailservice      | 8081          | x             |
+| mysql                 | 3306          | x             |
+
+#### **Altro**
+
+| Nome servizio | Porta |
+|---------------|-------|
+| AWS Service   | 5000  |
+| Proxy         | 5500  |
+| Clientx       | 900x  |
+
+
 # **SDCC-Project - Installazione**
 
 ## **Avvio cluster**
 
 0. **Installo Minikube**
-   1. cd Server && sh install_update_minikube.sh
+   1. ```cd Script && sh install_update_minikube.sh```
 1. **Installo Docker**
-   1. cd Server && sh install_docker.sh
+   1. ```cd Script && sh install_docker.sh```
 2. **Effettuo l'instanziazione del cluster**
-   1. cd Server && sh instantiate_cluster_docker_driver.sh
+   1. ```cd Script && sh instantiate_cluster_updated.sh```
       1. I privilegi dell'utente *sudo* sono necessari per l'avvio del servizio *minikube tunnel*
 3. **Avvio la dashboard**
-   1. minikube dashboard
+   1. ```minikube dashboard```
+
+
 
 - **Comandi utili:**
   - **Aggiornamento del deployment:**
-    - *sh update_deployment.sh*
+    - ```cd Script && sh update_deployment.sh```
   - **Pulizia del cluster:**
-    - *sh clean_cluster_without_delete.sh*
+    - ```cd Script && sh clean_cluster_without_delete.sh```
+  - **Avvio proxy e client (4 sensori e 4 controllori)**
+    - ```cd Script && sh run_proxy_client.sh```
 
 ## **Avvio proxy**
 
-1. cd proxy_python
+1. ```cd Server/proxy_python```
 2. **Installo i pacchetti necessari**
-   1. sh requirement.sh
+   1. ```sh requirement.sh```
 3. **Avvio il proxy**
-   1. sh run.sh
+   1. ```sh run.sh```
 
 ## **Avvio client**
 
-1. cd Client/client*
+1. ```cd Client/client```
 2. **Installo i pacchetti necessari**
-   1. sh requirement.sh
+   1. ```sh requirement.sh```
 3. **Avvio il client**
-   1. sh run.sh
+   1. ```sh run.sh```
 
 ## **Connessione al Database**
 
-1. sh mysql_client.sh
+1. ```cd Script && sh mysql_client.sh```
    1. Permette di avviare una shell per interagire con il database
 
 # **SDCC-Project - Materiale vario**

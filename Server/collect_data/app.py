@@ -40,6 +40,7 @@ def collectData():
             # Check if the devices is present on the database. Needed for the foreign key check.
             cursor.execute("select * FROM devices WHERE id = " + str(request.json['id']))
             
+            # Check if the result exists
             row = cursor.fetchone()
             if row == None:
                 return "Not present"

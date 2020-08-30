@@ -139,24 +139,24 @@ def editConfig():
     return "Ok"
 
 # Function that register the device and send the lecture to the proxy.
-def doSomeStuff():
+def sendData():
 
     getProxyIPAddress()
     getMineIpAddress()
-    result = ""
+    responnse = ""
 
     # Till when the device is not correctly registered.
-    while (result != "Ok"):
+    while (responnse != "Ok"):
         
         # Build the content of the POST request.       
         dictToSend = {'id':MINE_ID, 'ipAddress': MINE_IP_ADDRESS, 'ipPort': MINE_IP_PORT, 'name': data['name'], 'type':data['type']}
         
         try:    
             # Send the request to the Proxy
-            result = requests.post('http://'+CLUSTER_IP_ADDRESS+':'+ str(CLUSTER_PORT)+'/newDevice', json=dictToSend, timeout = 3).text
+            responnse = requests.post('http://'+CLUSTER_IP_ADDRESS+':'+ str(CLUSTER_PORT)+'/newDevice', json=dictToSend, timeout = 3).text
             
             # Check the reply
-            if result == "Ok":
+            if responnse == "Ok":
                 logging.info('Device registered correctly.')
             else:
                 raise(request.exceptions.RequestException)
@@ -178,12 +178,12 @@ def doSomeStuff():
            
             try:
                 # Send the request to the Proxy
-                result = requests.post('http://'+CLUSTER_IP_ADDRESS+':'+str(CLUSTER_PORT)+'/sendDataToCluster', json=dictToSend, timeout=3).text
+                responnse = requests.post('http://'+CLUSTER_IP_ADDRESS+':'+str(CLUSTER_PORT)+'/sendDataToCluster', json=dictToSend, timeout=3).text
                 
-                # Check the result
-                if result == "Ok":
+                # Check the responnse
+                if responnse == "Ok":
                     logging.info("Measurement registered correctly.")    
-                elif result == "Not present":
+                elif responnse == "Not present":
                     logging.warning('Device not registered.')
                 else:
                     raise(requests.exceptions.RequestException)
@@ -200,6 +200,6 @@ def doSomeStuff():
 
 if __name__ == '__main__':
     readJson()
-    thread = Thread(target = doSomeStuff)
+    thread = Thread(target = sendData)
     thread.start()
     app.run(host='0.0.0.0', debug=False, port=MINE_IP_PORT) #run app in debug mode on port 5000

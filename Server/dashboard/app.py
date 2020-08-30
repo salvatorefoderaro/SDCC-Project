@@ -98,9 +98,9 @@ def deleteWaterContainer():
 
     try:
         errorMessage = ERROR_DELETE_CONTAINER
-        res = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/deleteContainer?container_id='+container_id, timeout=5)
+        responnse = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/deleteContainer?container_id='+container_id, timeout=5)
 
-        if res.text != "Ok":
+        if responnse.text != "Ok":
             raise(requests.exceptions.RequestException)
         
         errorMessage = CONTAINER_HISTORY_ERROR
@@ -117,9 +117,9 @@ def deleteGroup():
     groupName = str(request.args.get("groupName"))
     try:
         errorMessage = DELETE_GROUP_ERROR
-        res = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/deleteGroup?groupName='+groupName, timeout=5)
+        responnse = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/deleteGroup?groupName='+groupName, timeout=5)
 
-        if res.text != "Ok":
+        if responnse.text != "Ok":
             raise(requests.exceptions.RequestException)
         
         errorMessage = GROUP_LIST_ERROR
@@ -142,8 +142,8 @@ def addGroup():
 
     try:
         errorMessage = ADD_GROUP_ERROR
-        res = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/addGroup?groupName='+groupName+'&parameter1=' + parameter1 + '&parameter2=' + parameter2 + '&parameter3=' + parameter3 + '&longCenter=' + longCenter + '&latCenter=' + latCenter, timeout=5)
-        if res.text != "Ok":
+        responnse = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/addGroup?groupName='+groupName+'&parameter1=' + parameter1 + '&parameter2=' + parameter2 + '&parameter3=' + parameter3 + '&longCenter=' + longCenter + '&latCenter=' + latCenter, timeout=5)
+        if responnse.text != "Ok":
             raise(requests.exceptions.RequestException)        
 
         errorMessage = GROUP_LIST_ERROR
@@ -163,8 +163,8 @@ def addWaterContainer():
 
     try:
         errorMessage = ERROR_ADD_CONTAINER
-        res = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/addWaterContainer?start='+start+'&end=' + end + '&water_value=' + water_value, timeout=5)
-        if res.text != "Ok":
+        responnse = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/addWaterContainer?start='+start+'&end=' + end + '&water_value=' + water_value, timeout=5)
+        if responnse.text != "Ok":
             raise(requests.exceptions.RequestException)
 
         errorMessage = CONTAINER_HISTORY_ERROR
@@ -180,10 +180,10 @@ def getStat():
 
     try:
         errorMessage = ERROR_ADD_CONTAINER
-        res = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/getStat', timeout=5).json()
+        responnse = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/getStat', timeout=5).json()
     except requests.exceptions.RequestException as e:
         return render_template('error_template.html', responseMessage=errorMessage)
-    return render_template('template_bootstrap_stat.html', dataToPlot=res)
+    return render_template('template_bootstrap_stat.html', dataToPlot=responnse)
 
 # Route to delete a device
 @app.route('/deleteDevice', methods=['GET'])
@@ -208,8 +208,8 @@ def deleteDevice():
         port = str(request.args.get("port"))
 
         errorMessage = ERROR_DELETE_DEVICE
-        res = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/deleteDevice?ipAddress='+ip_address+'&ipPort=' + port + '&new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
-        if res.text != "Ok":
+        responnse = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/deleteDevice?ipAddress='+ip_address+'&ipPort=' + port + '&new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
+        if responnse.text != "Ok":
             raise(requests.exceptions.RequestException)
 
         errorMessage = METEO_INFO_ERROR
@@ -245,23 +245,23 @@ def modifyDevice():
         
         if type == "lecture_interval" or type == "group_name":     
             errorMessage = ERROR_EDIT_DEVICE
-            res = requests.get('http://' + str(ip_address) + ':' +str(port) +'/editConfig?new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
-            if (res.text != "Ok"):
+            responnse = requests.get('http://' + str(ip_address) + ':' +str(port) +'/editConfig?new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
+            if (responnse.text != "Ok"):
                 raise(requests.exceptions.RequestException)
         
         else:
             if type =="name":
                 errorMessage = ERROR_EDIT_DEVICE
-                res = requests.get('http://' + str(ip_address) + ':' +str(port) +'/editConfig?new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
-                if (res.text != "Ok"):
+                responnse = requests.get('http://' + str(ip_address) + ':' +str(port) +'/editConfig?new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
+                if (responnse.text != "Ok"):
                     raise(requests.exceptions.RequestException)
             
             errorMessage = "Errore nella modifica del dispositivo."
-            res = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/editConfig?ipAddress='+ip_address+'&ipPort=' + port + '&new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
-            if (res.text == "Group name not present."):
+            responnse = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/editConfig?ipAddress='+ip_address+'&ipPort=' + port + '&new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
+            if (responnse.text == "Group name not present."):
                 errorMessage = "Il gruppo indicato non è presente. Aggiungerlo prima."
                 raise(requests.exceptions.RequestException)
-            elif (res.text != "Ok"):
+            elif (responnse.text != "Ok"):
                 errorMessage = "Errore nella modifica del dispositivo."
                 raise(requests.exceptions.RequestException)
 
