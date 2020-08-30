@@ -6,7 +6,7 @@
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Jekyll v4.0.1">
-    <title>Cluster Statistics - SDCC Project</title>
+    <title>Cluster Statistics - Precision Farming</title>
 
     <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/starter-template/">
 
@@ -57,28 +57,38 @@
   <body>
     <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
 
-  <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item active">
-        <a class="nav-link" href="/">Home</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/getFileList">Archivio dump</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/getGroupsList">Gestione gruppi</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/getWaterList">Gestione programmazione acqua</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/getStat">Statistiche risparmio <span class="sr-only">(current)</span></a>
-      </li>
-    </ul>
-   </div>
-</nav>
+      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/getFileList">Dump history</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/getGroupsList">Manage groups</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/getWaterList">Manage water schedule</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/getStat">Saving statistics</a>
+          </li>
+        </ul>
+       </div>
+    </nav>
 
 <main role="main" class="container">
+
+  {% if response is defined and respose == true %}
+  <div class="alert alert-success" role="alert">
+    Edit made successfully!
+  </div>
+  {% elif response is defined and response == false %}
+  <div class="alert alert-warning" role="alert">
+    Edit not made!
+    </div>
+      {% endif %}
 
     <div class="container">
         <div class="row">

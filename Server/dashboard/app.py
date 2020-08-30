@@ -11,24 +11,23 @@ import botocore.exceptions
 import os.path
 from datetime import datetime
 
-
 FOLDER_NAME = ""
 SERVICE_IP = 0
 SERVICE_PORT = 0
 EC2_IP = ""
 EC2_PORT = ""
-CONTAINER_HISTORY_ERROR = "Errore nell'ottenimento dello storico dei container."
-METEO_INFO_ERROR = "Errore nell'ottenimento delle informazioni meteo."
-DEVICES_LIST_ERROR = "Errore nell'ottenimento della lista dei dispositivi."
-ADD_GROUP_ERROR = "Errore nell'aggiunta del gruppo."
-DELETE_GROUP_ERROR = "Errore nell'eliminazione del gruppo."
-ERROR_DELETE_CONTAINER = "Errore nell'eliminazione del container."
-ERROR_ADD_CONTAINER = "Errore nell'aggiunta del conteiner."
-ERROR_DELETE_DEVICE = "Errore nell'eliminazione del dispositivo."
-ERROR_EDIT_DEVICE = "Errore nella modifica del dispositivo."
-GROUP_LIST_ERROR = "Errore nell'ottenimento della lista dei gruppi."
-ERROR_GET_S3_FILE = "Errore nell'ottenimento della lista dei file."
-ERROR_DOWNLOAD_S3_FILE = "Errore nel download dei file da S3."
+CONTAINER_HISTORY_ERROR = "Error getting container history."
+METEO_INFO_ERROR = "Error getting meteo info."
+DEVICES_LIST_ERROR = "Error getting devices list."
+ADD_GROUP_ERROR = "Error adding group."
+DELETE_GROUP_ERROR = "Error deleting group."
+ERROR_DELETE_CONTAINER = "Error deleting container."
+ERROR_ADD_CONTAINER = "Error adding container."
+ERROR_DELETE_DEVICE = "Error deleting device."
+ERROR_EDIT_DEVICE = "Error editing device."
+GROUP_LIST_ERROR = "Error getting groups list."
+ERROR_GET_S3_FILE = "Error downloading file from S3."
+ERROR_DOWNLOAD_S3_FILE = "Error getting file list from S3."
 
 BUCKET_NAME = "sdcc-test-bucket"
 ACCESS_KEY_ID = "AKIA57G4V3XAXOJRI7HS"
@@ -97,11 +96,12 @@ def deleteWaterContainer():
 
     container_id = str(request.args.get("container_id"))
 
+
     try:
         errorMessage = ERROR_DELETE_CONTAINER
-        res = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/deleteContainer?container_id='+container_id, timeout=5)
+        responnse = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/deleteContainer?container_id='+container_id, timeout=5)
 
-        if res.text != "Ok":
+        if responnse.text != "Ok":
             raise(requests.exceptions.RequestException)
         
         errorMessage = CONTAINER_HISTORY_ERROR
@@ -118,9 +118,9 @@ def deleteGroup():
     groupName = str(request.args.get("groupName"))
     try:
         errorMessage = DELETE_GROUP_ERROR
-        res = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/deleteGroup?groupName='+groupName, timeout=5)
+        responnse = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/deleteGroup?groupName='+groupName, timeout=5)
 
-        if res.text != "Ok":
+        if responnse.text != "Ok":
             raise(requests.exceptions.RequestException)
         
         errorMessage = GROUP_LIST_ERROR
@@ -143,8 +143,8 @@ def addGroup():
 
     try:
         errorMessage = ADD_GROUP_ERROR
-        res = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/addGroup?groupName='+groupName+'&parameter1=' + parameter1 + '&parameter2=' + parameter2 + '&parameter3=' + parameter3 + '&longCenter=' + longCenter + '&latCenter=' + latCenter, timeout=5)
-        if res.text != "Ok":
+        responnse = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/addGroup?groupName='+groupName+'&parameter1=' + parameter1 + '&parameter2=' + parameter2 + '&parameter3=' + parameter3 + '&longCenter=' + longCenter + '&latCenter=' + latCenter, timeout=5)
+        if responnse.text != "Ok":
             raise(requests.exceptions.RequestException)        
 
         errorMessage = GROUP_LIST_ERROR
@@ -164,8 +164,8 @@ def addWaterContainer():
 
     try:
         errorMessage = ERROR_ADD_CONTAINER
-        res = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/addWaterContainer?start='+start+'&end=' + end + '&water_value=' + water_value, timeout=5)
-        if res.text != "Ok":
+        responnse = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/addWaterContainer?start='+start+'&end=' + end + '&water_value=' + water_value, timeout=5)
+        if responnse.text != "Ok":
             raise(requests.exceptions.RequestException)
 
         errorMessage = CONTAINER_HISTORY_ERROR
@@ -181,10 +181,10 @@ def getStat():
 
     try:
         errorMessage = ERROR_ADD_CONTAINER
-        res = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/getStat', timeout=5).json()
+        responnse = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/getStat', timeout=5).json()
     except requests.exceptions.RequestException as e:
         return render_template('error_template.html', responseMessage=errorMessage)
-    return render_template('template_bootstrap_stat.html', dataToPlot=res)
+    return render_template('template_bootstrap_stat.html', dataToPlot=responnse)
 
 # Route to delete a device
 @app.route('/deleteDevice', methods=['GET'])
@@ -209,8 +209,8 @@ def deleteDevice():
         port = str(request.args.get("port"))
 
         errorMessage = ERROR_DELETE_DEVICE
-        res = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/deleteDevice?ipAddress='+ip_address+'&ipPort=' + port + '&new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
-        if res.text != "Ok":
+        responnse = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/deleteDevice?ipAddress='+ip_address+'&ipPort=' + port + '&new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
+        if responnse.text != "Ok":
             raise(requests.exceptions.RequestException)
 
         errorMessage = METEO_INFO_ERROR
@@ -246,23 +246,23 @@ def modifyDevice():
         
         if type == "lecture_interval" or type == "group_name":     
             errorMessage = ERROR_EDIT_DEVICE
-            res = requests.get('http://' + str(ip_address) + ':' +str(port) +'/editConfig?new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
-            if (res.text != "Ok"):
+            responnse = requests.get('http://' + str(ip_address) + ':' +str(port) +'/editConfig?new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
+            if (responnse.text != "Ok"):
                 raise(requests.exceptions.RequestException)
         
         else:
             if type =="name":
                 errorMessage = ERROR_EDIT_DEVICE
-                res = requests.get('http://' + str(ip_address) + ':' +str(port) +'/editConfig?new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
-                if (res.text != "Ok"):
+                responnse = requests.get('http://' + str(ip_address) + ':' +str(port) +'/editConfig?new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
+                if (responnse.text != "Ok"):
                     raise(requests.exceptions.RequestException)
             
             errorMessage = "Errore nella modifica del dispositivo."
-            res = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/editConfig?ipAddress='+ip_address+'&ipPort=' + port + '&new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
-            if (res.text == "Group name not present."):
+            responnse = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/editConfig?ipAddress='+ip_address+'&ipPort=' + port + '&new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
+            if (responnse.text == "Group name not present."):
                 errorMessage = "Il gruppo indicato non è presente. Aggiungerlo prima."
                 raise(requests.exceptions.RequestException)
-            elif (res.text != "Ok"):
+            elif (responnse.text != "Ok"):
                 errorMessage = "Errore nella modifica del dispositivo."
                 raise(requests.exceptions.RequestException)
 
@@ -341,6 +341,7 @@ def downloadFile():
         file_name_save = file_name_save[len(file_name_save)-1]
         s3.Bucket(BUCKET_NAME).download_file(file_key, file_name_save)
         return send_file(file_name_save, as_attachment=True)
+
 
     except Exception as e:
         print(str(e), flush=True)
