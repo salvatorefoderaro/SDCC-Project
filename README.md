@@ -1,4 +1,4 @@
-# **SDCC-Project - Introduzione**
+# **Precision Farming - Introduzione**
 
 ## **Abstract**
 
@@ -159,7 +159,7 @@ Il cluster è raggiungibile tramite due endpoint, quello relativo alla **dashboa
 | Clientx       | 900x  |
 
 
-# **SDCC-Project - Installazione**
+# **Precision Farming - Installazione**
 
 ## **Avvio cluster**
 
@@ -204,18 +204,7 @@ Il cluster è raggiungibile tramite due endpoint, quello relativo alla **dashboa
 1. ```cd Script && sh mysql_client.sh```
    1. Permette di avviare una shell per interagire con il database
 
-# **SDCC-Project - Materiale vario**
-
-## **Possibile query per l'invio ad EC2**
-
-- *select AVG(L.temperatura), AVG(L.umidita), D.groupName, G.p1, G.p2, G.p3 FROM lectures as L JOIN devices as D on L.id = D.id JOIN devicesGroups as G on D.groupName = G.groupName WHERE D.type='sensor' GROUP BY D.groupName;*
-
-## **Dockerizzazione Client - Mantenuto solamente come storico - Non funziona**
-
-1. docker build -t client* .
-2. docker run -p port:port client*
-
-Esercizio di stile, tanto non va la rete, non potendo mandare messaggi in broadcast al proxy
+# **Precision Farming - Materiale vario**
 
 ## **Link utili**
 

@@ -13,7 +13,7 @@ kubectl delete deployment sendemaildeployment
 kubectl delete deployment calculatevaluedeployment
 cp cluster_config.json dashboard/cluster_config.json
 cp cluster_config.json s3_upload_dump/cluster_config.json
-cp cluster_config.json calculate_value/cluster_config.json
+cp cluster_config.json calculate_value_aws/cluster_config.json
 eval $(minikube docker-env)
 cd check_devices_status && docker build -t checkdevicestatus:v1 .
 cd ../collect_data && docker build -t collectdata:v1 .

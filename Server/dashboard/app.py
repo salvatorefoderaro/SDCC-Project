@@ -96,6 +96,7 @@ def deleteWaterContainer():
 
     container_id = str(request.args.get("container_id"))
 
+
     try:
         errorMessage = ERROR_DELETE_CONTAINER
         responnse = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/deleteContainer?container_id='+container_id, timeout=5)
