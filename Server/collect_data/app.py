@@ -19,7 +19,7 @@ def collectData():
     if request.method != 'POST':
         return "Wrong request method."
 
-    elif  ('id' or 'temperatura' or 'umidita' or 'type') not in request.json:
+    elif  ('id' or 'temperature' or 'humidity' or 'type') not in request.json:
         return "Wrong request."
 
     else:
@@ -40,13 +40,14 @@ def collectData():
             # Check if the devices is present on the database. Needed for the foreign key check.
             cursor.execute("select * FROM devices WHERE id = " + str(request.json['id']))
             
+            # Check if the result exists
             row = cursor.fetchone()
             if row == None:
                 return "Not present"
 
             # If present, update the devices status and insert the lecture on the db.
-            cursor.execute("UPDATE devices SET status = 0, lettura=now() where id = " + str(request.json['id']))
-            cursor.execute("INSERT INTO lectures (id, temperatura, umidita, lettura) VALUES (" + str(request.json['id']) +"," + str(request.json['temperatura']) + "," + str(request.json['umidita'])+",now())")
+            cursor.execute("UPDATE devices SET status = 0, lastLecture=now() where id = " + str(request.json['id']))
+            cursor.execute("INSERT INTO lectures (id, temperature, humidity, lastLecture) VALUES (" + str(request.json['id']) +"," + str(request.json['temperature']) + "," + str(request.json['humidity'])+",now())")
             cursor.close()
             db.commit()
 

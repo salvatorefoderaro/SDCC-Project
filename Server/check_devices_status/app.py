@@ -25,9 +25,9 @@ def checkDevicesStatus():
         # Select all the devices.
         cursor.execute("SELECT id, ipAddress, ipPort from devices")
 
-        myresult = cursor.fetchall()
+        queryResult = cursor.fetchall()
 
-        for x in myresult:
+        for x in queryResult:
 
             # For each devices, try to contact and check for response
             try:
@@ -35,7 +35,7 @@ def checkDevicesStatus():
                 logging.info(res.text)
 
                 if res.text == "Ok":
-                    cursor.execute("UPDATE devices SET status = 0, lettura=now() WHERE id ="+str(x[0])+"")
+                    cursor.execute("UPDATE devices SET status = 0, lastLecture=now() WHERE id ="+str(x[0])+"")
                 else:
                     raise(requests.exceptions.RequestException)
             except requests.exceptions.RequestException as e:

@@ -2,22 +2,22 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: getdevicesstat
-  name: getdevicesstatdeployment
+    app: dbconnector
+  name: dbconnectordeployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: getdevicesstat
+      app: dbconnector
   strategy: {}
   template:
     metadata:
       labels:
-        app: getdevicesstat
+        app: dbconnector
     spec:
       containers:
-      - image: getdevicesstat:v1
+      - image: dbconnector:v1
         imagePullPolicy: Never
-        name: getdevicesstat
+        name: dbconnector
         ports:
         - containerPort: 8020

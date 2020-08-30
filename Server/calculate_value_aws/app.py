@@ -87,39 +87,36 @@ def calculateValueAWS():
         try: 
             db = connectToDb()
             cursor = db.cursor()
-            dict = {}
-            keyList = []
-            dictControl = {}
+            dictAWS = {}
             water_container_id = 0
 
             # Get info about the current water container,
             rows_count = cursor.execute("SELECT endDate, currentValue, id FROM water_container WHERE now() <= endDate ORDER BY endDate DESC LIMIT 1")
-            myresult = cursor.fetchall()
+            queryResult = cursor.fetchall()
 
             # If there is a valida water container for the period
-            if len(myresult) > 0:
-                dictControl["water_container_volume"] = myresult[0][1]
-                dictControl["expire"] = time.mktime(myresult[0][0].timetuple())
-                water_container_id = myresult[0][2]
+            if len(queryResult) > 0:
+                dictAWS["water_container_volume"] = queryResult[0][1]
+                dictAWS["expire"] = time.mktime(queryResult[0][0].timetuple())
+                water_container_id = queryResult[0][2]
 
-                dictControl['groups_list'] = []
+                dictAWS['groups_list'] = []
 
                 # Select AVG value for each group that need to be sent.
-                cursor.execute("select AVG(L.temperatura), AVG(L.umidita), D.groupName, G.latCenter, G.longCenter, G.p1, G.p2, G.p3 FROM lectures as L JOIN devices as D on L.id = D.id JOIN devicesGroups as G on D.groupName = G.groupName WHERE D.type=\'sensor\' GROUP BY D.groupName, G.latCenter, G.longCenter")
+                cursor.execute("select AVG(L.temperature), AVG(L.humidity), D.groupName, G.latCenter, G.longCenter, G.p1, G.p2, G.p3 FROM lectures as L JOIN devices as D on L.id = D.id JOIN devicesGroups as G on D.groupName = G.groupName WHERE D.type=\'sensor\' GROUP BY D.groupName, G.latCenter, G.longCenter")
 
-                myresult = cursor.fetchall()
+                queryResult = cursor.fetchall()
 
-                for x in myresult:
+                for x in queryResult:
                     key = str(x[2])             
                     if key != 'default':
-                        keyList.append(key)
-                        dictControl['groups_list'].append({'groupName':key, 'avgTemperatura':x[0], 'avgUmidita':x[1], 'p1':x[5], 'p2':x[6], 'p3':x[7], 'center': [x[3], x[4]]})
+                        dictAWS['groups_list'].append({'groupName':key, 'avgtemperature':x[0], 'avghumidity':x[1], 'p1':x[5], 'p2':x[6], 'p3':x[7], 'center': [x[3], x[4]]})
                 
                 # Dump the data to JSON.
-                json_data = json.dumps(dictControl)
+                json_data = json.dumps(dictAWS)
                 
                 # Send the POST request.
-                result = requests.post('http://' + EC2_IP + ':' +EC2_PORT + '/planning',  json=dictControl, timeout=5).json()
+                result = requests.post('http://' + EC2_IP + ':' +EC2_PORT + '/planning',  json=dictAWS, timeout=5).json()
 
                 # Update the statistic table needed for the plot.
                 cursor.execute("INSERT into statistics (dayPeriod, moneySaved, waterSaved) VALUES (now(), " +  str(result['saved_money']) + "," + str(result['saved_water']) + ") ON DUPLICATE KEY UPDATE moneySaved ="+ str(result['saved_money']) + ", waterSaved ="+ str(result['saved_water'])) 
@@ -131,9 +128,12 @@ def calculateValueAWS():
                 # For each group, take the device of type 'control' and send info about how much water have to be done to the field.
                 for x in result['groups_list']:
                     cursor.execute("SELECT id, ipAddress, ipPort from devices where groupName = \'" + x['groupName'] + "\' and type = \'control\'") 
-                    myresult = cursor.fetchall()
-                    for y in myresult:
-                        control_water_unit = x['daily_water_unit'] / len(myresult)
+                    queryResult = cursor.fetchall()
+                    for y in queryResult:
+                        
+                        # If ther'are more than 1 control device, split the same quantity of water for each one
+                        control_water_unit = x['daily_water_unit'] / len(queryResult)
+                        
                         if control_water_unit != 0:
                             try:
                                 res = requests.get('http://' + str(y[1]) + ':' + str(y[2]) +'/getEC2Value?daily_water_unit=' + str(x['daily_water_unit']), timeout=3)
