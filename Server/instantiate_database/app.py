@@ -2,6 +2,7 @@ from flask import Flask
 import requests
 import mysql.connector as mysql
 import json
+import logging
 
 '''
 The module instantiate the database, creating tables and inserting data.

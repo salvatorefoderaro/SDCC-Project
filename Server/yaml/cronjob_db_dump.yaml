@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: jobdbdump
 spec:
-  schedule: "* */12 * * *"
+  schedule: "* */4 * * *"
   jobTemplate:
     spec:
       template:
@@ -12,7 +12,7 @@ spec:
           - name: mysql
             image: mysql:5.7.5
             command: ["/bin/sh","-c"]
-            args: ["mysqldump --single-transaction -u $MYSQL_USER $MYSQL_DB -h $MYSQL_HOST > /var/lib/dump/`date '+%Y%m%d-%H:%M:%S'`.sql; mysql -u $MYSQL_USER -p$MYSQL_PWD $MYSQL_DB -e \"DELETE FROM lectures WHERE lettura < DATE_SUB(NOW(), INTERVAL $DAY_INTERVAL DAY)\""]
+            args: ["mysqldump --single-transaction -u $MYSQL_USER $MYSQL_DB -h $MYSQL_HOST > /var/lib/dump/`date '+%Y%m%d-%H:%M:%S'`.sql; mysql -u $MYSQL_USER -p$MYSQL_PWD $MYSQL_DB -e \"DELETE FROM lectures WHERE lastLecture < DATE_SUB(NOW(), INTERVAL $DAY_INTERVAL DAY)\""]
             volumeMounts:
             - mountPath: /var/lib/dump
               name: mysql-persistent-storage-dump
@@ -26,7 +26,7 @@ spec:
             - name: MYSQL_HOST
               value: "mysql"
             - name: DAY_INTERVAL
-              value: "1"
+              value: "2"
           restartPolicy: OnFailure
           volumes:
           - name: mysql-persistent-storage-dump
