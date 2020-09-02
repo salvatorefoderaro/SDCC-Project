@@ -1,0 +1,22 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: uploads3job
+spec:
+  schedule: "* */12 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - image: uploads3:v1
+            imagePullPolicy: Never
+            name: uploads3
+            volumeMounts:
+            - name: mysql-persistent-storage-dump
+              mountPath: /app/dump
+          restartPolicy: OnFailure
+          volumes:
+          - name: mysql-persistent-storage-dump
+            persistentVolumeClaim:
+              claimName: mysql-pv-claim-dump

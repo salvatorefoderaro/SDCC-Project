@@ -1,16 +1,7 @@
 {
-    "water_container_volume": 3000,
+    "water_container_volume": 5000,
     "expire": 0.0,
     "groups_list": [{
-            "center": "[longitude,latitude]",
-            "groupName": "default",
-            "avgTemperatura": 21.49385959066843,
-            "avgUmidita": 56.084210632009466,
-            "p1": 0.0,
-            "p2": 0.0,
-            "p3": 0.0
-        },
-        {
             "center": "[longitude,latitude]",
             "groupName": "default",
             "avgTemperatura": 21.49385959066843,

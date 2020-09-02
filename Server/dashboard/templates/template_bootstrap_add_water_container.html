@@ -3,12 +3,9 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
-    <meta name="generator" content="Jekyll v4.0.1">
-    <title>Add groups - SDCC Project</title>
+    <meta name="author" content="Salvatore Foderaro, Alessandro Pontis, Gianmarco and Bootstrap contributors">
+    <title>Add Water Container - Precision Farming</title>
 
-    <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/starter-template/">
 
     <!-- Bootstrap core CSS -->
 <link href="{{ url_for('static', filename='css/bootstrap.css') }}" rel="stylesheet">
@@ -35,39 +32,54 @@
   <body>
     <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
 
-  <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item active">
-        <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/getFileList">Archivio dump</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/getGroupsList">Gestione gruppi</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/getWaterList">Gestione programmazione acqua</a>
-      </li>
-    </ul>
-   </div>
-</nav>
+      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/getFileList">Dump history</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/getGroupsList">Manage groups</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/getWaterList">Manage water schedule</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/getStat">Saving statistics</a>
+          </li>
+        </ul>
+       </div>
+    </nav>
 
 <main role="main" class="container">
 
-  <form action="/addWaterContainer" method="GET">
+  {% if response is defined and respose == true %}
+  <div class="alert alert-success" role="alert">
+    Edit made successfully!
+  </div>
+  {% elif response is defined and response == false %}
+  <div class="alert alert-warning" role="alert">
+    Edit not made!
+    </div>
+      {% endif %}
+
+  <form style="margin-top:300px" action="/addWaterContainer" method="GET">
     <div class="form-group">
         <div class="input-daterange input-group" id="datepicker">
-        <input type="text" class="input-sm form-control" name="start" placeholder="Data inizio..."/ required>
-        <span class="input-group-addon"> intervallo di tempo </span>
-        <input type="text" class="input-sm form-control" name="end" placeholder="Data fine..."/ required>
+        <input type="text" class="input-sm form-control" name="start" placeholder="Start date..."/ required>
+        <span class="input-group-addon"> to </span>
+        <input type="text" class="input-sm form-control" name="end" placeholder="End date..."/ required>
     </div>
     </div>
     <div class="form-group">
-      <label for="exampleInputPassword5">Capienza totale (m3)</label>
+      <label for="exampleInputPassword5">Total water</label>
       <input name="water_value" type="number" step="any" class="form-control" id="exampleInputPassword5" placeholder="m3" required>
     </div>
-    <button type="submit" class="btn btn-primary">Aggiungi programmazione</button>
+    <div class="row justify-content-center">
+    <button type="submit" class="btn btn-primary">Add water schedule</button>
+    </div>
   </form>
 
 </main><!-- /.container -->
@@ -86,7 +98,7 @@
 <script>
 
     $('.input-daterange').datepicker({
-        format: "yyyy/mm/dd",
+        format: "yyyy-mm-dd",
         language: "it",
         multidate: false,
         autoclose: true

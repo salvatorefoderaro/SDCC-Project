@@ -3,10 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
-    <meta name="generator" content="Jekyll v4.0.1">
-    <title>Home - SDCC Project</title>
+    <meta name="author" content="Salvatore Foderaro, Alessandro Pontis, Gianmarco and Bootstrap contributors">
+    <title>Home - Precision Farming</title>
 
 
     <!-- Bootstrap core CSS -->
@@ -113,6 +111,13 @@
     height: 100px;
 }
 
+.icon-field {
+  background-image: url("{{ url_for('static', filename='img/field.png') }}");
+    background-position: center center;
+    width: 100px;
+    height: 100px;
+}
+
 .icon-snow {
   background-image: url("{{ url_for('static', filename='img/snow.png') }}");
     background-position: center center;
@@ -139,13 +144,16 @@
         <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/getFileList">Archivio dump</a>
+        <a class="nav-link" href="/getFileList">Dump history</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/getGroupsList">Gestione gruppi</a>
+        <a class="nav-link" href="/getGroupsList">Manage groups</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/getWaterList">Gestione programmazione acqua</a>
+        <a class="nav-link" href="/getWaterList">Manage water schedule</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/getStat">Saving statistics</a>
       </li>
     </ul>
    </div>
@@ -153,20 +161,26 @@
 
 <main role="main" class="container">
 
-  {% if response == true  %}
+  {% if response is defined and respose == true %}
   <div class="alert alert-success" role="alert">
-    Modifica effettuata con successo!
+    Edit made successfully!
   </div>
-    {% elif response == false %}
+    {% elif response is defined and response == false %}
     <div class="alert alert-warning" role="alert">
-    Modifica non effettuata!
+      Edit not made!
     </div>
+      {% endif %}
+
+      {% if ndvi is not none and ndvi['warning'] != 'default' %}
+      <div class="alert alert-warning" role="alert">
+        Settimana prossima è previsto {{ ndvi['warning'] }} 
+      </div>
       {% endif %}
 
             <div class="container-fluid">
         <div class="scrolling-wrapper row flex-row flex-nowrap mt-4 pb-4">
 
-    {% if myString['water_level']|length  %}
+    {% if dataToPlot['water_level']|length  %}
 
                 <div class="col-5">
       <div class="card weather-card">
@@ -175,22 +189,27 @@
         <div class="card-body pb-3">
       
           <!-- Title -->
-          <h4 class="card-title font-weight-bold">Acqua disponibile</h4>
+          <h4 class="card-title font-weight-bold">Avaliable water</h4>
           <!-- Text -->
           <p class="card-text"></p>
           <div class="d-flex justify-content-between">
 
-            <p class="display-1 degree">{{ myString['water_level']['currentValue']}} m<sup>3</sup></p>
+            <p class="display-1 degree">{{ "%.3f"|format(dataToPlot['water_level']['currentValue']) }} m<sup>3</sup></p>
             <i class="icon-water"></i>
           </div>
           <div class="progress">
-  <div class="progress-bar" role="progressbar" style="width: {{ myString['water_level']['percentage']}}%;" aria-valuenow="{{ myString['water_level']['currentValue']}}" aria-valuemin="0" aria-valuemax="{{ myString['water_level']['totalValue']}}">{{ myString['water_level']['percentage']}}%</div>
+  <div class="progress-bar" role="progressbar" style="width: {{ dataToPlot['water_level']['percentage']}}%;" aria-valuenow="{{ dataToPlot['water_level']['currentValue']}}" aria-valuemin="0" aria-valuemax="{{ dataToPlot['water_level']['totalValue']}}">{{ dataToPlot['water_level']['percentage']}}%</div>
   </div><br>
+  <div class="d-flex justify-content-between mb-4">
+    <b>Total water:</b> {{ dataToPlot['water_level']['totalValue']}}
+  </div>          <div class="d-flex justify-content-between mb-4">
+    <b>Today date:</b> {{ dataToPlot['water_level']['today']}}
+  </div>
           <div class="d-flex justify-content-between mb-4">
-            <b>Inizio:</b> {{ myString['water_level']['startDate']}}
+            <b>Start date:</b> {{ dataToPlot['water_level']['startDate']}}
           </div>
           <div class="d-flex justify-content-between mb-4">
-            <b>Fine:</b> {{ myString['water_level']['endDate']}}
+            <b>End date:</b> {{ dataToPlot['water_level']['endDate']}}
           </div>
       
         </div>
@@ -209,7 +228,7 @@
         <div class="card-body pb-3">
       
           <!-- Title -->
-          <h4 class="card-title font-weight-bold">Acqua disponibile</h4>
+          <h4 class="card-title font-weight-bold">Avaliable water</h4>
           <!-- Text -->
           <p class="card-text"></p>
           <div class="d-flex justify-content-between">
@@ -219,7 +238,7 @@
 
           <div class="d-flex justify-content-between">
             <div class="row justify-content-center">
-              <p><a href="addWaterContainerLink" type="button" class="btn btn-primary btn-lg">Aggiungi programmazione acqua</a></p>
+              <p><a href="addWaterContainerLink" type="button" class="btn btn-primary btn-lg">Add water schedule</a></p>
       </div>
           </div>
       
@@ -266,8 +285,8 @@
                   <i class="icon-thunderstorm"></i>
                   {% endif %}                </div>
                 <div class="d-flex justify-content-between mb-4"><p>
-                  {{  weather['weather_forecasts'][i]['prob_of_precipitations'] }}&percnt; Precipitazioni</p>
-                  <p>{{  weather['weather_forecasts'][i]['wind_speed'] }} km/h Venti</p>
+                  {{  weather['weather_forecasts'][i]['prob_of_precipitations'] }}&percnt; Rainfall</p>
+                  <p>{{  weather['weather_forecasts'][i]['wind_speed'] }} km/h Winds</p>
                 </div>
             
                 <div class="collapse-content">
@@ -277,7 +296,7 @@
                     <table class="table table-borderless table-sm mb-0">
                       <tbody>
                         <tr>
-                          <td class="font-weight-normal align-middle">Mattina</td>
+                          <td class="font-weight-normal align-middle">Morning</td>
                           <td class="float-right font-weight-normal">
                             <p class="mb-1">{{  weather['weather_forecasts'][i]['temperatures']['morning'] }}&deg;</p>
                           </td>
@@ -286,7 +305,7 @@
                           </td>
                         </tr>
                         <tr>
-                          <td class="font-weight-normal align-middle">Giorno</td>
+                          <td class="font-weight-normal align-middle">Daylight</td>
                           <td class="float-right font-weight-normal">
                             <p class="mb-1">{{  weather['weather_forecasts'][i]['temperatures']['daylight'] }}&deg;</p>
                           </td>
@@ -295,7 +314,7 @@
                           </td>
                         </tr>
                         <tr>
-                          <td class="font-weight-normal align-middle">Sera</td>
+                          <td class="font-weight-normal align-middle">Evening</td>
                           <td class="float-right font-weight-normal">
                             <p class="mb-1">{{  weather['weather_forecasts'][i]['temperatures']['evening'] }}&deg;</p>
                           </td>
@@ -304,7 +323,7 @@
                           </td>
                         </tr>
                         <tr>
-                          <td class="font-weight-normal align-middle">Notte</td>
+                          <td class="font-weight-normal align-middle">Night</td>
                           <td class="float-right font-weight-normal">
                             <p class="mb-1">{{  weather['weather_forecasts'][i]['temperatures']['night'] }}&deg;</p>
                           </td>
@@ -319,7 +338,7 @@
             
                   <hr class="">
             
-                    <a class="btn btn-flat red-text p-1 my-1 mr-0 mml-1 deep-purple-text collapsed" data-toggle="collapse" href="{{ weather_collapse_link }}" aria-expanded="false" aria-controls="collapseExample">Mostra dettaglio</a>
+                    <a class="btn btn-flat red-text p-1 my-1 mr-0 mml-1 deep-purple-text collapsed" data-toggle="collapse" href="{{ weather_collapse_link }}" aria-expanded="false" aria-controls="collapseExample">More infos</a>
             
                 </div>
             
@@ -335,18 +354,24 @@
         </div>
         
 <p><div class="row justify-content-center">
-        <a href="/checkDevicesStatus" type="button" class="btn btn-primary btn-lg">Aggiorna lo stato dei dispositivi</a>
+        <a href="/checkDevicesStatus" type="button" class="btn btn-primary btn-lg">Update devices status</a>
 </div></p>
 <p><div class="row justify-content-center">
 
-                <p><a href="/" type="button" class="btn btn-secondary btn-lg">Aggiorna le previsioni meteo</a>
+                <p><a href="/" type="button" class="btn btn-secondary btn-lg">Update weather forecasts</a>
 </div></p>
 
+{% if dataToPlot['list']|length > 0 %}
+  <h1>Groups list</h1>
+{% endif %}
 
-  {% for i in range(0, myString['list']|length ) %} 
 
-  <p><h2>{{ myString['list'][i]['groupName'] }}</h2>
-{% if ndvi[myString['list'][i]['groupName']] is defined%}
+  {% for i in range(0, dataToPlot['list']|length ) %} 
+
+  <i class="icon-field"></i>
+  <p><h2>{{ dataToPlot['list'][i]['groupName'] }}</h2>                </p>
+  <i class="icon-field"></i>
+{% if ndvi is not none and ndvi[dataToPlot['list'][i]['groupName']] is defined %}
 
 <div class="row">
   <div class="col-sm-6">
@@ -356,103 +381,76 @@
   <div class="card-body pb-3">
 
     <!-- Title -->
-    <h4 class="card-title font-weight-bold">Qualità vegetazione</h4>
+    <h4 class="card-title font-weight-bold">Vegetation quality</h4>
     <!-- Text -->
     <div class="d-flex justify-content-between">
-      <p class="display-1 degree">{{ ndvi[myString['list'][i]['groupName']] }}</p>
+      {% if ndvi[dataToPlot['list'][i]['groupName']] >= -1 and ndvi[dataToPlot['list'][i]['groupName']] < 0 %}
       <i class="icon-ndvi0"></i>
-    </div>
-
-  </div>
-
-  <!-- Card content -->
-  <div class="card-body pb-3">
-
-    <!-- Title -->
-    <h4 class="card-title font-weight-bold">Qualità vegetazione</h4>
-    <!-- Text -->
-    <div class="d-flex justify-content-between">
-      <p class="display-1 degree">{{ ndvi[myString['list'][i]['groupName']] }}</p>
+      {% elif ndvi[dataToPlot['list'][i]['groupName']] >= 0 and ndvi[dataToPlot['list'][i]['groupName']] < 0.33 %}
       <i class="icon-ndvi1"></i>
-    </div>
 
-  </div>
-
-  <!-- Card content -->
-  <div class="card-body pb-3">
-
-    <!-- Title -->
-    <h4 class="card-title font-weight-bold">Qualità vegetazione</h4>
-    <!-- Text -->
-    <div class="d-flex justify-content-between">
-      <p class="display-1 degree">{{ ndvi[myString['list'][i]['groupName']] }}</p>
+      {% elif ndvi[dataToPlot['list'][i]['groupName']] >= 0.33 and ndvi[dataToPlot['list'][i]['groupName']] < 0.66 %}
       <i class="icon-ndvi2"></i>
-    </div>
 
-  </div>
-
-  <!-- Card content -->
-  <div class="card-body pb-3">
-
-    <!-- Title -->
-    <h4 class="card-title font-weight-bold">Qualità vegetazione</h4>
-    <!-- Text -->
-    <div class="d-flex justify-content-between">
-      <p class="display-1 degree">{{ ndvi[myString['list'][i]['groupName']] }}</p>
+      {% elif ndvi[dataToPlot['list'][i]['groupName']] >= 0.66 and ndvi[dataToPlot['list'][i]['groupName']] <= 1 %}
       <i class="icon-ndvi3"></i>
+
+      {% endif %}
+      <p class="display-4 degree">{{ ndvi[dataToPlot['list'][i]['groupName']] }}</p>
     </div>
 
   </div>
 
-</div>
-  </div>
+
 </div>
 
+  </div>
+</div>
 {% endif %}
 
   <div>
-  {% if myString['list'][i]['devicesList']|length > 0%}
+  {% if dataToPlot['list'][i]['devicesList']|length > 0%}
 <p>
   <h3>Sensor list</h3>
 
   <div class="container-fluid">
     <div class="scrolling-wrapper row flex-row flex-nowrap mt-4 pb-4">
-  {%for j in range(0, myString['list'][i]['devicesList']|length )%} 
+  {%for j in range(0, dataToPlot['list'][i]['devicesList']|length )%} 
   <div class="col-5">
       <div class="card">
 
-        {% if myString['list'][i]['devicesList'][j]['status'] == 0 %}
+        {% if dataToPlot['list'][i]['devicesList'][j]['status'] == 0 %}
           <div class="card-body" style="background-color:green;">
         {% else %}
           <div class="card-body" style="background-color:red;">
         {% endif %}
-          <h5 class="card-title">{{ myString['list'][i]['devicesList'][j]['name'] }}</h5>
+          <h5 class="card-title">{{ dataToPlot['list'][i]['devicesList'][j]['name'] }}</h5>
         </div>
         <ul class="list-group list-group-flush">
-          <li class="list-group-item">ID: {{ myString['list'][i]['devicesList'][j]['id'] }}</li>
-          <li class="list-group-item">Indirizzo IP: {{ myString['list'][i]['devicesList'][j]['ipAddress'] }} : {{ myString['list'][i]['devicesList'][j]['ipPort']}}</li>
-          <!-- <li class="list-group-item">Nome: {{ myString['list'][i]['devicesList'][j]['name'] }}</li> -->
-          <!-- <li class="list-group-item">Gruppo: {{ myString['list'][i]['devicesList'][j]['groupName'] }}</li> -->
-          <li class="list-group-item">Ultima temperatura: {{ myString['list'][i]['devicesList'][j]['temperatura'] }}</li>
-          <li class="list-group-item">Ultima umidità: {{ myString['list'][i]['devicesList'][j]['umidita'] }}</li>
-          <li class="list-group-item">Ultima rilevazione: {{ myString['list'][i]['devicesList'][j]['lettura'] }}</li>
+          <li class="list-group-item">ID: {{ dataToPlot['list'][i]['devicesList'][j]['id'] }}</li>
+          <li class="list-group-item">IP address: {{ dataToPlot['list'][i]['devicesList'][j]['ipAddress'] }} : {{ dataToPlot['list'][i]['devicesList'][j]['ipPort']}}</li>
+          <!-- <li class="list-group-item">Nome: {{ dataToPlot['list'][i]['devicesList'][j]['name'] }}</li> -->
+          <!-- <li class="list-group-item">Gruppo: {{ dataToPlot['list'][i]['devicesList'][j]['groupName'] }}</li> -->
+          <li class="list-group-item">Last temperature: {{ dataToPlot['list'][i]['devicesList'][j]['temperatura'] }}</li>
+          <li class="list-group-item">Last humidity: {{ dataToPlot['list'][i]['devicesList'][j]['umidita'] }}</li>
+          <li class="list-group-item">Last lecture: {{ dataToPlot['list'][i]['devicesList'][j]['lettura'] }}</li>
         </ul>
 
-        {% set name_collapse = "name_collapse" ~ myString['list'][i]['devicesList'][j]['id'] %}
-        {% set group_collapse = "group_collapse" ~ myString['list'][i]['devicesList'][j]['id'] %}
-        {% set lecture_collapse = "lecture_collapse" ~ myString['list'][i]['devicesList'][j]['id'] %}
-        {% set link_name_collapse = "#name_collapse" ~ myString['list'][i]['devicesList'][j]['id'] %}
-        {% set link_group_collapse = "#group_collapse" ~ myString['list'][i]['devicesList'][j]['id'] %}
-        {% set link_lecture_collapse = "#lecture_collapse" ~ myString['list'][i]['devicesList'][j]['id'] %}
-        {% set link_delete = "deleteDevice?id=" ~ myString['list'][i]['devicesList'][j]['id'] %}
+        {% set name_collapse = "name_collapse" ~ dataToPlot['list'][i]['devicesList'][j]['id'] %}
+        {% set group_collapse = "group_collapse" ~ dataToPlot['list'][i]['devicesList'][j]['id'] %}
+        {% set lecture_collapse = "lecture_collapse" ~ dataToPlot['list'][i]['devicesList'][j]['id'] %}
+        {% set link_name_collapse = "#name_collapse" ~ dataToPlot['list'][i]['devicesList'][j]['id'] %}
+        {% set link_group_collapse = "#group_collapse" ~ dataToPlot['list'][i]['devicesList'][j]['id'] %}
+        {% set link_lecture_collapse = "#lecture_collapse" ~ dataToPlot['list'][i]['devicesList'][j]['id'] %}
+        {% set link_delete = "deleteDevice?id=" ~ dataToPlot['list'][i]['devicesList'][j]['id'] %}
 
         <div class="card-body">
-          {% if myString['list'][i]['devicesList'][j]['status'] == 0 %}
-          <a data-toggle="collapse" href= {{ link_name_collapse }} role="button" aria-expanded="false" aria-controls="nameCollapse" class="card-link">Modifica nome</a>
-          <a data-toggle="collapse" href= {{ link_group_collapse }} role="button" aria-expanded="false" aria-controls="groupCollapse" class="card-link">Modifica gruppo</a>
-          <a data-toggle="collapse" href= {{ link_lecture_collapse }} role="button" aria-expanded="false" aria-controls="lectureCollapse" class="card-link">Modifica intervallo lettura</a>
+          {% if dataToPlot['list'][i]['devicesList'][j]['status'] == 0 %}
+          <a data-toggle="collapse" href= {{ link_name_collapse }} role="button" aria-expanded="false" aria-controls="nameCollapse" class="card-link">Edit name</a>
+          <a data-toggle="collapse" href= {{ link_group_collapse }} role="button" aria-expanded="false" aria-controls="groupCollapse" class="card-link">Edit group</a>
+          <a data-toggle="collapse" href= {{ link_lecture_collapse }} role="button" aria-expanded="false" aria-controls="lectureCollapse" class="card-link">Edit lecture interval</a>
           {% endif %}
-          <a href={{ link_delete }} class="card-link">Elimina</a>
+          <a href={{ link_delete }} class="card-link">Delete</a>
         </div>
 
         <div class="collapse" id={{ name_collapse }}>
@@ -460,12 +458,12 @@
 
             <form action="/modifyDevice" method="GET">
               <div class="form-group">
-                <label for="exampleInputEmail">Nome</label>
-                <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="new_value" placeholder="Nome nuovo" required>
-                <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="id" value={{ myString['list'][i]['devicesList'][j]['id'] }}>
+                <label for="exampleInputEmail">Name</label>
+                <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="new_value" placeholder="Name" required>
+                <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="id" value={{ dataToPlot['list'][i]['devicesList'][j]['id'] }}>
                 <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="type" value="name">
-                <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="ip_address" value= {{ myString['list'][i]['devicesList'][j]['ipAddress'] }}>
-                <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="port" value= {{ myString['list'][i]['devicesList'][j]['ipPort'] }}>
+                <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="ip_address" value= {{ dataToPlot['list'][i]['devicesList'][j]['ipAddress'] }}>
+                <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="port" value= {{ dataToPlot['list'][i]['devicesList'][j]['ipPort'] }}>
 
                 <button type="submit" class="btn btn-primary">Submit</button>
               </div>
@@ -478,12 +476,12 @@
 
             <form action="/modifyDevice" method="GET">
               <div class="form-group">
-                <label for="exampleInputEmail1">Gruppo</label>
-                <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="new_value" placeholder="Gruppo nuovo" required>
-                <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="id" value={{ myString['list'][i]['devicesList'][j]['id'] }}>
+                <label for="exampleInputEmail1">Group</label>
+                <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="new_value" placeholder="Group name" required>
+                <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="id" value={{ dataToPlot['list'][i]['devicesList'][j]['id'] }}>
                 <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="type" value="groupName">
-                <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="ip_address" value= {{ myString['list'][i]['devicesList'][j]['ipAddress'] }}>
-                <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="port" value= {{ myString['list'][i]['devicesList'][j]['ipPort'] }}>
+                <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="ip_address" value= {{ dataToPlot['list'][i]['devicesList'][j]['ipAddress'] }}>
+                <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="port" value= {{ dataToPlot['list'][i]['devicesList'][j]['ipPort'] }}>
 
                 <button type="submit" class="btn btn-primary">Submit</button>
               </div>
@@ -495,12 +493,12 @@
           <div class="card card-body">
             <form action="/modifyDevice" method="GET">
               <div class="form-group">
-                <label for="exampleInputEmail1">Intervallo lettura</label>
-                <input type="number" min="5" step="1" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="new_value" placeholder="Nuovo intervallo lettura" required>
-                <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="id" value={{ myString['list'][i]['devicesList'][j]['id'] }}>
+                <label for="exampleInputEmail1">Lecture time interval</label>
+                <input type="number" min="5" step="1" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="new_value" placeholder="Lecture time interval (s)" required>
+                <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="id" value={{ dataToPlot['list'][i]['devicesList'][j]['id'] }}>
                 <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="type" value="lecture_interval">
-                <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="ip_address" value= {{ myString['list'][i]['devicesList'][j]['ipAddress'] }}>
-                <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="port" value= {{ myString['list'][i]['devicesList'][j]['ipPort'] }}>
+                <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="ip_address" value= {{ dataToPlot['list'][i]['devicesList'][j]['ipAddress'] }}>
+                <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="port" value= {{ dataToPlot['list'][i]['devicesList'][j]['ipPort'] }}>
 
                 <button type="submit" class="btn btn-primary">Submit</button>
               </div>
@@ -518,45 +516,45 @@
       </p>
 {% endif %}
 
-{% if myString['list'][i]['controlList']|length > 0%}
+{% if dataToPlot['list'][i]['controlList']|length > 0%}
         <h3>Control list</h3>
         <p>
           <div class="container-fluid">
             <div class="scrolling-wrapper row flex-row flex-nowrap mt-4 pb-4">
-          {%for j in range(0, myString['list'][i]['controlList']|length )%} 
+          {%for j in range(0, dataToPlot['list'][i]['controlList']|length )%} 
           <div class="col-5">
            <div class="card">
-            {% if myString['list'][i]['controlList'][j]['status'] == 0 %}
+            {% if dataToPlot['list'][i]['controlList'][j]['status'] == 0 %}
             <div class="card-body" style="background-color:green;">
           {% else %}
             <div class="card-body" style="background-color:red;">
           {% endif %}
-              <h5 class="card-title">{{ myString['list'][i]['controlList'][j]['name'] }}</h5>
+              <h5 class="card-title">{{ dataToPlot['list'][i]['controlList'][j]['name'] }}</h5>
             </div>
 
               <ul class="list-group list-group-flush">
-              <li class="list-group-item">ID: {{ myString['list'][i]['controlList'][j]['id'] }}</li>
-              <li class="list-group-item">Indirizzo IP: {{ myString['list'][i]['controlList'][j]['ipAddress'] }} : {{ myString['list'][i]['controlList'][j]['ipPort']}}</li>
-              <li class="list-group-item">Ultima rilevazione: {{ myString['list'][i]['controlList'][j]['lettura'] }}</li>
+              <li class="list-group-item">ID: {{ dataToPlot['list'][i]['controlList'][j]['id'] }}</li>
+              <li class="list-group-item">IP address: {{ dataToPlot['list'][i]['controlList'][j]['ipAddress'] }} : {{ dataToPlot['list'][i]['controlList'][j]['ipPort']}}</li>
+              <li class="list-group-item">Last lecture: {{ dataToPlot['list'][i]['controlList'][j]['lettura'] }}</li>
 
-              <!-- <li class="list-group-item">Nome: {{ myString['list'][i]['controlList'][j]['name'] }}</li> -->
-              <!-- <li class="list-group-item">Gruppo: {{ myString['list'][i]['controlList'][j]['groupName'] }}</li> -->
+              <!-- <li class="list-group-item">Nome: {{ dataToPlot['list'][i]['controlList'][j]['name'] }}</li> -->
+              <!-- <li class="list-group-item">Gruppo: {{ dataToPlot['list'][i]['controlList'][j]['groupName'] }}</li> -->
             </ul>
     
-            {% set name_collapse = "name_collapse" ~ myString['list'][i]['controlList'][j]['id'] %}
-            {% set group_collapse = "group_collapse" ~ myString['list'][i]['controlList'][j]['id'] %}
-            {% set lecture_collapse = "lecture_collapse" ~ myString['list'][i]['controlList'][j]['id'] %}
-            {% set link_name_collapse = "#name_collapse" ~ myString['list'][i]['controlList'][j]['id'] %}
-            {% set link_group_collapse = "#group_collapse" ~ myString['list'][i]['controlList'][j]['id'] %}
-            {% set link_lecture_collapse = "#lecture_collapse" ~ myString['list'][i]['controlList'][j]['id'] %}
-            {% set link_delete = "deleteDevice?id=" ~ myString['list'][i]['controlList'][j]['id'] %}
+            {% set name_collapse = "name_collapse" ~ dataToPlot['list'][i]['controlList'][j]['id'] %}
+            {% set group_collapse = "group_collapse" ~ dataToPlot['list'][i]['controlList'][j]['id'] %}
+            {% set lecture_collapse = "lecture_collapse" ~ dataToPlot['list'][i]['controlList'][j]['id'] %}
+            {% set link_name_collapse = "#name_collapse" ~ dataToPlot['list'][i]['controlList'][j]['id'] %}
+            {% set link_group_collapse = "#group_collapse" ~ dataToPlot['list'][i]['controlList'][j]['id'] %}
+            {% set link_lecture_collapse = "#lecture_collapse" ~ dataToPlot['list'][i]['controlList'][j]['id'] %}
+            {% set link_delete = "deleteDevice?id=" ~ dataToPlot['list'][i]['controlList'][j]['id'] %}
     
             <div class="card-body">
-              {% if myString['list'][i]['controlList'][j]['status'] == 0 %}
-              <a data-toggle="collapse" href= {{ link_name_collapse }} role="button" aria-expanded="false" aria-controls="nameCollapse" class="card-link">Modifica nome</a>
-              <a data-toggle="collapse" href= {{ link_group_collapse }} role="button" aria-expanded="false" aria-controls="groupCollapse" class="card-link">Modifica gruppo</a>
+              {% if dataToPlot['list'][i]['controlList'][j]['status'] == 0 %}
+              <a data-toggle="collapse" href= {{ link_name_collapse }} role="button" aria-expanded="false" aria-controls="nameCollapse" class="card-link">Edit name</a>
+              <a data-toggle="collapse" href= {{ link_group_collapse }} role="button" aria-expanded="false" aria-controls="groupCollapse" class="card-link">Edit group name</a>
               {% endif %}
-              <a href={{ link_delete }} class="card-link">Elimina</a>
+              <a href={{ link_delete }} class="card-link">Delete</a>
             </div>
     
             <div class="collapse" id={{ name_collapse }}>
@@ -564,12 +562,12 @@
     
                 <form action="/modifyDevice" method="GET">
                   <div class="form-group">
-                    <label for="exampleInputEmail">Nome</label>
-                    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="new_value" placeholder="Nome nuovo" required>
-                    <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="id" value={{ myString['list'][i]['controlList'][j]['id'] }}>
+                    <label for="exampleInputEmail">Name</label>
+                    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="new_value" placeholder="Name" required>
+                    <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="id" value={{ dataToPlot['list'][i]['controlList'][j]['id'] }}>
                     <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="type" value="name">
-                    <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="ip_address" value= {{ myString['list'][i]['controlList'][j]['ipAddress'] }}>
-                    <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="port" value= {{ myString['list'][i]['controlList'][j]['ipPort'] }}>
+                    <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="ip_address" value= {{ dataToPlot['list'][i]['controlList'][j]['ipAddress'] }}>
+                    <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="port" value= {{ dataToPlot['list'][i]['controlList'][j]['ipPort'] }}>
     
                     <button type="submit" class="btn btn-primary">Submit</button>
                   </div>
@@ -582,12 +580,12 @@
     
                 <form action="/modifyDevice" method="GET">
                   <div class="form-group">
-                    <label for="exampleInputEmail1">Gruppo</label>
-                    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="new_value" placeholder="Gruppo nuovo" required>
-                    <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="id" value={{ myString['list'][i]['controlList'][j]['id'] }}>
+                    <label for="exampleInputEmail1">Group</label>
+                    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="new_value" placeholder="Group name" required>
+                    <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="id" value={{ dataToPlot['list'][i]['controlList'][j]['id'] }}>
                     <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="type" value="groupName">
-                    <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="ip_address" value= {{ myString['list'][i]['controlList'][j]['ipAddress'] }}>
-                    <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="port" value= {{ myString['list'][i]['controlList'][j]['ipPort'] }}>
+                    <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="ip_address" value= {{ dataToPlot['list'][i]['controlList'][j]['ipAddress'] }}>
+                    <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="port" value= {{ dataToPlot['list'][i]['controlList'][j]['ipPort'] }}>
     
                     <button type="submit" class="btn btn-primary">Submit</button>
                   </div>

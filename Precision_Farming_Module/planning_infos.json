@@ -1,5 +1,8 @@
 {
+    "today": "date",
+    "warning": "",
     "saved_water": 0.0,
+    "saved_money": 0.0,
     "groups_list": [{
             "center": "",
             "groupName": "",

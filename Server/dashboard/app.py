@@ -7,119 +7,136 @@ from flask import Flask, render_template, send_file
 from flask import request
 import boto3
 from botocore.client import Config
+import botocore.exceptions
+import os.path
+from datetime import datetime
+import logging
 
 FOLDER_NAME = ""
 SERVICE_IP = 0
 SERVICE_PORT = 0
-AWS_IP = ""
-AWS_PORT = 0
+EC2_IP = ""
+EC2_PORT = ""
+CONTAINER_HISTORY_ERROR = "Error getting container history."
+METEO_INFO_ERROR = "Error getting meteo info."
+DEVICES_LIST_ERROR = "Error getting devices list."
+ADD_GROUP_ERROR = "Error adding group."
+DELETE_GROUP_ERROR = "Error deleting group."
+ERROR_DELETE_CONTAINER = "Error deleting container."
+ERROR_ADD_CONTAINER = "Error adding container."
+ERROR_DELETE_DEVICE = "Error deleting device."
+ERROR_EDIT_DEVICE = "Error editing device."
+GROUP_LIST_ERROR = "Error getting groups list."
+ERROR_GET_S3_FILE = "Error downloading file from S3."
+ERROR_DOWNLOAD_S3_FILE = "Error getting file list from S3."
+BUCKET_NAME = ""
+AWS_KEY_ID = ""
+AWS_SECRET_KEY = ""
+
 
 '''
 Modulo per la dashboard di gestione dell'intero applicativo.
 '''
 
-
 app = Flask(__name__)
 
 def readJson():
-    global FOLDER_NAME, SERVICE_IP, SERVICE_PORT, AWS_IP, AWS_PORT
+    global BUCKET_NAME, AWS_KEY_ID, AWS_SECRET_KEY, FOLDER_NAME, SERVICE_IP, SERVICE_PORT, EC2_IP, EC2_PORT
     with open('/config/config.json') as config_file:
         data = json.load(config_file)
         SERVICE_IP = data['service_ip']
         SERVICE_PORT = data['service_port']
-        AWS_IP = data['aws_ip']
-        AWS_PORT = data['aws_port']
+        EC2_IP = data['ec2_ip']
+        EC2_PORT = data['ec2_port']
         config_file.close()
     with open('/config/cluster_config.json') as config_file:
         data = json.load(config_file)
         FOLDER_NAME = data['folder_name']
         config_file.close()
+    with open('/config/s3_key.json') as config_file:
+        data = json.load(config_file)
+        AWS_KEY_ID = data['aws_key_id']
+        AWS_SECRET_KEY = data['aws_secret_key']
+        BUCKET_NAME = data['bucket_name']
+        config_file.close()
 
+# Make a manual check of the status of the device
 @app.route('/checkDevicesStatus', methods=['GET'])
 def checkDevicesStatus():
 
-    dictec2 = {}
-
     try:
-        data_meteo = requests.get("http://192.168.1.106:5000/weather_forecasts", timeout=5).json()
-    except requests.exceptions.RequestException as e:
-        print(str(e))
-        return render_template('error_template.html', responseMessage=str(e) + " Errore nell'ottenimento delle informazioni meteo." + " " + str(AWS_IP) + " " + str(AWS_PORT))
+        errorMessage = METEO_INFO_ERROR
+        data_meteo = requests.get('http://' + EC2_IP + ':' +EC2_PORT + '/weather_forecasts', timeout=5).json()
 
-    with open('ec2value.json') as config_file:
-        data_ec2 = json.load(config_file)
-        config_file.close()    
+        if os.path.isfile('dump/awsvalue.json'): 
+            dictec2 = {}
+            with open('dump/awsvalue.json') as config_file:
+                data_ec2 = json.load(config_file)
+                config_file.close()
 
-    with open('ec2value.json') as config_file:
-        data_ec2 = json.load(config_file)
-        config_file.close()
+            for i in range(0, len(data_ec2['groups_list'])):
+                dictec2[data_ec2['groups_list'][i]['groupName']] = round(data_ec2['groups_list'][i]['ndvi_mean'], 4)
+        else:
+            dictec2 = None
 
-    for i in range(0, len(data_ec2['groups_list'])):
-        dictec2[data_ec2['groups_list'][i]['groupName']] = data_ec2['groups_list'][i]['ndvi_mean']
-
-    try:
+        errorMessage = DEVICES_LIST_ERROR
         data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getDeviceStat").json()
-    except Exception as e:
-        print(e)
-        return render_template('error_template.html', responseMessage="Errore nell'ottenimento della lista dei dispositivi.")
-    return render_template('template_bootstrap.html', myString=data, weather=data_meteo, ndvi=dictec2, response=True)
 
-# Funzione per l'aggiunta di un nuovo gruppo
+    except requests.exceptions.RequestException as e:
+        return render_template('error_template.html', responseMessage=errorMessage)
+    return render_template('template_bootstrap.html', dataToPlot=data, weather=data_meteo, ndvi=dictec2)
+
+# Route to render the page
 @app.route('/addGroupLink', methods=['GET'])
 def addGroupLink():
-
     return render_template('template_bootstrap_add_groups.html')
 
-
-# Funzione per l'aggiunta di un nuovo gruppo
+# Route to render the page
 @app.route('/addWaterContainerLink', methods=['GET'])
 def addWaterContainerLink():
-
     return render_template('template_bootstrap_add_water_container.html')
 
+# Route to add a water container
 @app.route('/deleteWaterContainer', methods=['GET'])
 def deleteWaterContainer():
 
     container_id = str(request.args.get("container_id"))
 
-    try:
-        res = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/deleteContainer?container_id='+container_id, timeout=5)
-        response123 = True
-    except Exception as e:
-        return render_template('error_template.html', responseMessage=str(e))
-
-
-    if res.text != "Ok":
-        return render_template('error_template.html', responseMessage=str("Errore nell'eliminazione della programmazione."))
 
     try:
+        errorMessage = ERROR_DELETE_CONTAINER
+        responnse = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/deleteContainer?container_id='+container_id, timeout=5)
+
+        if responnse.text != "Ok":
+            raise(requests.exceptions.RequestException)
+        
+        errorMessage = CONTAINER_HISTORY_ERROR
         data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getWaterList").json()
-    except Exception as e:
-        print(e)
-        return render_template('error_template.html', responseMessage="Errore nell'ottenimento dello storico dei container.")
-    return render_template('template_bootstrap_groups_water_container.html', myString=data)
-    ##return render_template('template_bootstrap.html', myString=data)
 
+    except requests.exceptions.RequestException as e:
+        return render_template('error_template.html', responseMessage=errorMessage)
+    return render_template('template_bootstrap_groups_water_container.html', dataToPlot=data,response=True)
+
+# Route to delete a group
 @app.route('/deleteGroup', methods=['GET'])
 def deleteGroup():
 
-
     groupName = str(request.args.get("groupName"))
-
     try:
-        res = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/deleteGroup?groupName='+groupName, timeout=5)
-        response123 = True
-    except Exception as e:
-        print(e)
-        return render_template('error_template.html', responseMessage=str(e))
+        errorMessage = DELETE_GROUP_ERROR
+        responnse = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/deleteGroup?groupName='+groupName, timeout=5)
 
-    if res.text != "Ok":
-        return render_template('error_template.html', responseMessage=str("Errore nell'eliminazione del gruppo."))
+        if responnse.text != "Ok":
+            raise(requests.exceptions.RequestException)
+        
+        errorMessage = GROUP_LIST_ERROR
+        data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getGroupsList").json()
 
-    data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getGroupsList").json()
-    return render_template('template_bootstrap_groups.html', myString=data, response=response123)
+    except requests.exceptions.RequestException as e:
+        return render_template('error_template.html', responseMessage=errorMessage)
+    return render_template('template_bootstrap_groups.html', dataToPlot=data, response=True)
 
-# Funzione per l'aggiunta di un nuovo gruppo
+# Route to add a group
 @app.route('/addGroup', methods=['GET'])
 def addGroup():
 
@@ -130,24 +147,20 @@ def addGroup():
     latCenter = str(request.args.get("latCenter"))
     longCenter = str(request.args.get("longCenter"))
 
-    response123 = False
-
-
     try:
-        res = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/addGroup?groupName='+groupName+'&parameter1=' + parameter1 + '&parameter2=' + parameter2 + '&parameter3=' + parameter3 + '&longCenter=' + longCenter + '&latCenter=' + latCenter, timeout=5)
-        response123 = True
-        if res.text != "Ok":
-            message = "Errore nell'aggiunta del gruppo."
-            return render_template('error_template.html', responseMessage=message)
-    except Exception as e:
-        print(e)
-        return render_template('error_template.html', responseMessage=str(e))
+        errorMessage = ADD_GROUP_ERROR
+        responnse = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/addGroup?groupName='+groupName+'&parameter1=' + parameter1 + '&parameter2=' + parameter2 + '&parameter3=' + parameter3 + '&longCenter=' + longCenter + '&latCenter=' + latCenter, timeout=5)
+        if responnse.text != "Ok":
+            raise(requests.exceptions.RequestException)        
 
+        errorMessage = GROUP_LIST_ERROR
+        data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getGroupsList").json()
+    except requests.exceptions.RequestException as e:
+        return render_template('error_template.html', responseMessage=errorMessage)
 
-    data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getGroupsList").json()
-    return render_template('template_bootstrap_groups.html', myString=data, response=response123)
+    return render_template('template_bootstrap_groups.html', dataToPlot=data, response=True)
 
-# Funzione per l'aggiunta di un nuovo gruppo
+# Route to add a water container
 @app.route('/addWaterContainer', methods=['GET'])
 def addWaterContainer():
 
@@ -155,198 +168,178 @@ def addWaterContainer():
     end = str(request.args.get("end"))
     water_value = str(request.args.get("water_value"))
 
-    response123 = False
-
     try:
-        res = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/addWaterContainer?start='+start+'&end=' + end + '&water_value=' + water_value, timeout=5)
-        response123 = True
-        if res.text != "Ok":
-            message = "Errore nell'aggiunta del gruppo."
-            return render_template('error_template.html', responseMessage=message)
-    except Exception as e:
-        print(e)
-        return render_template('error_template.html', responseMessage=str(e))
+        errorMessage = ERROR_ADD_CONTAINER
+        responnse = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/addWaterContainer?start='+start+'&end=' + end + '&water_value=' + water_value, timeout=5)
+        if responnse.text != "Ok":
+            raise(requests.exceptions.RequestException)
 
-
-    try:
+        errorMessage = CONTAINER_HISTORY_ERROR
         data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getWaterList").json()
-    except Exception as e:
-        print(e)
-        return render_template('error_template.html', responseMessage="Errore nell'ottenimento dello storico dei container.")
-    return render_template('template_bootstrap_groups_water_container.html', myString=data)
-    ##return render_template('template_bootstrap.html', myString=data)
+    except requests.exceptions.RequestException as e:
+        return render_template('error_template.html', responseMessage=errorMessage)
 
+    return render_template('template_bootstrap_groups_water_container.html', dataToPlot=data, response=True)
 
-# Funzione per l'eliminazione di un dispositivo
+# Route to get the stat needed for the chart
+@app.route('/getStat', methods=['GET'])
+def getStat():
+
+    try:
+        errorMessage = ERROR_ADD_CONTAINER
+        responnse = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/getStat', timeout=5).json()
+    except requests.exceptions.RequestException as e:
+        return render_template('error_template.html', responseMessage=errorMessage)
+    return render_template('template_bootstrap_stat.html', dataToPlot=responnse)
+
+# Route to delete a device
 @app.route('/deleteDevice', methods=['GET'])
 def deleteDevice():
 
-    dictec2 = {}
-
     try:
-        data_meteo = requests.get("http://192.168.1.106:5000/weather_forecasts", timeout=5).json()
+        if os.path.isfile('dump/awsvalue.json'): 
+            dictec2 = {}
+            with open('dump/awsvalue.json') as config_file:
+                data_ec2 = json.load(config_file)
+                config_file.close()
+
+            for i in range(0, len(data_ec2['groups_list'])):
+                dictec2[data_ec2['groups_list'][i]['groupName']] = round(data_ec2['groups_list'][i]['ndvi_mean'], 4)
+        else:
+            dictec2 = None
+
+        new_value = str(request.args.get("new_value"))
+        id = str(request.args.get("id"))
+        type = str(request.args.get("type"))
+        ip_address = str(request.args.get("ip_address"))
+        port = str(request.args.get("port"))
+
+        errorMessage = ERROR_DELETE_DEVICE
+        responnse = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/deleteDevice?ipAddress='+ip_address+'&ipPort=' + port + '&new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
+        if responnse.text != "Ok":
+            raise(requests.exceptions.RequestException)
+
+        errorMessage = METEO_INFO_ERROR
+        data_meteo = requests.get('http://' + EC2_IP + ':' +EC2_PORT + '/weather_forecasts', timeout=5).json()
+
+        errorMessage = GROUP_LIST_ERROR
+        data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getGroupsList").json()
     except requests.exceptions.RequestException as e:
-        print(str(e))
-        return render_template('error_template.html', responseMessage=str(e) + " Errore nell'ottenimento delle informazioni meteo." + " " + str(AWS_IP) + " " + str(AWS_PORT))
+        return render_template('error_template.html', responseMessage=errorMessage)
+    return render_template('template_bootstrap.html', dataToPlot=data, weather=data_meteo, ndvi=dictec2, response=True)
 
-
-
-    with open('ec2value.json') as config_file:
-        data_ec2 = json.load(config_file)
-        config_file.close()
-
-    for i in range(0, len(data_ec2['groups_list'])):
-        dictec2[data_ec2['groups_list'][i]['groupName']] = data_ec2['groups_list'][i]['ndvi_mean']
-
-    new_value = str(request.args.get("new_value"))
-    id = str(request.args.get("id"))
-    type = str(request.args.get("type"))
-    ip_address = str(request.args.get("ip_address"))
-    port = str(request.args.get("port"))
-
-    response123 = True
-
-    try:
-        res = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/deleteDevice?ipAddress='+ip_address+'&ipPort=' + port + '&new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
-        if res.text != "Ok":
-            message = "Errore nell'eliminazione del dispositivo."
-            return render_template('error_template.html', responseMessage = message)
-    except requests.exceptions.RequestException as e:
-        print(e)
-        return render_template('error_template.html', responseMessage=str(e))
-
-    data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getDeviceStat").json()
-    return render_template('template_bootstrap.html', myString=data, weather=data_meteo, ndvi=dictec2, response=True)
-
-# Funzione per la modifica di un dispositivo
+# Route to modify a device
 @app.route('/modifyDevice', methods=['GET'])
 def modifyDevice():
 
-    dictec2 = {}
+    try: 
+        if os.path.isfile('dump/awsvalue.json'): 
+            dictec2 = {}
+            with open('dump/awsvalue.json') as config_file:
+                data_ec2 = json.load(config_file)
+                config_file.close()
 
-    try:
-        data_meteo = requests.get("http://192.168.1.106:5000/weather_forecasts", timeout=5).json()
-    except requests.exceptions.RequestException as e:
-        print(str(e))
-        return render_template('error_template.html', responseMessage=str(e) + " Errore nell'ottenimento delle informazioni meteo." + " " + str(AWS_IP) + " " + str(AWS_PORT))
+            for i in range(0, len(data_ec2['groups_list'])):
+                dictec2[data_ec2['groups_list'][i]['groupName']] = round(data_ec2['groups_list'][i]['ndvi_mean'], 4)
+        else:
+            dictec2 = None
 
-
-    with open('ec2value.json') as config_file:
-        data_ec2 = json.load(config_file)
-        config_file.close()
-
-    for i in range(0, len(data_ec2['groups_list'])):
-        dictec2[data_ec2['groups_list'][i]['groupName']] = data_ec2['groups_list'][i]['ndvi_mean']
-
-    new_value = str(request.args.get("new_value"))
-    id = str(request.args.get("id"))
-    type = str(request.args.get("type"))
-    ip_address = str(request.args.get("ip_address"))
-    port = str(request.args.get("port"))
-    
-
-    if type == "lecture_interval":     
-        try:
-            res = requests.get('http://' + str(ip_address) + ':' +str(port) +'/editConfig?new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
-            print(res.text)
-            if (res.text != "Ok"):
-                raise(Exception)
-        except Exception as e:
-            print(e)
-            return render_template('error_template.html', responseMessage="Errore nella modifica del dispositivo.")
-    
-    else:
-        if type =="name":
-            try:
-                res = requests.get('http://' + str(ip_address) + ':' +str(port) +'/editConfig?new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
-                print(res.text)
-                if (res.text != "Ok"):
-                    raise(Exception)
-            except Exception as e:
-                print(e)
-                return render_template('error_template.html', responseMessage="Errore nella modifica del dispositivo.")
-        try:
-            res = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/editConfig?ipAddress='+ip_address+'&ipPort=' + port + '&new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
-            print(res.text)
-            if (res.text == "Group name not present."):
+        new_value = str(request.args.get("new_value"))
+        id = str(request.args.get("id"))
+        type = str(request.args.get("type"))
+        ip_address = str(request.args.get("ip_address"))
+        port = str(request.args.get("port"))
+        
+        if type == "lecture_interval" or type == "group_name":     
+            errorMessage = ERROR_EDIT_DEVICE
+            responnse = requests.get('http://' + str(ip_address) + ':' +str(port) +'/editConfig?new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
+            if (responnse.text != "Ok"):
+                raise(requests.exceptions.RequestException)
+        
+        else:
+            if type =="name":
+                errorMessage = ERROR_EDIT_DEVICE
+                responnse = requests.get('http://' + str(ip_address) + ':' +str(port) +'/editConfig?new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
+                if (responnse.text != "Ok"):
+                    raise(requests.exceptions.RequestException)
+            
+            errorMessage = "Errore nella modifica del dispositivo."
+            responnse = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/editConfig?ipAddress='+ip_address+'&ipPort=' + port + '&new_value=' + new_value + '&type=' + type + '&id=' + id, timeout=3)
+            if (responnse.text == "Group name not present."):
                 errorMessage = "Il gruppo indicato non è presente. Aggiungerlo prima."
-                raise(Exception)
-            elif (res.text != "Ok"):
+                raise(requests.exceptions.RequestException)
+            elif (responnse.text != "Ok"):
                 errorMessage = "Errore nella modifica del dispositivo."
-                raise(Exception)
-        except Exception as e:
-            print(e)
-            return render_template('error_template.html', responseMessage=errorMessage)
+                raise(requests.exceptions.RequestException)
 
-    try:
+        errorMessage = METEO_INFO_ERROR
+        data_meteo = requests.get('http://' + EC2_IP + ':' +EC2_PORT + '/weather_forecasts', timeout=5).json()
+
+        errorMessage = DEVICES_LIST_ERROR
         data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getDeviceStat").json()
+        
     except requests.exceptions.RequestException as e:
-        print(e)
-        return render_template('error_template.html', responseMessage=str(e))
-    return render_template('template_bootstrap.html', myString=data, weather=data_meteo, ndvi=dictec2, response=True)
+        return render_template('error_template.html', responseMessage=errorMessage)
 
+    return render_template('template_bootstrap.html', dataToPlot=data, weather=data_meteo, ndvi=dictec2, response=True)
 
-# Funzione per la visualizzazione della lista dei dispositivi
+# Route for the index page
 @app.route('/')
 def indexRoute():
 
-    dictec2 = {}
-
     try:
-        data_meteo = requests.get("http://192.168.1.106:5000/weather_forecasts", timeout=5).json()
-    except requests.exceptions.RequestException as e:
-        print(str(e))
-        return render_template('error_template.html', responseMessage=str(e) + " Errore nell'ottenimento delle informazioni meteo." + " " + str(AWS_IP) + " " + str(AWS_PORT))
+        errorMessage = METEO_INFO_ERROR
+        data_meteo = requests.get('http://' + EC2_IP + ':' +EC2_PORT + '/weather_forecasts', timeout=5).json()
 
-    with open('ec2value.json') as config_file:
-        data_ec2 = json.load(config_file)
-        config_file.close()
+        if os.path.isfile('dump/awsvalue.json'): 
+            dictec2 = {}
+            with open('dump/awsvalue.json') as config_file:
+                data_ec2 = json.load(config_file)
+                config_file.close()
 
-    for i in range(0, len(data_ec2['groups_list'])):
-        dictec2[data_ec2['groups_list'][i]['groupName']] = data_ec2['groups_list'][i]['ndvi_mean']
-    try:
+            for i in range(0, len(data_ec2['groups_list'])):
+                dictec2[data_ec2['groups_list'][i]['groupName']] = round(data_ec2['groups_list'][i]['ndvi_mean'], 4)
+                dictec2['warning'] = data_ec2['warning']
+        else:
+            dictec2 = None
+        
+        errorMessage = DEVICES_LIST_ERROR
         data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getDeviceStat", timeout=5).json()
     except requests.exceptions.RequestException as e:
-        print(e)
-        return render_template('error_template.html', responseMessage="Errore nell'ottenimento della lista dei dispositivi.")
-    return render_template('template_bootstrap.html', myString=data, weather=data_meteo, ndvi=dictec2)
+        return render_template('error_template.html', responseMessage=errorMessage)
+    return render_template('template_bootstrap.html', dataToPlot=data, weather=data_meteo, ndvi=dictec2)
 
+# Route to get the list of groups
 @app.route('/getGroupsList',)
 def getGroupsList():
      
-    
     try:
+        errorMessage = GROUP_LIST_ERROR
         data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getGroupsList").json()
-    except Exception as e:
-        print(e)
-        return render_template('error_template.html', responseMessage="Errore nell'ottenimento della lista dei dispositivi.")
-    return render_template('template_bootstrap_groups.html', myString=data)
-    ##return render_template('template_bootstrap.html', myString=data)
+    except requests.exceptions.RequestException as e:
+        return render_template('error_template.html', responseMessage=errorMessage)
+    return render_template('template_bootstrap_groups.html', dataToPlot=data)
 
+# Route to get the list of water container
 @app.route('/getWaterList',)
 def getWaterList():
      
     try:
         data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getWaterList").json()
-    except Exception as e:
-        print(e)
-        return render_template('error_template.html', responseMessage="Errore nell'ottenimento dello storico dei container.")
-    return render_template('template_bootstrap_groups_water_container.html', myString=data)
-    ##return render_template('template_bootstrap.html', myString=data)
+        errorMessage = GROUP_LIST_ERROR
+    except requests.exceptions.RequestException as e:
+        return render_template('error_template.html', responseMessage=errorMessage)
+    return render_template('template_bootstrap_groups_water_container.html', dataToPlot=data)
 
+# Route to download a file
 @app.route('/downloadFile', methods=['GET'])
 def downloadFile():
-
-    ### information from configS3
-    BUCKET_NAME = "sdcc-test-bucket"
-    ACCESS_KEY_ID = "AKIA57G4V3XAZXYSWEYA"
-    ACCESS_SECRET_KEY = "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"
 
     try:
         s3 = boto3.resource(
             's3',
-            aws_access_key_id=ACCESS_KEY_ID,
-            aws_secret_access_key=ACCESS_SECRET_KEY,
+            aws_access_key_id=AWS_KEY_ID,
+            aws_secret_access_key=AWS_SECRET_KEY,
             config=Config(signature_version='s3v4'))
 
         file_key = request.args.get("file_name")
@@ -354,27 +347,21 @@ def downloadFile():
         file_name_save = file_name_save[len(file_name_save)-1]
         s3.Bucket(BUCKET_NAME).download_file(file_key, file_name_save)
         return send_file(file_name_save, as_attachment=True)
-    except requests.exceptions.RequestException as e:
-        print(e)
-        return render_template('error_template.html', responseMessage="Errore nel download del file da S3.")
 
 
+    except Exception as e:
+        logging.info(str(e), flush=True)
+        return render_template('error_template.html', responseMessage=ERROR_DOWNLOAD_S3_FILE)
+
+# Route to get the file list from S3
 @app.route('/getFileList')
 def getFileList():
-
-
-
-    ### information from configS3   
-    ACCESS_KEY_ID = "AKIA57G4V3XAZXYSWEYA"
-    ACCESS_SECRET_KEY = "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"
-    BUCKET_NAME = "sdcc-test-bucket"
-
 
     try:
         s3 = boto3.resource(
         's3',
-        aws_access_key_id=ACCESS_KEY_ID,
-        aws_secret_access_key=ACCESS_SECRET_KEY,
+        aws_access_key_id=AWS_KEY_ID,
+        aws_secret_access_key=AWS_SECRET_KEY,
         config=Config(signature_version='s3v4'))
     
         file_key_list = []
@@ -382,12 +369,10 @@ def getFileList():
     
         for file in my_bucket.objects.filter(Prefix=FOLDER_NAME):
             file_key_list.append(file.key)
-
-        return render_template('template_bootstrap_file.html', myString=file_key_list)
+        return render_template('template_bootstrap_file.html', dataToPlot=file_key_list)
     except Exception as e:
-        return render_template('error_template.html', responseMessage="Errore nell'ottenumento dei file da S3.")
-
-
+        logging.info(str(e), flush=True)
+        return render_template('error_template.html', responseMessage=ERROR_GET_S3_FILE)
 
 if __name__ == '__main__':
     readJson()

@@ -3,12 +3,9 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
-    <meta name="generator" content="Jekyll v4.0.1">
-    <title>Manage groups - SDCC Project</title>
+    <meta name="author" content="Salvatore Foderaro, Alessandro Pontis, Gianmarco and Bootstrap contributors">
+    <title>Manage groups - Precision Farming</title>
 
-    <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/starter-template/">
 
     <!-- Bootstrap core CSS -->
 <link href="{{ url_for('static', filename='css/bootstrap.css') }}" rel="stylesheet">
@@ -22,6 +19,13 @@
         -ms-user-select: none;
         user-select: none;
       }
+
+      .icon-field {
+  background-image: url("{{ url_for('static', filename='img/field.png') }}");
+    background-position: center center;
+    width: 100px;
+    height: 100px;
+}
 
       @media (min-width: 768px) {
         .bd-placeholder-img-lg {
@@ -50,61 +54,71 @@
   <body>
     <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
 
-  <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item active">
-        <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/getFileList">Archivio dump</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/getGroupsList">Gestione gruppi</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/getWaterList">Gestione programmazione acqua</a>
-      </li>
-    </ul>
-   </div>
-</nav>
+      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/getFileList">Dump history</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/getGroupsList">Manage groups</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/getWaterList">Manage water schedule</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/getStat">Saving statistics</a>
+          </li>
+        </ul>
+       </div>
+    </nav>
 
 <main role="main" class="container">
 
-  {% if response == true %}
+  {% if response is defined and respose == true %}
   <div class="alert alert-success" role="alert">
-    Modifica effettuata con successo!
+    Edit made successfully!
   </div>
-    {% elif response == false %}
-    <div class="alert alert-warning" role="alert">
-    Modifica non effettuata!
+  {% elif response is defined and response == false %}
+  <div class="alert alert-warning" role="alert">
+    Edit not made!
     </div>
       {% endif %}
 
 <div class="row justify-content-center">
-        <p><a href="addGroupLink" type="button" class="btn btn-primary btn-lg">Aggiungi gruppo</a></p>
+        <p><a href="addGroupLink" type="button" class="btn btn-primary btn-lg">Add group</a></p>
 </div>
 
 <div class="container-fluid">
             <div class="scrolling-wrapper row flex-row flex-nowrap mt-4 pb-4">
          
-  {% for i in range(0, myString['list']|length ) %} 
+  {% for i in range(0, dataToPlot['list']|length ) %} 
 
           <div class="col-5">
 
       <div class="card" >
           <div class="card-body">
-          <h5 class="card-title"> {{ myString['list'][i]['groupName'] }}</h5>
-        </div>
+            <div class="d-flex justify-content-between">
+
+              <p class="display-4 degree">{{ dataToPlot['list'][i]['groupName'] }}</p>
+              <i class="icon-field"></i>
+            </div>
+          </div>
         <ul class="list-group list-group-flush">
-          <li class="list-group-item">Parameter 1: {{ myString['list'][i]['parameter1'] }}</li>
-          <li class="list-group-item">Parameter 2: {{ myString['list'][i]['parameter2'] }}</li>
-          <li class="list-group-item">Parameter3: {{ myString['list'][i]['parameter3'] }}</li>
+          <li class="list-group-item">Parameter 1: {{ dataToPlot['list'][i]['parameter1'] }}</li>
+          <li class="list-group-item">Parameter 2: {{ dataToPlot['list'][i]['parameter2'] }}</li>
+          <li class="list-group-item">Parameter 3: {{ dataToPlot['list'][i]['parameter3'] }}</li>
+          <li class="list-group-item">Center latitude: {{ dataToPlot['list'][i]['latCenter'] }}</li>
+          <li class="list-group-item">Center longitude: {{ dataToPlot['list'][i]['longCenter'] }}</li>
+
         </ul>
 
-        {% set link_delete = "deleteGroup?groupName=" ~ myString['list'][i]['groupName'] %}
+        {% set link_delete = "deleteGroup?groupName=" ~ dataToPlot['list'][i]['groupName'] %}
 
         <div class="card-body">
-          <a href={{ link_delete }} class="card-link">Elimina gruppo</a>
+          <a href={{ link_delete }} class="card-link">Delete group</a>
         </div>
 
     </div>

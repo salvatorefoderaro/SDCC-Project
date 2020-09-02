@@ -3,12 +3,9 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
-    <meta name="generator" content="Jekyll v4.0.1">
-    <title>Add groups - SDCC Project</title>
+    <meta name="author" content="Salvatore Foderaro, Alessandro Pontis, Gianmarco and Bootstrap contributors">
+    <title>Add groups - Precision Farming</title>
 
-    <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/starter-template/">
 
     <!-- Bootstrap core CSS -->
 <link href="{{ url_for('static', filename='css/bootstrap.css') }}" rel="stylesheet">
@@ -35,25 +32,38 @@
   <body>
     <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
 
-  <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item active">
-        <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/getFileList">Archivio dump</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/getGroupsList">Gestione gruppi</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/getWaterList">Gestione programmazione acqua</a>
-      </li>
-    </ul>
-   </div>
-</nav>
+      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/getFileList">Dump history</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/getGroupsList">Manage groups</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/getWaterList">Manage water schedule</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/getStat">Saving statistics</a>
+          </li>
+        </ul>
+       </div>
+    </nav>
 
 <main role="main" class="container">
+
+  {% if response is defined and respose == true %}
+  <div class="alert alert-success" role="alert">
+    Edit made successfully!
+  </div>
+  {% elif response is defined and response == false %}
+  <div class="alert alert-warning" role="alert">
+    Edit not made!
+    </div>
+      {% endif %}
 
   <form action="/addGroup" method="GET">
     <div class="form-group">
@@ -73,14 +83,16 @@
       <input name="parameter3" type="number" min="0" class="form-control" id="exampleInputPassword1" placeholder="Parameter 3" required>
     </div>
     <div class="form-group">
-      <label for="exampleInputPassword1">Parameter3</label>
+      <label for="exampleInputPassword1">Center Latitude</label>
       <input name="latCenter" type="number" step="any" class="form-control" id="exampleInputPassword1" placeholder="Center Latitude" required>
     </div>
     <div class="form-group">
-      <label for="exampleInputPassword1">Parameter3</label>
+      <label for="exampleInputPassword1">Center Longitude</label>
       <input name="longCenter" type="number" step="any" class="form-control" id="exampleInputPassword1" placeholder="Center Longitude" required>
     </div>
+    <div class="row justify-content-center">
     <button type="submit" class="btn btn-primary">Add group</button>
+    </div>
   </form>
 
 </main><!-- /.container -->
