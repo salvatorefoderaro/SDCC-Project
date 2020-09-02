@@ -5,6 +5,7 @@ import requests
 import mysql.connector as mysql
 from flask import request
 import json
+import logging
 
 app = Flask(__name__)
 
@@ -53,7 +54,7 @@ def collectData():
 
             return "Ok"
         except mysql.Error as err:
-            print(str(err), flush=True)
+            logging.info(str(err), flush=True)
             return str(err)
 
 # Route to add a new device to the cluster.
@@ -88,7 +89,7 @@ def newDevice():
 
             return "Ok"
         except mysql.Error as err:
-            print(str(err), flush=True)
+            logging.info(str(err), flush=True)
             return str(err)
 
 if __name__ == '__main__':

@@ -7,8 +7,8 @@ RUN apt-get update -y && \
 COPY ./requirements.txt /app/requirements.txt
 
 COPY ./config.json /config/config.json
-
 COPY ./cluster_config.json /config/cluster_config.json
+COPY ./s3_key.json /config/s3_key.json
 
 WORKDIR /app
 

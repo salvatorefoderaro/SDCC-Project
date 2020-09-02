@@ -49,7 +49,7 @@ def checkDevicesStatus():
 
         return 0
     except mysql.Error as err:
-        print(str(err))
+        logging.info(str(err))
 
 if __name__ == '__main__':
     checkDevicesStatus()

@@ -10,6 +10,7 @@ from botocore.client import Config
 import botocore.exceptions
 import os.path
 from datetime import datetime
+import logging
 
 FOLDER_NAME = ""
 SERVICE_IP = 0
@@ -28,10 +29,9 @@ ERROR_EDIT_DEVICE = "Error editing device."
 GROUP_LIST_ERROR = "Error getting groups list."
 ERROR_GET_S3_FILE = "Error downloading file from S3."
 ERROR_DOWNLOAD_S3_FILE = "Error getting file list from S3."
-
-BUCKET_NAME = "sdcc-test-bucket"
-ACCESS_KEY_ID = "AKIA57G4V3XAXOJRI7HS"
-ACCESS_SECRET_KEY = "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"
+BUCKET_NAME = ""
+AWS_KEY_ID = ""
+AWS_SECRET_KEY = ""
 
 
 '''
@@ -41,7 +41,7 @@ Modulo per la dashboard di gestione dell'intero applicativo.
 app = Flask(__name__)
 
 def readJson():
-    global FOLDER_NAME, SERVICE_IP, SERVICE_PORT, EC2_IP, EC2_PORT
+    global BUCKET_NAME, AWS_KEY_ID, AWS_SECRET_KEY, FOLDER_NAME, SERVICE_IP, SERVICE_PORT, EC2_IP, EC2_PORT
     with open('/config/config.json') as config_file:
         data = json.load(config_file)
         SERVICE_IP = data['service_ip']
@@ -52,6 +52,12 @@ def readJson():
     with open('/config/cluster_config.json') as config_file:
         data = json.load(config_file)
         FOLDER_NAME = data['folder_name']
+        config_file.close()
+    with open('/config/s3_key.json') as config_file:
+        data = json.load(config_file)
+        AWS_KEY_ID = data['aws_key_id']
+        AWS_SECRET_KEY = data['aws_secret_key']
+        BUCKET_NAME = data['bucket_name']
         config_file.close()
 
 # Make a manual check of the status of the device
@@ -332,8 +338,8 @@ def downloadFile():
     try:
         s3 = boto3.resource(
             's3',
-            aws_access_key_id=ACCESS_KEY_ID,
-            aws_secret_access_key=ACCESS_SECRET_KEY,
+            aws_access_key_id=AWS_KEY_ID,
+            aws_secret_access_key=AWS_SECRET_KEY,
             config=Config(signature_version='s3v4'))
 
         file_key = request.args.get("file_name")
@@ -344,7 +350,7 @@ def downloadFile():
 
 
     except Exception as e:
-        print(str(e), flush=True)
+        logging.info(str(e), flush=True)
         return render_template('error_template.html', responseMessage=ERROR_DOWNLOAD_S3_FILE)
 
 # Route to get the file list from S3
@@ -354,8 +360,8 @@ def getFileList():
     try:
         s3 = boto3.resource(
         's3',
-        aws_access_key_id=ACCESS_KEY_ID,
-        aws_secret_access_key=ACCESS_SECRET_KEY,
+        aws_access_key_id=AWS_KEY_ID,
+        aws_secret_access_key=AWS_SECRET_KEY,
         config=Config(signature_version='s3v4'))
     
         file_key_list = []
@@ -365,7 +371,7 @@ def getFileList():
             file_key_list.append(file.key)
         return render_template('template_bootstrap_file.html', dataToPlot=file_key_list)
     except Exception as e:
-        print(str(e), flush=True)
+        logging.info(str(e), flush=True)
         return render_template('error_template.html', responseMessage=ERROR_GET_S3_FILE)
 
 if __name__ == '__main__':

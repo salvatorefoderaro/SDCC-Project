@@ -5,6 +5,7 @@ import requests
 from flask import request
 import json
 import smtplib
+import logging
 
 app = Flask(__name__)
 
@@ -41,7 +42,7 @@ def sendEmail():
         server.close()
         return 0
     except smtplib.SMTPException as e:
-        print(str(e), flush=True)
+        logging.info(str(e), flush=True)
         return str(e)
 
 if __name__ == '__main__':
