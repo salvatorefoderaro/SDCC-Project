@@ -5,6 +5,7 @@ clear
 kubectl delete deployment collectdatadeployment
 kubectl delete deployment dashboarddeployment
 kubectl delete deployment dbconnectordeployment
+kubectl delete hpa collectdatahpa
 kubectl delete job dbinstantiate
 kubectl delete cronjobs jobdbdump
 kubectl delete cronjobs calculatevaluejob

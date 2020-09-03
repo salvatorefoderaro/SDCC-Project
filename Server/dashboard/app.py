@@ -40,6 +40,10 @@ Modulo per la dashboard di gestione dell'intero applicativo.
 
 app = Flask(__name__)
 
+@app.route('/test')
+def testRoute():
+    return "Ok"
+
 def readJson():
     global BUCKET_NAME, AWS_KEY_ID, AWS_SECRET_KEY, FOLDER_NAME, SERVICE_IP, SERVICE_PORT, EC2_IP, EC2_PORT
     with open('/config/config.json') as config_file:

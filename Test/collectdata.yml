@@ -1,0 +1,23 @@
+scenarios:
+- name: Kill one pod of collectdata deployment
+  steps:
+  # kill a pod from `myapp` namespace
+  - podAction:
+      matches:
+        - deployment:
+            name: collectdatadeployment
+            namespace: default
+      filters:
+        - randomSample:
+            size: 1
+      actions:
+        - kill:
+            probability: 1
+  # check my service continues working
+  - probeHTTP:
+      target:
+        service:
+          name: collectdataservice
+          namespace: default
+          port: 30006
+      endpoint: /test
