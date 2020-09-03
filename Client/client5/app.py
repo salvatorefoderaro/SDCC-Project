@@ -166,6 +166,7 @@ def sendData():
              # Connection error. Is the proxy down? Try searching for it...
             logging.warning('Errore during the registration of the device.')
             getProxyIPAddress()
+            time.sleep(20)
         
     # If the device is a sensor, send the lectures.
     if TYPE == 'sensor':

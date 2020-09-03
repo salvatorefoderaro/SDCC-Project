@@ -60,8 +60,8 @@ def newDevice():
 @app.route('/sendDataToCluster', methods=['POST'])
 def sendDataToCluster():
     try:
-        responnse = requests.post("http://" + str(SERVICE_EXTERNAL_IP) + ":"+ str(COLLECT_DATA_PORT) +"/collectData", json=reqeust.json, timeout=10)
-        return responnse.text
+        response = requests.post("http://" + str(SERVICE_EXTERNAL_IP) + ":"+ str(COLLECT_DATA_PORT) +"/collectData", json=request.json, timeout=10)
+        return response.text
     except requests.exceptions.RequestException as e:  
        
         # Connection error. Is the cluster down? Try searching for it...      
