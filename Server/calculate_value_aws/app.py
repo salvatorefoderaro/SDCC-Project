@@ -109,9 +109,12 @@ def calculateValueAWS():
             # Dump the data to JSON.
             json_data = json.dumps(dictAWS)
             
+            
+            try:
             # Send the POST request.
-            result = requests.post('http://' + EC2_IP + ':' +EC2_PORT + '/planning',  json=dictAWS, timeout=5).json()
-
+                result = requests.post('http://' + EC2_IP + ':' +EC2_PORT + '/planning',  json=dictAWS, timeout=5).json()
+            except requests.exceptions.RequestException as e:
+                lo
             # Update the statistic table needed for the plot.
             cursor.execute("INSERT into statistics (dayPeriod, moneySaved, waterSaved) VALUES (now(), " +  str(result['saved_money']) + "," + str(result['saved_water']) + ") ON DUPLICATE KEY UPDATE moneySaved ="+ str(result['saved_money']) + ", waterSaved ="+ str(result['saved_water'])) 
             db.commit()
@@ -143,7 +146,7 @@ def calculateValueAWS():
             
             cursor.close()
             db.close()
-            return "Ok"
+            return 0
 
 
 if __name__ == '__main__':
