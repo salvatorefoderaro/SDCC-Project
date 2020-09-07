@@ -8,6 +8,9 @@ COPY ./requirements.txt /app/requirements.txt
 
 COPY ./cluster_config.json /config/cluster_config.json
 
+COPY ./s3_key.json /config/s3_key.json
+
+
 WORKDIR /app
 
 RUN pip3 install --default-timeout=100 -r requirements.txt

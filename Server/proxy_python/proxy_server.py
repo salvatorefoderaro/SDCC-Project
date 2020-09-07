@@ -6,6 +6,7 @@ import minikubeservice
 import time
 import logging
 import json
+import logging
 
 '''
 The module make a bridge between the devices and the cluster. Because of Minikube, the outside-exposed services could be reached just from the
@@ -39,7 +40,7 @@ def getCollectDataIP():
     global SERVICE_EXTERNAL_IP
     SERVICE_EXTERNAL_IP = minikubeservice.getServiceExternalIP("collectdataservice") 
     while (SERVICE_EXTERNAL_IP == 'None' or SERVICE_EXTERNAL_IP == '<pending>'):
-        print("Waiting for cluster 'collect_data' ip...")
+        logging.info("Waiting for cluster 'collect_data' ip...")
         time.sleep(EXTERNAL_IP_INTERVAL)   
         SERVICE_EXTERNAL_IP = minikubeservice.getServiceExternalIP("collectdataservice") 
 

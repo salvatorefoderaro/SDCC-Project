@@ -4,6 +4,7 @@ import json
 from flask import Flask
 from flask import request
 from datetime import datetime
+import logging
 
 '''
 Module to get infos from the db. The communication is made using JSON response.
@@ -134,7 +135,7 @@ def editConfig():
         return "Ok"
 
     except mysql.Error as err:
-        print(str(err), flush=True)
+        logging.info(str(err), flush=True)
         return str(err)
 
 # Delete a device from the database.
@@ -154,7 +155,7 @@ def deleteDevice():
         return "Ok"
 
     except mysql.Error as err:
-        print(str(err), flush=True)
+        logging.info(str(err), flush=True)
         return str(err)
 
 # Delete a group from the database.
@@ -174,7 +175,7 @@ def deleteGroup():
         return "Ok"
 
     except mysql.Error as err:
-        print(str(err), flush=True)
+        logging.info(str(err), flush=True)
         return str(err)
 
 # Delete a water container.
@@ -192,7 +193,7 @@ def deleteContainer():
 
         return "Ok"
     except mysql.Error as err:
-        print(str(err), flush=True)
+        logging.info(str(err), flush=True)
         return str(err)
 
 # Add a group.
@@ -208,7 +209,7 @@ def addGroup():
         return "Ok"
 
     except mysql.Error as err:
-        print(str(err), flush=True)
+        logging.info(str(err), flush=True)
         return str(err)
 
 # Add a water container.
@@ -223,7 +224,7 @@ def addWaterContainer():
         db.commit()
         return "Ok"
     except mysql.Error as err:
-        print(str(err), flush=True)
+        logging.info(str(err), flush=True)
         return str(err)
 
 # Get stat for plotting.

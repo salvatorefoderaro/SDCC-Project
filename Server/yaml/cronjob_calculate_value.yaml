@@ -1,0 +1,24 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: calculatevaluejob
+spec:
+  schedule: "* */8 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - image: calculatevalue:v1
+            imagePullPolicy: Never
+            name: calculatevalue
+            ports:
+            - containerPort: 8070
+            volumeMounts:
+            - name: mysql-persistent-storage-dump
+              mountPath: /app/dump
+          restartPolicy: OnFailure
+          volumes:
+          - name: mysql-persistent-storage-dump
+            persistentVolumeClaim:
+              claimName: mysql-pv-claim-dump
