@@ -5,43 +5,46 @@ import glob
 import os
 import logging
 import json
-
-##Il session token risulta essere necessario quando si utilizza un account AWSEducate. In particolare deve essere aggiunto a boto3. Se non 
-##Dovesse essere presente allora la funzione restituirebbe un errore.
-##Le informazioni come KEY_ID, Secret_key e session_token sono disponibili nella workbench, cliccando sul pulsante account details.
-
-##S3 config############################
-
-### information from configS3
+import logging
 
 '''
-Modulo per il caricamento del dump del database nel bucket S3.
+The module is needed to upload the DB dump to S3.
 '''
 
+AWS_KEY_ID = ""
+AWS_SECRET_KEY = ""
+BUCKET_NAME = ""
+s3 = ""
 
-BUCKET_NAME = "sdcc-test-bucket"
-ACCESS_KEY_ID = "AKIA57G4V3XAXOJRI7HS"
-ACCESS_SECRET_KEY = "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"
+# Read the .json file to get the config.
+def readJson():
+    global AWS_KEY_ID, AWS_SECRET_KEY, BUCKET_NAME
+    with open('/config/s3_key.json') as config_file:
+        data = json.load(config_file)
+        AWS_KEY_ID = data['aws_key_id']
+        AWS_SECRET_KEY = data['aws_secret_key']
+        BUCKET_NAME = data['bucket_name']
 
-s3 = boto3.resource(
-        's3',
-        aws_access_key_id=ACCESS_KEY_ID,
-        aws_secret_access_key=ACCESS_SECRET_KEY,
-        config=Config(signature_version='s3v4')
-    )
 ###################################
 
 def addToBucket():
-    #La funzione aggiunge l'immagine all'interno del bucket desiderato.
-    #imgPath: str --> path locale del file
-    #imgName: str --> nome del file una volta inserito all'interno del bucket.
+
+    s3 = boto3.resource(
+        's3',
+        aws_access_key_id=AWS_KEY_ID,
+        aws_secret_access_key=AWS_SECRET_KEY,
+        config=Config(signature_version='s3v4')
+        )
 
     with open('/config/cluster_config.json') as config_file:
         data = json.load(config_file)
         FOLDER_NAME = data['folder_name']
         config_file.close()
 
-    list_of_files = glob.glob('dump/*') # * means all if need specific format then *.csv
+    # List all the file in the folder
+    list_of_files = glob.glob('dump/*')
+
+    # Get the most recent file (using timestamp) 
     latest_file = max(list_of_files, key=os.path.getctime)
     try:
         data = open(latest_file, 'rb')
@@ -49,16 +52,12 @@ def addToBucket():
         logging.warning("Errore nell'apertura del file.")
         exit(-1)
     
-    try:
-        s3.Bucket(BUCKET_NAME).put_object(Key=FOLDER_NAME+'/'+latest_file, Body=data)
-    except Exception as e:
-        print(e)
-        exit(-1)
-
-    logging.info('Upload eseguito correttamente.')
+    # Put the file to S3
+    s3.Bucket(BUCKET_NAME).put_object(Key=FOLDER_NAME+'/'+latest_file, Body=data)
 
     # Dopo l'upload elimino il file per non occupare inutilmente spazio
     os.remove(latest_file)
 
 if __name__ == '__main__':
+    readJson()
     addToBucket()

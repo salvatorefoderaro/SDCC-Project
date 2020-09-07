@@ -3,13 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
-    <meta name="generator" content="Jekyll v4.0.1">
-    <title>Cluster Statistics - SDCC Project</title>
-
-    <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/starter-template/">
-
+    <meta name="author" content="Salvatore Foderaro, Alessandro Pontis, Gianmarco and Bootstrap contributors">
+    <title>Cluster Statistics - Precision Farming</title>
     <!-- Bootstrap core CSS -->
 <link href="{{ url_for('static', filename='css/bootstrap.css') }}" rel="stylesheet">
 
@@ -57,28 +52,38 @@
   <body>
     <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
 
-  <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item active">
-        <a class="nav-link" href="/">Home</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/getFileList">Archivio dump</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/getGroupsList">Gestione gruppi</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/getWaterList">Gestione programmazione acqua</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/getStat">Statistiche risparmio <span class="sr-only">(current)</span></a>
-      </li>
-    </ul>
-   </div>
-</nav>
+      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/getFileList">Dump history</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/getGroupsList">Manage groups</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/getWaterList">Manage water schedule</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/getStat">Saving statistics</a>
+          </li>
+        </ul>
+       </div>
+    </nav>
 
 <main role="main" class="container">
+
+  {% if response is defined and respose == true %}
+  <div class="alert alert-success" role="alert">
+    Edit made successfully!
+  </div>
+  {% elif response is defined and response == false %}
+  <div class="alert alert-warning" role="alert">
+    Edit not made!
+    </div>
+      {% endif %}
 
     <div class="container">
         <div class="row">
@@ -100,17 +105,17 @@
       <script type="text/javascript" src="{{ url_for('static', filename='js/Chart.js') }}"></script>
 
       <script>
-     var label_label = '{{ myString['label']|tojson }}';
-     var data_data1 = '{{ myString['data1']|tojson }}';
-     var data_data2 = '{{  myString['data2']|tojson }}';
+     var label_label = '{{ dataToPlot['label']|tojson }}';
+     var data_data1 = '{{ dataToPlot['data1']|tojson }}';
+     var data_data2 = '{{  dataToPlot['data2']|tojson }}';
      var chartData = {
-  labels: {{ myString['label']|tojson }},
+  labels: {{ dataToPlot['label']|tojson }},
   datasets: [{
-    data: {{ myString['data1']|tojson }},
+    data: {{ dataToPlot['data1']|tojson }},
     label: 'Saved money (€)'
   },
   {
-    data: {{  myString['data2']|tojson }},
+    data: {{  dataToPlot['data2']|tojson }},
     label: 'Saved water (m3)'
   }]
 };

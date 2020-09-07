@@ -4,9 +4,10 @@ import json
 from flask import Flask
 from flask import request
 from datetime import datetime
+import logging
 
 '''
-Modulo per la comunicazione tra la dashboard ed il database.
+Module to get infos from the db. The communication is made using JSON response.
 '''
 
 app = Flask(__name__)
@@ -24,7 +25,7 @@ def connectToDb():
 
     return db
 
-# Funzione che crea un json con le informazioni dei dispositivi presenti nella base di dati, e delle loro ultime attivitò.
+# Get devices stat for display on the dashboard.
 @app.route('/getDeviceStat', methods=['GET'])
 def getDevicesStat():
 
@@ -35,9 +36,10 @@ def getDevicesStat():
     dictControl = {}
     dictWaterLevel = {}
 
-    rows_count = cursor.execute("SELECT startDate, endDate, currentValue, totalValue FROM water_container WHERE now() <= endDate  ORDER BY endDate DESC LIMIT 1")
-    myresult = cursor.fetchall()
-    for x in myresult:
+    # Get info about the water_container.
+    cursor.execute("SELECT startDate, endDate, currentValue, totalValue FROM water_container WHERE now() <= endDate  ORDER BY endDate DESC LIMIT 1")
+    queryResult = cursor.fetchall()
+    for x in queryResult:
         dictWaterLevel['startDate'] = x[0].strftime("%d-%m-%Y")
         dictWaterLevel['endDate'] = x[1].strftime("%d-%m-%Y")
         dictWaterLevel['currentValue'] = x[2]
@@ -45,12 +47,12 @@ def getDevicesStat():
         dictWaterLevel['percentage'] = int(((x[3]-x[2])/x[3])*100)
         dictWaterLevel['today'] = datetime.today().strftime('%d-%m-%Y')
 
+    # Get info about the devices with type 'sensor'
+    cursor.execute("select L.id, L.temperature, L.humidity, L.lastLecture, D.ipAddress, D.ipPort, D.status, D.name, D.groupName FROM lectures as L JOIN devices as D on L.id = D.id WHERE L.lastLecture = (SELECT MAX(lastLecture) FROM lectures WHERE id = L.id) and D.type='\sensor\'")
 
-    cursor.execute("select L.id, L.temperatura, L.umidita, L.lettura, D.ipAddress, D.ipPort, D.status, D.name, D.groupName FROM lectures as L JOIN devices as D on L.id = D.id WHERE L.lettura = (SELECT MAX(Lettura) FROM lectures WHERE id = L.id) and D.type='\sensor\'")
+    queryResult = cursor.fetchall()
 
-    myresult = cursor.fetchall()
-
-    for x in myresult:
+    for x in queryResult:
         if str(x[8]).replace(" ", "") == 'None':
             key = 'Default'
         else:
@@ -59,15 +61,16 @@ def getDevicesStat():
             keyList.append(key)
         if key not in dict:
             dict[key] = []
-            dict[key].append({'id':x[0], 'temperatura':x[1], 'umidita':x[2], 'lettura':str(x[3]), 'ipAddress':x[4], 'ipPort':x[5], 'status':x[6], 'name':x[7], 'groupName':str(x[8])})
+            dict[key].append({'id':x[0], 'temperature':x[1], 'humidity':x[2], 'lastLecture':str(x[3]), 'ipAddress':x[4], 'ipPort':x[5], 'status':x[6], 'name':x[7], 'groupName':str(x[8])})
         else:
-            dict[key].append({'id':x[0], 'temperatura':x[1], 'umidita':x[2], 'lettura':str(x[3]), 'ipAddress':x[4], 'ipPort':x[5], 'status':x[6], 'name':x[7], 'groupName':str(x[8])})
+            dict[key].append({'id':x[0], 'temperature':x[1], 'humidity':x[2], 'lastLecture':str(x[3]), 'ipAddress':x[4], 'ipPort':x[5], 'status':x[6], 'name':x[7], 'groupName':str(x[8])})
 
-    cursor.execute("select D.id, D.lettura, D.ipAddress, D.ipPort, D.status, D.name, D.groupName FROM devices as D where type='\control\'")
+    # Get info about the devices with type 'control'
+    cursor.execute("select D.id, D.lastLecture, D.ipAddress, D.ipPort, D.status, D.name, D.groupName FROM devices as D where type='\control\'")
 
-    myresult = cursor.fetchall()
+    queryResult = cursor.fetchall()
 
-    for x in myresult:
+    for x in queryResult:
         if str(x[6]).replace(" ", "") == 'None':
             key = 'Default'
         else:
@@ -77,10 +80,11 @@ def getDevicesStat():
             keyList.append(key)
         if key not in dictControl:
             dictControl[key] = []
-            dictControl[key].append({'id':x[0], 'lettura':str(x[1]), 'ipAddress':x[2], 'ipPort':x[3], 'status':x[4], 'name':x[5], 'groupName':str(x[6])})
+            dictControl[key].append({'id':x[0], 'lastLecture':str(x[1]), 'ipAddress':x[2], 'ipPort':x[3], 'status':x[4], 'name':x[5], 'groupName':str(x[6])})
         else:
-            dictControl[key].append({'id':x[0], 'lettura':str(x[1]), 'ipAddress':x[2], 'ipPort':x[3], 'status':x[4], 'name':x[5], 'groupName':str(x[6])})
+            dictControl[key].append({'id':x[0], 'lastLecture':str(x[1]), 'ipAddress':x[2], 'ipPort':x[3], 'status':x[4], 'name':x[5], 'groupName':str(x[6])})
 
+    # Build the json for sending.
     jsonDict = {'list' : []}
 
     for i in keyList:
@@ -102,7 +106,7 @@ def getDevicesStat():
 
     return json_data
 
-# Funzione che modifica la configurazione di un siingolo dispositivo
+# Edit the config on the database of a specific device.
 @app.route('/editConfig', methods=['GET'])
 def editConfig():
 
@@ -110,17 +114,20 @@ def editConfig():
         db = connectToDb()
         cursor = db.cursor()
 
-        # Se la richiesta è di tipo nome, oltre a modificare il record nel db contatto anche il dispositivo per l'aggiornamento
-        # del file 'config.json'
+        # Check the type of the edit.
         if (request.args.get("type") == "name"):
             cursor.execute("UPDATE devices SET name=\'"+ str(request.args.get("new_value")) + "\' where id = " + str(request.args.get("id")))
-        # Se devo modificare il gruppo di appartenenza di un dispositivo, controllo prima che il gruppo esista
-        # altrimenti fallirebbe il controllo sulla foreign key.
+
+
         elif (request.args.get("type") == "groupName"):
+            # Check if group exist.
             cursor.execute("select * FROM devicesGroups WHERE groupName = \'" + str(request.args.get("new_value")) +"\'")
             row = cursor.fetchone()
+            
+            # Check if the result exists
             if row == None:
                 return "Group name not present."
+
             cursor.execute("UPDATE devices SET groupName=\'"+ str(request.args.get("new_value")) +"\' where id = " + str(request.args.get("id")))
 
         cursor.close()
@@ -128,10 +135,10 @@ def editConfig():
         return "Ok"
 
     except mysql.Error as err:
-        print(str(err), flush=True)
+        logging.info(str(err), flush=True)
         return str(err)
 
-# Funzione per l'eliminazione di un dispositivo
+# Delete a device from the database.
 @app.route('/deleteDevice', methods=['GET'])
 def deleteDevice():
 
@@ -146,11 +153,12 @@ def deleteDevice():
         cursor.close()
         db.commit()
         return "Ok"
+
     except mysql.Error as err:
-        print(str(err), flush=True)
+        logging.info(str(err), flush=True)
         return str(err)
 
-# Funzione per l'eliminazione di un dispositivo
+# Delete a group from the database.
 @app.route('/deleteGroup', methods=['GET'])
 def deleteGroup():
 
@@ -167,9 +175,10 @@ def deleteGroup():
         return "Ok"
 
     except mysql.Error as err:
-        print(str(err), flush=True)
+        logging.info(str(err), flush=True)
         return str(err)
-    # Funzione per l'eliminazione di un dispositivo
+
+# Delete a water container.
 @app.route('/deleteContainer', methods=['GET'])
 def deleteContainer():
     try: 
@@ -184,9 +193,10 @@ def deleteContainer():
 
         return "Ok"
     except mysql.Error as err:
-        print(str(err), flush=True)
+        logging.info(str(err), flush=True)
         return str(err)
-# Funzione per l'aggiunta di un nuovo gruppo
+
+# Add a group.
 @app.route('/addGroup', methods=['GET'])
 def addGroup():
 
@@ -199,9 +209,10 @@ def addGroup():
         return "Ok"
 
     except mysql.Error as err:
-        print(str(err), flush=True)
+        logging.info(str(err), flush=True)
         return str(err)
 
+# Add a water container.
 @app.route('/addWaterContainer', methods=['GET'])
 def addWaterContainer():
 
@@ -213,10 +224,10 @@ def addWaterContainer():
         db.commit()
         return "Ok"
     except mysql.Error as err:
-        print(str(err), flush=True)
+        logging.info(str(err), flush=True)
         return str(err)
 
-# Funzione per l'ottenimento dei gruppi attualmente presenti.
+# Get stat for plotting.
 @app.route('/getStat', methods=['GET'])
 def getStat():
 
@@ -224,11 +235,11 @@ def getStat():
     cursor = db.cursor()
     dict = {}
     cursor.execute("select * from statistics")
-    myresult = cursor.fetchall()
+    queryResult = cursor.fetchall()
     label = []
     data1 = []
     data2 = []
-    for x in myresult:
+    for x in queryResult:
         label.append(x[0].strftime("%d-%m-%Y"))
         data1.append(x[1])
         data2.append(x[2])
@@ -240,7 +251,7 @@ def getStat():
     cursor.close()
     return json_data
 
-# Funzione per l'ottenimento dei gruppi attualmente presenti.
+# Get groups list.
 @app.route('/getGroupsList', methods=['GET'])
 def getGroupsList():
 
@@ -248,10 +259,10 @@ def getGroupsList():
     cursor = db.cursor()
     dict = {}
     cursor.execute("select * from devicesGroups")
-    myresult = cursor.fetchall()
+    queryResult = cursor.fetchall()
     jsonDict = {'list' : []}
 
-    for x in myresult:
+    for x in queryResult:
         dict = {}
         dict['groupName'] = x[0]
         dict['parameter1'] = x[1]
@@ -266,8 +277,7 @@ def getGroupsList():
     cursor.close()
     return json_data
 
-
-# Funzione per l'ottenimento dei gruppi attualmente presenti.
+# Get water container list.
 @app.route('/getWaterList', methods=['GET'])
 def getWaterList():
 
@@ -277,13 +287,13 @@ def getWaterList():
 
     dict = {}
 
-    rows_count = cursor.execute("SELECT startDate, endDate, currentValue, totalValue, id FROM water_container ORDER BY endDate DESC")
+    cursor.execute("SELECT startDate, endDate, currentValue, totalValue, id FROM water_container ORDER BY endDate DESC")
 
-    myresult = cursor.fetchall()
+    queryResult = cursor.fetchall()
 
     jsonDict = {'list' : []}
 
-    for x in myresult:
+    for x in queryResult:
         dict = {}
         dict['startDate'] = x[0].strftime("%d-%m-%Y")
         dict['endDate'] = x[1].strftime("%d-%m-%Y")
@@ -298,7 +308,6 @@ def getWaterList():
     cursor.close()
 
     return json_data
-
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=8020, threaded=True)
