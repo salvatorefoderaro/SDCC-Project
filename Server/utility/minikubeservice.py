@@ -5,7 +5,7 @@ def getServiceExternalIP(serviceName):
     global SERVICE_EXTERNAL_IP
     a = subprocess.Popen(['kubectl','get','services'], 
             stdout=subprocess.PIPE, 
-            stderr=subprocess.STDOUT).communicate()
+            stderr=subprocess.STDOUT, universal_newlines=True).communicate()
 
     list = str(a[0])
     for i in range(0, len(list.split("\\n"))):
