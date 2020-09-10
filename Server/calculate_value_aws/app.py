@@ -92,6 +92,11 @@ def calculateValueAWS():
 
         # If there is a valida water container for the period
         if len(queryResult) > 0:
+            # Read group coordinates
+
+
+
+
             dictAWS["water_container_volume"] = queryResult[0][1]
             dictAWS["expire"] = time.mktime(queryResult[0][0].timetuple())
             water_container_id = queryResult[0][2]
@@ -106,6 +111,7 @@ def calculateValueAWS():
             for x in queryResult:
                 key = str(x[2])             
                 if key != 'default':
+                    # -> To do: add key 'coordinates' readed before
                     dictAWS['groups_list'].append({'groupName':key, 'avgtemperature':x[0], 'avghumidity':x[1], 'p1':x[5], 'p2':x[6], 'p3':x[7], 'center': [x[3], x[4]]})
             
             # Dump the data to JSON.

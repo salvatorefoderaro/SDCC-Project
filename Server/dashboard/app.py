@@ -43,7 +43,6 @@ app = Flask(__name__)
 def testRoute():
     return "Ok"
     
-
 def readJson():
     global BUCKET_NAME, AWS_KEY_ID, AWS_SECRET_KEY, FOLDER_NAME, SERVICE_IP, SERVICE_PORT, EC2_IP, EC2_PORT
     with open('/config/config.json') as config_file:
@@ -105,7 +104,6 @@ def addWaterContainerLink():
 def deleteWaterContainer():
 
     container_id = str(request.args.get("container_id"))
-
 
     try:
         errorMessage = ERROR_DELETE_CONTAINER
@@ -309,6 +307,7 @@ def indexRoute():
         
         errorMessage = DEVICES_LIST_ERROR
         data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getDeviceStat", timeout=5).json()
+    
     except requests.exceptions.RequestException as e:
         return render_template('error_template.html', responseMessage=errorMessage)
     return render_template('template_bootstrap.html', dataToPlot=data, weather=data_meteo, ndvi=dictec2)

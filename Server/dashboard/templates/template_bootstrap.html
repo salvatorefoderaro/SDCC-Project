@@ -431,9 +431,9 @@
           <li class="list-group-item">IP address: {{ dataToPlot['list'][i]['devicesList'][j]['ipAddress'] }} : {{ dataToPlot['list'][i]['devicesList'][j]['ipPort']}}</li>
           <!-- <li class="list-group-item">Nome: {{ dataToPlot['list'][i]['devicesList'][j]['name'] }}</li> -->
           <!-- <li class="list-group-item">Gruppo: {{ dataToPlot['list'][i]['devicesList'][j]['groupName'] }}</li> -->
-          <li class="list-group-item">Last temperature: {{ dataToPlot['list'][i]['devicesList'][j]['temperatura'] }}</li>
-          <li class="list-group-item">Last humidity: {{ dataToPlot['list'][i]['devicesList'][j]['umidita'] }}</li>
-          <li class="list-group-item">Last lecture: {{ dataToPlot['list'][i]['devicesList'][j]['lettura'] }}</li>
+          <li class="list-group-item">Last temperature: {{ dataToPlot['list'][i]['devicesList'][j]['temperature'] }}</li>
+          <li class="list-group-item">Last humidity: {{ dataToPlot['list'][i]['devicesList'][j]['humidity'] }}</li>
+          <li class="list-group-item">Last lecture: {{ dataToPlot['list'][i]['devicesList'][j]['lastLecture'] }}</li>
         </ul>
 
         {% set name_collapse = "name_collapse" ~ dataToPlot['list'][i]['devicesList'][j]['id'] %}
@@ -535,7 +535,7 @@
               <ul class="list-group list-group-flush">
               <li class="list-group-item">ID: {{ dataToPlot['list'][i]['controlList'][j]['id'] }}</li>
               <li class="list-group-item">IP address: {{ dataToPlot['list'][i]['controlList'][j]['ipAddress'] }} : {{ dataToPlot['list'][i]['controlList'][j]['ipPort']}}</li>
-              <li class="list-group-item">Last lecture: {{ dataToPlot['list'][i]['controlList'][j]['lettura'] }}</li>
+              <li class="list-group-item">Last lecture: {{ dataToPlot['list'][i]['controlList'][j]['lastLecture'] }}</li>
 
               <!-- <li class="list-group-item">Nome: {{ dataToPlot['list'][i]['controlList'][j]['name'] }}</li> -->
               <!-- <li class="list-group-item">Gruppo: {{ dataToPlot['list'][i]['controlList'][j]['groupName'] }}</li> -->
