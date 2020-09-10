@@ -6,6 +6,7 @@ import json
 from datetime import datetime
 import time
 import logging
+import os
 
 '''
 The module prepare a JSON that is sent to AWS. AWS reply with a JSON containing infos about the daily water planning.
@@ -50,7 +51,8 @@ The data received, this:
 LAT = 0
 LONG = 0
 EC2_IP = ""
-EC2_PORT = ""
+EC2_PORT = 0
+FILE_LOCATION = 'dump/awsvalue.json'
 
 def connectToDb():
     global LAT, LONG, EC2_IP, EC2_PORT
@@ -109,21 +111,29 @@ def calculateValueAWS():
             # Dump the data to JSON.
             json_data = json.dumps(dictAWS)
             
+            # Check if planning exist and get last edit/creation time
+            if os.path.exists(FILE_LOCATION):
+                editTime = os.path.getmtime(FILE_LOCATION)
             
-            try:
-            # Send the POST request.
+            # If file doesn't exists (first run) or different day (new planning required), contact AWS
+            if ((not os.path.exists(FILE_LOCATION)) or (datetime.datetime.now().date() != datetime.datetime.fromtimestamp(editTime).date())):
+                os.remove(FILE_LOCATION) 
+                # Send the POST request.
                 result = requests.post('http://' + EC2_IP + ':' +EC2_PORT + '/planning',  json=dictAWS, timeout=5).json()
-            except requests.exceptions.RequestException as e:
-                lo
-            # Update the statistic table needed for the plot.
-            cursor.execute("INSERT into statistics (dayPeriod, moneySaved, waterSaved) VALUES (now(), " +  str(result['saved_money']) + "," + str(result['saved_water']) + ") ON DUPLICATE KEY UPDATE moneySaved ="+ str(result['saved_money']) + ", waterSaved ="+ str(result['saved_water'])) 
-            db.commit()
+                # Update the statistic table needed for the plot.
+                cursor.execute("INSERT into statistics (dayPeriod, moneySaved, waterSaved) VALUES (now(), " +  str(result['saved_money']) + "," + str(result['saved_water']) + ") ON DUPLICATE KEY UPDATE moneySaved ="+ str(result['saved_money']) + ", waterSaved ="+ str(result['saved_water'])) 
+                
+                db.commit()
+            
+                # Write the JSON Result to file
+                with open(FILE_LOCATION, 'w+') as f:
+                    json.dump(result, f)
 
-            with open('dump/awsvalue.json', 'w+') as f:
-                json.dump(result, f)
+            planningFile = open(FILE_LOCATION, "r")
+            planningJson = json.load(planningFile)
 
             # For each group, take the device of type 'control' and send info about how much water have to be done to the field.
-            for x in result['groups_list']:
+            for x in planningJson['groups_list']:
                 cursor.execute("SELECT id, ipAddress, ipPort from devices where groupName = \'" + x['groupName'] + "\' and type = \'control\'") 
                 queryResult = cursor.fetchall()
                 for y in queryResult:
@@ -146,7 +156,7 @@ def calculateValueAWS():
             
             cursor.close()
             db.close()
-            return 0
+        return 0
 
 
 if __name__ == '__main__':

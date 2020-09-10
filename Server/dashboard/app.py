@@ -33,9 +33,8 @@ BUCKET_NAME = ""
 AWS_KEY_ID = ""
 AWS_SECRET_KEY = ""
 
-
 '''
-Modulo per la dashboard di gestione dell'intero applicativo.
+Module for the dashboard needed to manage the application by the user.
 '''
 
 app = Flask(__name__)
@@ -43,6 +42,7 @@ app = Flask(__name__)
 @app.route('/test')
 def testRoute():
     return "Ok"
+    
 
 def readJson():
     global BUCKET_NAME, AWS_KEY_ID, AWS_SECRET_KEY, FOLDER_NAME, SERVICE_IP, SERVICE_PORT, EC2_IP, EC2_PORT
