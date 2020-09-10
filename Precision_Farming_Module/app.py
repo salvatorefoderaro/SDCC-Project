@@ -17,61 +17,64 @@ import logging
 
 
 # Global variables
-DAILY_PLAN = { "today": 0.0 }           # Daily Water plan : computed once per day and stored into this runtime global dictionary
-WATER_CONTAINER = 0.0                   # Water residual volume within the container (m^3)
-REMAINING_DAYS = 0                      # Remaining days before water refill
-TODAY_WATER = 0.0                       # Total water volume reserved for today's computation
-WATER_PRICE = 1.40                      # Water price : euro/(m^3)
-SAVED_WATER = 0.0                       # Saved water volume for this day, after analysis and planning phases
-TOTAL_AREA = 0.0                        # Total fields' coverage (m^2)
 
+WATER_PRICE = 1.40                      # Water price : euro/(m^3)
 CREATE_POLY_URL = ""                    # URL to POST the desired polygon's geographic coordinates
 GET_SATELLITE_IMG_URL = ""              # URL to GET satellite data about the polygon associated to the ID
 APPID = ""                              # User credential to access OpenWeatherAPI Server
-POLYGONS_INFOS = []                     # List of all Polygon objects
-SATELLITE_IMAGES = []                   # List of Satellite_Image objects
-SEVEN_DAYS_WEATHER_FORCASTS = []        # List of WeatherForecast objects
-
 
 
 app = Flask(__name__)                   # Create the Flask app
 
 
-# REST API to compute Daily Water Plan and get results back to the user cluster.
+# REST API to compute Daily Water Plan and get results back to the user cluster - @params: json file as in : sensor_data.json
 @app.route('/planning', methods = ['POST', 'GET'])
 def planning():
     if request.method == 'POST':
 
-        global  WATER_CONTAINER, REMAINING_DAYS, TODAY_WATER, SAVED_WATER, TOTAL_AREA
-        global  POLYGONS_INFOS, SEVEN_DAYS_WEATHER_FORCASTS, DAILY_PLAN, SATELLITE_IMAGES
+        POLYGONS_INFOS = []                     # List of all Polygon objects
+        SATELLITE_IMAGES = []                   # List of Satellite_Image objects
+        SEVEN_DAYS_WEATHER_FORCASTS = []        # List of WeatherForecast objects
 
-        # Check: if today's daily water plan has already been requested and computed, then return that one.
-        try:
-            # CASE 1 : Daily plan has already been computed, and it is stored in a runtime global variable. 
-            if  datetime( date.today().year, date.today().month, date.today().day, 0, 0, 0, 0 ).timestamp()  == DAILY_PLAN["today"]:
-                data = dict(DAILY_PLAN)
-                data["today"] = date.today()
-                print("Received request refers to current Water Plan, which has already been computed.\nSending back Stored Daily Plan...\n")
-                return data
-            # CASE 2 : Daily plan has already been computed and dumped on local storage, but this server has been subject to system-crashes.
-            else:
-                print("Checking for plan dumps in local storage...\n")
-                with open('DAILY_PLAN.json') as fp:
-                    plan = json.load( fp )
-                    fp.close()
-                if datetime( date.today().year, date.today().month, date.today().day, 0, 0, 0, 0 ).timestamp() == plan["today"]:
-                    DAILY_PLAN = dict(plan)
-                    data = dict(plan)
-                    data["today"] = date.today()
-                    print("Sending back Stored Daily Plan...\n")
-                    return data
+        WATER_CONTAINER = 0.0                   # Water residual volume within the container (m^3)
+        REMAINING_DAYS = 0                      # Remaining days before water refill
+        TODAY_WATER = 0.0                       # Total water volume reserved for today's computation
+        SAVED_WATER = 0.0                       # Saved water volume for this day, after analysis and planning phases
+        TOTAL_AREA = 0.0                        # Total fields' coverage (m^2)
 
-        except KeyError as ke:
-            print("Key error!\n\n ")
-        
+
         print("New Plan is being computed...\n\n ")
 
         args = request.get_json()
+        group_list = args.get("groups_list")
+
+        # KEEP INFOS
+        for elem in group_list:
+            polygon = Polygon()
+            infos = {
+                "name": elem["name"],
+                "geo_json": {
+                    "type": "Feature",
+                    "properties": {},
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": elem["coordinates"]
+                    }
+                }
+            }
+            polygon.set_json_infos( infos )
+            polygon.set_name(elem["name"])
+            POLYGONS_INFOS.append( polygon )
+
+        #RETRIEVE POLYGONS AND RELATED SATELLITE IMAGES
+        retrieve_polygons( TOTAL_AREA, POLYGONS_INFOS )
+        for p in POLYGONS_INFOS:
+            get_satellite_img(SATELLITE_IMAGES, p)
+        
+        # WEATHER FORECASTS
+        center = POLYGONS_INFOS[0].center
+        weather_by_geocoordinates( SEVEN_DAYS_WEATHER_FORCASTS, center )
+
 
         # Check if the expire date is correctly formulated.
         expire = datetime.fromtimestamp(args.get("expire")).date()
@@ -87,9 +90,6 @@ def planning():
         # Calculate the value of today's total water amount.
         TODAY_WATER = WATER_CONTAINER/REMAINING_DAYS
     
-        # Append sensors' informations on each reference-polygon's list.
-        group_list = args.get("groups_list")
-
         for elem in group_list:
             for polygon in POLYGONS_INFOS:
                 if elem["center"] == polygon.center:
@@ -139,22 +139,24 @@ def planning():
             new_elem["daily_water_unit"] = p.water_unit
             data["groups_list"].append( new_elem )            
 
-        # Store today's plan to be returned in case of repeated calls.
-        DAILY_PLAN = dict(data)
-        DAILY_PLAN["today"] = datetime( date.today().year, date.today().month, date.today().day, 0, 0, 0, 0 ).timestamp()
-
-        with open('DAILY_PLAN.json', 'w') as fp:
-            json.dump( DAILY_PLAN , fp ) 
-            fp.close()
-
         return data
     
     return "You should use a POST method"
     
 
-# REST API to get 7 days Weather Forecasting
+# REST API to get 7 days Weather Forecasting - @params: json file as follows: { center: "[longitude, latitude]" }
 @app.route('/weather_forecasts')
 def weather_forecasts():
+
+    SEVEN_DAYS_WEATHER_FORCASTS = []
+
+    args = request.get_json()
+
+    res = args["center"]
+    center = res.strip('][').split(', ')
+
+    weather_by_geocoordinates( SEVEN_DAYS_WEATHER_FORCASTS, center )
+
     with open('dashboard_infos.json') as dash_infos:
         data = json.load(dash_infos)
         dash_infos.close()
@@ -185,6 +187,7 @@ def weather_forecasts():
 def read_configurations():
 
     global  CREATE_POLY_URL, APPID
+
     with open('config.json') as configurations:
         data = json.load(configurations)
         CREATE_POLY_URL = data['create_poly_url']
@@ -234,9 +237,7 @@ def keep_infos():
     
 
 # This function contains API call to the OpenWeatherAPI Server, to retrieve all polygons identifiers and main geometric features.
-def retrieve_polygons():
-
-    global TOTAL_AREA, POLYGONS_INFOS
+def retrieve_polygons( TOTAL_AREA, POLYGONS_INFOS ):
 
     for p in POLYGONS_INFOS:
 
@@ -257,7 +258,7 @@ def retrieve_polygons():
 
 
 # This function contains API call to the Agro API Server, to get all satellite's collected data about tracked polygon.
-def get_satellite_img( polygon ):
+def get_satellite_img( SATELLITE_IMAGES, polygon ):
 
     # get the timestamps of the 'start' and the 'end' parameters of image research
     end_dt = datetime.now()
@@ -310,13 +311,14 @@ def get_satellite_img( polygon ):
     polygon.set_satellite_image( satellite_img )
 
 
+#**
 # This function contains API call to the OpenWeatherAPI Server, to retrieve 7 days weather forecasts.
-def weather_by_geocoordinates():
+def weather_by_geocoordinates( SEVEN_DAYS_WEATHER_FORCASTS, center ):
 
     # Keep the reference zone-geo-coordinates as the center of one of the tracked polygons.
-    ref_geo_coordinates = POLYGONS_INFOS[0].center
-    longitude = ref_geo_coordinates[0]
-    latitude = ref_geo_coordinates[1]
+    
+    longitude   =   center[0]
+    latitude    =   center[1]
 
     try:
         res = requests.get( 'https://api.openweathermap.org/data/2.5/onecall?lat=' + str(latitude) + '&lon=' + 
@@ -327,7 +329,7 @@ def weather_by_geocoordinates():
         logging.warning('Error retrieving weather infos about these coordinates from OpenWeatherMap Server.')
 
     forecasts = data['daily']
-
+    
     for this_day in forecasts:
 
         weather_forecast = WeatherForecast( this_day['dt'], this_day['weather'][0]['description'],    this_day['temp'],   this_day['pop'],   
@@ -350,16 +352,13 @@ def evaluate_remaining_days( expire ):
 # This function contains all retrieval calls to setup the server infos at the launch.
 def setup():
 
-    global POLYGONS_INFOS, SATELLITE_IMAGES, SEVEN_DAYS_WEATHER_FORCASTS
-
     read_configurations()
-    keep_infos()
-    retrieve_polygons()
-    for p in POLYGONS_INFOS:
-        get_satellite_img(p) 
-    weather_by_geocoordinates()
+    
+
+
+
 
 if __name__ == '__main__':
 
     setup()
-    app.run(host='0.0.0.0', debug=False, port = 5000)
+    app.run(host='0.0.0.0', debug=False, threaded = True, port = 5000)
