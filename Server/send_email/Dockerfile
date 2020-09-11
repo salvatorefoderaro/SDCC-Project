@@ -5,6 +5,8 @@ RUN apt-get update -y && \
 
 # We copy just the requirements.txt first to leverage Docker cache
 COPY ./requirements.txt /app/requirements.txt
+COPY ./config.json /config/config.json
+COPY ./cluster_config.json /config/cluster_config.json
 
 WORKDIR /app
 

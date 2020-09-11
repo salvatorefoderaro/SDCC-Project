@@ -5,6 +5,7 @@ clear
 kubectl delete deployment collectdatadeployment
 kubectl delete deployment dashboarddeployment
 kubectl delete deployment dbconnectordeployment
+kubectl delete hpa collectdatahpa
 kubectl delete job dbinstantiate
 kubectl delete cronjobs jobdbdump
 kubectl delete cronjobs calculatevaluejob
@@ -14,6 +15,7 @@ kubectl delete deployment sendemaildeployment
 cp cluster_config.json dashboard/cluster_config.json
 cp cluster_config.json s3_upload_dump/cluster_config.json
 cp cluster_config.json calculate_value_aws/cluster_config.json
+cp cluster_config.json send_email/cluster_config.json
 cp s3_key.json dashboard/s3_key.json
 cp s3_key.json s3_upload_dump/s3_key.json
 eval $(minikube docker-env)
@@ -31,11 +33,13 @@ rm s3_upload_dump/cluster_config.json
 rm calculate_value_aws/cluster_config.json
 rm dashboard/s3_key.json
 rm s3_upload_dump/s3_key.json
+rm send_email/cluster_config.json
 docker pull mysql:5.7.5
 cd yaml
 kubectl apply -f job_db_instantiate.yaml
 kubectl apply -f cronjob_db_dump.yaml
 kubectl apply -f cronjob_dump_upload.yaml
+kubectl apply -f dep_collect_data_hpa.yaml
 kubectl apply -f dep_collect_data.yaml
 kubectl apply -f dep_dashboard.yaml
 kubectl apply -f dep_db_connector.yaml
