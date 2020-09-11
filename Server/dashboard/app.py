@@ -32,6 +32,8 @@ ERROR_DOWNLOAD_S3_FILE = "Error getting file list from S3."
 BUCKET_NAME = ""
 AWS_KEY_ID = ""
 AWS_SECRET_KEY = ""
+LAT = ""
+LONG = ""
 
 '''
 Module for the dashboard needed to manage the application by the user.
@@ -44,7 +46,7 @@ def testRoute():
     return "Ok"
     
 def readJson():
-    global BUCKET_NAME, AWS_KEY_ID, AWS_SECRET_KEY, FOLDER_NAME, SERVICE_IP, SERVICE_PORT, EC2_IP, EC2_PORT
+    global BUCKET_NAME, AWS_KEY_ID, AWS_SECRET_KEY, FOLDER_NAME, SERVICE_IP, SERVICE_PORT, EC2_IP, EC2_PORT, LAT, LONG
     with open('/config/config.json') as config_file:
         data = json.load(config_file)
         SERVICE_IP = data['service_ip']
@@ -55,6 +57,8 @@ def readJson():
     with open('/config/cluster_config.json') as config_file:
         data = json.load(config_file)
         FOLDER_NAME = data['folder_name']
+        LAT = str(data['lat'])
+        LONG = str(data['long'])
         config_file.close()
     with open('/config/s3_key.json') as config_file:
         data = json.load(config_file)
@@ -68,8 +72,9 @@ def readJson():
 def checkDevicesStatus():
 
     try:
+        data = { "center" : "[" + LAT + ", " + LONG + "]" }
         errorMessage = METEO_INFO_ERROR
-        data_meteo = requests.get('http://' + EC2_IP + ':' +EC2_PORT + '/weather_forecasts', timeout=5).json()
+        data_meteo = requests.get('http://' + EC2_IP + ':' +EC2_PORT + '/weather_forecasts',json=data, timeout=5).json()
 
         if os.path.isfile('dump/awsvalue.json'): 
             dictec2 = {}
@@ -169,7 +174,7 @@ def addWaterContainer():
     start = str(request.args.get("start"))
     end = str(request.args.get("end"))
     water_value = str(request.args.get("water_value"))
-
+    
     try:
         errorMessage = ERROR_ADD_CONTAINER
         responnse = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/addWaterContainer?start='+start+'&end=' + end + '&water_value=' + water_value, timeout=5)
@@ -221,8 +226,9 @@ def deleteDevice():
         if responnse.text != "Ok":
             raise(requests.exceptions.RequestException)
 
+        data = { "center" : "[" + LAT + ", " + LONG + "]" }
         errorMessage = METEO_INFO_ERROR
-        data_meteo = requests.get('http://' + EC2_IP + ':' +EC2_PORT + '/weather_forecasts', timeout=5).json()
+        data_meteo = requests.get('http://' + EC2_IP + ':' +EC2_PORT + '/weather_forecasts',json=data, timeout=5).json()
 
         errorMessage = GROUP_LIST_ERROR
         data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getGroupsList").json()
@@ -271,11 +277,12 @@ def modifyDevice():
                 errorMessage = "Il gruppo indicato non è presente. Aggiungerlo prima."
                 raise(requests.exceptions.RequestException)
             elif (responnse.text != "Ok"):
-                errorMessage = "Errore nella modifica del dispositivo."
+                errorMessage = ERROR_EDIT_DEVICE
                 raise(requests.exceptions.RequestException)
 
+        data = { "center" : "[" + LAT + ", " + LONG + "]" }
         errorMessage = METEO_INFO_ERROR
-        data_meteo = requests.get('http://' + EC2_IP + ':' +EC2_PORT + '/weather_forecasts', timeout=5).json()
+        data_meteo = requests.get('http://' + EC2_IP + ':' +EC2_PORT + '/weather_forecasts',json=data, timeout=5).json()
 
         errorMessage = DEVICES_LIST_ERROR
         data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getDeviceStat").json()
@@ -290,8 +297,10 @@ def modifyDevice():
 def indexRoute():
 
     try:
+
+        data = { "center" : "[" + LAT + ", " + LONG + "]" }
         errorMessage = METEO_INFO_ERROR
-        data_meteo = requests.get('http://' + EC2_IP + ':' +EC2_PORT + '/weather_forecasts', timeout=5).json()
+        data_meteo = requests.get('http://' + EC2_IP + ':' +EC2_PORT + '/weather_forecasts',json=data, timeout=5).json()
 
         if os.path.isfile('dump/awsvalue.json'): 
             dictec2 = {}
