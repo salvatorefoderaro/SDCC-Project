@@ -5,6 +5,6 @@
     "database": "cluster",
     "service_ip": "dbconnectorservice",
     "service_port": 8020,
-    "ec2_ip": "localhost",
+    "ec2_ip": "192.168.1.106",
     "ec2_port": "5000"
 }
