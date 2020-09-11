@@ -301,7 +301,7 @@ def indexRoute():
         data = { "center" : "[" + LAT + ", " + LONG + "]" }
         errorMessage = METEO_INFO_ERROR
         data_meteo = requests.get('http://' + EC2_IP + ':' +EC2_PORT + '/weather_forecasts',json=data, timeout=5).json()
-
+        
         if os.path.isfile('dump/awsvalue.json'): 
             dictec2 = {}
             with open('dump/awsvalue.json') as config_file:
@@ -359,7 +359,6 @@ def downloadFile():
         file_name_save = file_name_save[len(file_name_save)-1]
         s3.Bucket(BUCKET_NAME).download_file(file_key, file_name_save)
         return send_file(file_name_save, as_attachment=True)
-
 
     except Exception as e:
         logging.info(str(e), flush=True)

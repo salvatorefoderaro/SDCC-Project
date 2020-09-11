@@ -50,6 +50,8 @@ The data received, this:
 
 '''
 
+
+
 LAT = 0
 LONG = 0
 EC2_IP = ""

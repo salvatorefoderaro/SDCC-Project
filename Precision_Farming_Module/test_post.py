@@ -56,7 +56,7 @@ def weather():
     data = { "center" : str(POLYGONS_INFOS[0].center) }
 
     try:
-        res = requests.get("http://127.0.0.1:5000/weather_forecasts", json = data)
+        res = requests.get("http://testsdcc1-env.eba-egewcv65.eu-central-1.elasticbeanstalk.com:80/weather_forecasts", json = data)
 
     except requests.exceptions.RequestException as e:  # This is the correct syntax
         logging.warning('Errore!')
@@ -68,7 +68,7 @@ def weather():
 def test_plan():
 
     for i in range(50):
-        res = requests.get("http://0.0.0.0:5001/weather").json
+        res = requests.get("http://testsdcc1-env.eba-egewcv65.eu-central-1.elasticbeanstalk.com:80/weather_forecasts").json
         pprint(res)
 
 
