@@ -16,7 +16,7 @@ The module is needed to send e-mail. The configuration of smtplib is made for GM
 @app.route('/sendEmail', methods=['GET'])
 def sendEmail():
     gmail_user = 'gnammeorg@gmail.com'
-    gmail_password = '***'
+    gmail_password = 'Frazzei95'
     device_id = str(request.args.get("deviceId"))
     device_ip = str(request.args.get("deviceIp"))
     device_port = str(request.args.get("devicePort"))
@@ -38,11 +38,12 @@ def sendEmail():
         server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
         server.ehlo()
         server.login(gmail_user, gmail_password)
-        server.sendmail(FROM, TO, message)       
+        server.sendmail(FROM, TO, message)
+        logging.info("Email sent")     
         server.close()
         return 0
     except smtplib.SMTPException as e:
-        logging.info(str(e), flush=True)
+        logging.info(str(e))
         return str(e)
 
 if __name__ == '__main__':

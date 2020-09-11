@@ -13,6 +13,10 @@ app = Flask(__name__)
 The module is exposed outside the cluster. It receives data from the Proxy and insert it on the database.
 '''
 
+@app.route('/test')
+def testRoute():
+    return "Ok"
+
 # Route to get data about lectures.
 @app.route('/collectData', methods=['POST'])
 def collectData():
