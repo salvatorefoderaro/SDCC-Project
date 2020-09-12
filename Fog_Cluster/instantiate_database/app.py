@@ -50,7 +50,7 @@ def instantiateDatabase():
         cursor.execute("CREATE TABLE IF NOT EXISTS devices (id INT PRIMARY KEY, lastLecture DATETIME, ipAddress VARCHAR(30), ipPort INT, status INT, name VARCHAR(100), groupName VARCHAR(100), type VARCHAR(100), FOREIGN KEY (groupName) REFERENCES devicesGroups(groupName))")
         cursor.execute("CREATE TABLE IF NOT EXISTS lectures (id INT, temperature float, humidity float, lastLecture DATETIME, PRIMARY KEY(id, lastLecture), FOREIGN KEY (id) REFERENCES devices(id))")
         cursor.execute("CREATE TABLE IF NOT EXISTS water_container (id INT AUTO_INCREMENT, startDate DATE, endDate DATE, currentValue double, totalValue double, PRIMARY KEY (id))")
-        cursor.execute("INSERT INTO water_container (id, startDate, endDate, currentValue, totalValue) VALUES (1, NOW, NOW() + INTERVAL 7 DAY, 80, 100) ON DUPLICATE KEY UPDATE currentValue = 1, totalValue = 100")
+        cursor.execute("INSERT INTO water_container (id, startDate, endDate, currentValue, totalValue) VALUES (1, NOW(), NOW() + INTERVAL 7 DAY, 80, 100) ON DUPLICATE KEY UPDATE currentValue = 1, totalValue = 100")
         cursor.execute("INSERT INTO water_container (id, startDate, endDate, currentValue, totalValue) VALUES (2, NOW() - INTERVAL 7 DAY, NOW(), 40, 100) ON DUPLICATE KEY UPDATE currentValue = 2, totalValue = 100")
         db.commit()
 

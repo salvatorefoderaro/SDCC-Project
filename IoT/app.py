@@ -60,7 +60,7 @@ def readJson():
         CLUSTER_PORT = data['cluster_port']
         LECTURE_INTERVAL = data['lecture_interval']
         TYPE = data['type']
-        if TYPE == 'control':
+        if TYPE == 'execute':
             WATER_SPEED = data['water_speed']
         config_file.close()
 
@@ -172,13 +172,13 @@ def sendData():
             time.sleep(20)
         
     # If the device is a sensor, send the lectures.
-    if TYPE == 'sensor':
+    if TYPE == 'monitor':
 
         # Invio ad intervallo di tempo regolari le letture di temperatura ed umidità
         while (True):
 
             # Build the content of the POST request.       
-            dictToSend = {'id':data['id'], 'temperature': fakesensor.getTemperature(), 'humidity': fakesensor.getUmidity(), 'type': 'sensor'}
+            dictToSend = {'id':data['id'], 'temperature': fakesensor.getTemperature(), 'humidity': fakesensor.getUmidity(), 'type': 'monitor'}
            
             try:
                 # Send the request to the Proxy

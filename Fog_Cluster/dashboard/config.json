@@ -5,6 +5,6 @@
     "database": "cluster",
     "service_ip": "dbconnectorservice",
     "service_port": 8020,
-    "ec2_ip": "testsdcc-env.eba-menzms8x.eu-central-1.elasticbeanstalk.com",
-    "ec2_port": "5000"
+    "ec2_ip": "testsdcc1-env.eba-egewcv65.eu-central-1.elasticbeanstalk.com",
+    "ec2_port": "80"
 }

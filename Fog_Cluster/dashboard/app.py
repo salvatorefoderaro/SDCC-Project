@@ -39,6 +39,7 @@ LONG = ""
 Module for the dashboard needed to manage the application by the user.
 '''
 
+
 app = Flask(__name__)
 
 @app.route('/test')

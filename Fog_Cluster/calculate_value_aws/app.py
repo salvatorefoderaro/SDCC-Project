@@ -162,6 +162,7 @@ def calculateValueAWS():
                     json.dump(result, f)
                 
 
+
             planningFile = open(FILE_LOCATION, "r")
             planningJson = json.load(planningFile)
 
