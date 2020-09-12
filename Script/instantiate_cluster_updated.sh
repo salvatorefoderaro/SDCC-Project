@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd ../Server
+cd ../Fog_Cluster
 minikube start --driver=docker
 minikube addons enable storage-provisioner
 minikube addons enable metrics-server

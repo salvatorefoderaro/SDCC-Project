@@ -1,0 +1,10 @@
+{
+    "host": "mysql",
+    "user": "root",
+    "passwd": "password",
+    "database": "cluster",
+    "service_ip": "dbconnectorservice",
+    "service_port": 8020,
+    "ec2_ip": "testsdcc-env.eba-menzms8x.eu-central-1.elasticbeanstalk.com",
+    "ec2_port": "5000"
+}
