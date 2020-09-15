@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="author" content="Salvatore Foderaro, Alessandro Pontis, Gianmarco and Bootstrap contributors">
+    <title>Cluster Statistics - Foggy Day</title>
+    <!-- Bootstrap core CSS -->
+<link href="{{ url_for('static', filename='css/bootstrap.css') }}" rel="stylesheet">
+
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+
+            .scrolling-wrapper{
+	overflow-x: auto;
+}
+
+.card-block{
+	height: 250px;
+	background-color: #fff;
+	border: none;
+	transition: all 0.2s ease-in-out !important;
+	&:hover{
+		transform: translateY(-5px);
+		box-shadow: none;
+	}
+}
+
+.icon-water {
+  background-image: url("{{ url_for('static', filename='img/water-drop.png') }}");
+    background-position: center center;
+    width: 100px;
+    height: 100px;
+}
+    </style>
+    <!-- Custom styles for this template -->
+    <link href="{{ url_for('static', filename='css/starter-template.css') }}" rel="stylesheet">
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+      <a class="navbar-brand" href="#">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="">
+      </a>
+      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="/">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/getFileList">Dump history</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/getGroupsList">Manage groups</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/getWaterList">Manage water schedule</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/getStat">Saving statistics <span class="sr-only">(current)</span></a>
+          </li>
+        </ul>
+       </div>
+    </nav>
+
+<main role="main" class="container">
+  <br><br><br>
+
+  {% if response is defined and respose == true %}
+  <div class="alert alert-success" role="alert">
+    Edit made successfully!
+  </div>
+  {% elif response is defined and response == false %}
+  <div class="alert alert-warning" role="alert">
+    Edit not made!
+    </div>
+      {% endif %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <canvas id="chLine"></canvas>
+                    </div>
+                </div>
+            </div>
+         </div>     
+    </div>
+
+
+</main><!-- /.container -->
+<script src=" {{ url_for('static', filename='js/jquery-3.5.1.slim.min.js') }}"></script>
+      <script>window.jQuery || document.write('<script src="../assets/js/vendor/jquery.slim.min.js"><\/script>')</script><script src="{{ url_for('static', filename='js/bootstrap.bundle.js') }}"></script></body>
+
+      <script type="text/javascript" src="{{ url_for('static', filename='js/Chart.js') }}"></script>
+
+      <script>
+     var label_label = '{{ dataToPlot['label']|tojson }}';
+     var data_data1 = '{{ dataToPlot['data1']|tojson }}';
+     var data_data2 = '{{  dataToPlot['data2']|tojson }}';
+     var chartData = {
+  labels: {{ dataToPlot['label']|tojson }},
+  datasets: [{
+    data: {{ dataToPlot['data1']|tojson }},
+    label: 'Saved money (€)'
+  },
+  {
+    data: {{  dataToPlot['data2']|tojson }},
+    label: 'Saved water (m3)'
+  }]
+};
+      
+      var chLine = document.getElementById("chLine");
+      if (chLine) {
+        new Chart(chLine, {
+        type: 'line',
+        data: chartData,
+        options: {
+          scales: {
+            yAxes: [{
+              ticks: {
+                beginAtZero: false
+              }
+            }]
+          },
+          legend: {
+            display: true
+          }
+        }
+        });
+      }
+      
+      </script>
+</html>

@@ -177,6 +177,13 @@ def weather_forecasts():
 
     return data
 
+@app.route('/')
+def aws_check1():
+    return "ok"
+
+@app.route('/aws_check')
+def aws_check():
+    return "ok"
 
 '''
 ----------------------------------------------------------------------------------------------------------------------------------
@@ -361,4 +368,4 @@ def setup():
 if __name__ == '__main__':
 
     setup()
-    app.run(host='0.0.0.0', debug=False, threaded = True, port = 5000)
+    app.run(host='0.0.0.0', debug=False, threaded = True, port = 80)

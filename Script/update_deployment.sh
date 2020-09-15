@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd ../Server
+cd ../Fog_Cluster
 clear
 kubectl delete deployment collectdatadeployment
 kubectl delete deployment dashboarddeployment
