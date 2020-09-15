@@ -1,4 +1,5 @@
 from datetime import datetime, date, time, timezone, timedelta
+from matplotlib import pyplot as plt
 from flask import Flask, request 
 from polygon import Polygon, Sensor
 from threading import Thread
@@ -17,16 +18,20 @@ POLYGONS_INFOS = []
 CREATE_POLY_URL = "" 
 APPID = ""     
 TOTAL_AREA = 0.0  
+PLANNING_TIMES = []
 
+POLYGONS_ID = []
 
 app = Flask(__name__)                   # Create the Flask app
+
+
 
 
 # SAMPLE REST API TO POST SENSORS' DATA AND GET THE WATER DAILY PLAN
 @app.route("/getplan")
 def getplan():
 
-    global POLYGONS_INFOS
+    global PLANNING_TIMES
 
     with open('sensor_data.json') as j:
         data = json.load(j)
@@ -34,22 +39,25 @@ def getplan():
 
     data["water_container_volume"] = 6000
     data["expire"] = datetime(2020, 9, 28, 0, 0, 0, 0 ).timestamp()
-    counter = 0
-    for elem in data["groups_list"]:
-        elem["center"] = POLYGONS_INFOS[counter].center
-        elem["groupName"] = POLYGONS_INFOS[counter].name
-        counter += 1
-    
+
     pprint(data)
 
     try:
-        res = requests.post("http://127.0.0.1:5000/planning", json = data )
+
+        BEFORE = datetime.now()
+        res = requests.post("http://0.0.0.0:5000/planning", json = data )
+        AFTER = datetime.now()
 
     except requests.exceptions.RequestException as e:  # This is the correct syntax
         logging.warning('Errore!')
     
-    return res.json()
+
+    interval_sample = ( AFTER - BEFORE ).total_seconds()
     
+    PLANNING_TIMES.append(interval_sample)
+
+    return str(interval_sample)
+
 @app.route("/weather")
 def weather():
 
@@ -63,13 +71,51 @@ def weather():
     
     return res.json()
 
+@app.route("/times")
+def times():
+
+    global PLANNING_TIMES
+    
+    plt.scatter(range(len(PLANNING_TIMES)), PLANNING_TIMES, c='r', label='planning time (local host) - #threads = 1')
+    plt.xlabel('measurements')
+    plt.ylabel('y')
+    plt.show()
+
+    return "Ok"
+
+
+
+
+
+def get_polygons_id():
+
+    global POLYGONS_INFOS, POLYGONS_ID
+
+    for elem in POLYGONS_INFOS:
+        POLYGONS_ID.append(elem.id)
+
+    return 0
+
+
+def remove_polygons():
+
+    for identifier in POLYGONS_ID:
+
+        url = ("http://api.agromonitoring.com/agro/1.0/polygons/" + identifier + "?appid=1709a3a96099a66ed619f1f6ec016586")
+        print(url)
+
+        res = requests.delete(url)
+
+        print("response: " + str(res.status_code) )
 
 
 def test_plan():
 
-    for i in range(50):
         res = requests.get("http://testsdcc1-env.eba-egewcv65.eu-central-1.elasticbeanstalk.com:80/weather_forecasts").json
         pprint(res)
+
+
+
 
 
 
@@ -166,14 +212,11 @@ def getMineIpAddress():
 def setup():
     getMineIpAddress()
     read_configurations()
-    keep_infos()
-    retrieve_polygons()
-    print("appid : " , APPID)
-    for p in POLYGONS_INFOS:
-        print(p.name)
+
 
 
 
 if __name__ == '__main__' :
+
     setup()
     app.run(host='0.0.0.0', debug=False, port = 5001)
