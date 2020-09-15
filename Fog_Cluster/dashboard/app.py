@@ -12,6 +12,7 @@ import os.path
 from datetime import datetime
 import logging
 
+
 FOLDER_NAME = ""
 SERVICE_IP = 0
 SERVICE_PORT = 0
@@ -34,6 +35,8 @@ AWS_KEY_ID = ""
 AWS_SECRET_KEY = ""
 LAT = ""
 LONG = ""
+
+
 
 '''
 Module for the dashboard needed to manage the application by the user.
