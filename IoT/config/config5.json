@@ -1,1 +1,4 @@
-{"id": 2001, "port":9005, "name": "b", "groupName": "one", "cluster_port": 5500, "search_interval": 5, "bcast_ip": "239.255.255.250", "bcast_port": 10000, "protocol": "ssdp", "networkid": "cluster", "mine_ip_port": 9001, "type" : "monitor", "lecture_interval": 20}
+{"id": 2001, "port":9005, "name": "b", "groupName": "one", "cluster_port": 5500, "search_interval": 5, "bcast_ip": "239.255.255.250", "bcast_port": 10000, "protocol": "ssdp", "networkid": "cluster", "mine_ip_port": 9001, "type" : "monitor", "lecture_interval": 20,
+    "reference_image": "img/002.jpeg",
+    "image_interval" : 3600,
+    "camera": "Yes"}

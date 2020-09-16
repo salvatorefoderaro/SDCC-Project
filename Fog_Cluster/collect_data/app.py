@@ -6,6 +6,7 @@ import mysql.connector as mysql
 from flask import request
 import json
 import logging
+from pprint import pprint
 
 app = Flask(__name__)
 
@@ -16,6 +17,51 @@ The module is exposed outside the cluster. It receives data from the Proxy and i
 @app.route('/test')
 def testRoute():
     return "Ok"
+
+# Route to get data about lectures.
+@app.route('/collectDataImage', methods=['POST'])
+def collectDataImage():
+
+    if request.method != 'POST':
+        return "Wrong request method."
+
+    elif  ('deviceId' or 'message') not in request.json:
+        return "Wrong request."
+
+    else:
+        configFile = open("/config/config.json", "r")
+        json_object = json.load(configFile)
+
+        try:
+            db = mysql.connect(
+                host = json_object['host'],
+                user = json_object['user'],
+                passwd = json_object['passwd'],
+                database = json_object['database']
+            )
+
+            cursor = db.cursor()
+
+            # Select all the devices.
+            cursor.execute("SELECT ipAddress, ipPort, groupName from devices WHERE id = " + str(request.json['deviceId']))
+
+            queryResult = cursor.fetchall()
+
+            for x in queryResult:
+
+                # If present, update the devices status and insert the lecture on the db.
+                cursor.execute("UPDATE devices SET alert = \'" + str(request.json['message']) + "\' where id = " + str(request.json['deviceId']))
+                cursor.close()
+                db.commit()
+                request.json['deviceIp'] = x[0]
+                request.json['devicePort'] = x[1]
+                request.json['deviceGroup'] = x[2]
+                res = requests.get('http://sendemailservice:8081/sendEmail', timeout=5, json=request.json)
+
+            return "Ok"
+        except mysql.Error as err:
+            logging.info(str(err), flush=True)
+            return str(err)
 
 # Route to get data about lectures.
 @app.route('/collectData', methods=['POST'])

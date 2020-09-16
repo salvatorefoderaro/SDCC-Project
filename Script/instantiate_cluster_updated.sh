@@ -20,6 +20,7 @@ cd ../db_connector && docker build -t dbconnector:v1 .
 cd ../s3_upload_dump && docker build -t uploads3:v1 .
 cd ../send_email && docker build -t sendemail:v1 .
 cd ../calculate_value_aws && docker build -t calculatevalue:v1 .
+cd ../ssdp_server && docker build -t ssdpserver:v1 .
 cd ..
 rm dashboard/cluster_config.json
 rm s3_upload_dump/cluster_config.json
@@ -48,4 +49,6 @@ kubectl apply -f cronjob_calculate_value.yaml
 kubectl apply -f cronjob_check_devices_status.yaml
 kubectl apply -f ser_send_email.yaml
 kubectl apply -f dep_send_email.yaml
+kubectl apply -f dep_ssdp_server.yaml
+kubectl apply -f ser_ssdp_server.yaml
 minikube tunnel

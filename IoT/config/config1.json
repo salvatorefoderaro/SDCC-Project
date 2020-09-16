@@ -10,4 +10,7 @@
       "networkid": "cluster",
        "mine_ip_port": 9003,
         "type" : "monitor",
-         "lecture_interval": 20}
+         "lecture_interval": 20,
+        "reference_image": "img/002.jpeg",
+        "image_interval" : 10,
+        "camera": "Yes"}

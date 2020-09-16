@@ -1,2 +1,5 @@
 Flask
 requests>=2.7.0
+opencv-python
+numpy
+Pillow

@@ -48,7 +48,7 @@ def getDevicesStat():
         dictWaterLevel['today'] = datetime.today().strftime('%d-%m-%Y')
 
     # Get info about the devices with type 'monitor'
-    cursor.execute("select L.id, L.temperature, L.humidity, L.lastLecture, D.ipAddress, D.ipPort, D.status, D.name, D.groupName FROM lectures as L JOIN devices as D on L.id = D.id WHERE L.lastLecture = (SELECT MAX(lastLecture) FROM lectures WHERE id = L.id) and D.type='\monitor\'")
+    cursor.execute("select L.id, L.temperature, L.humidity, L.lastLecture, D.ipAddress, D.ipPort, D.status, D.name, D.groupName, D.alert FROM lectures as L JOIN devices as D on L.id = D.id WHERE L.lastLecture = (SELECT MAX(lastLecture) FROM lectures WHERE id = L.id) and D.type='\monitor\'")
 
     queryResult = cursor.fetchall()
 
@@ -61,9 +61,9 @@ def getDevicesStat():
             keyList.append(key)
         if key not in dict:
             dict[key] = []
-            dict[key].append({'id':x[0], 'temperature':x[1], 'humidity':x[2], 'lastLecture':str(x[3]), 'ipAddress':x[4], 'ipPort':x[5], 'status':x[6], 'name':x[7], 'groupName':str(x[8])})
+            dict[key].append({'id':x[0], 'temperature':x[1], 'humidity':x[2], 'lastLecture':str(x[3]), 'ipAddress':x[4], 'ipPort':x[5], 'status':x[6], 'name':x[7], 'groupName':str(x[8]), 'alert':str(x[9])})
         else:
-            dict[key].append({'id':x[0], 'temperature':x[1], 'humidity':x[2], 'lastLecture':str(x[3]), 'ipAddress':x[4], 'ipPort':x[5], 'status':x[6], 'name':x[7], 'groupName':str(x[8])})
+            dict[key].append({'id':x[0], 'temperature':x[1], 'humidity':x[2], 'lastLecture':str(x[3]), 'ipAddress':x[4], 'ipPort':x[5], 'status':x[6], 'name':x[7], 'groupName':str(x[8]), 'alert':str(x[9])})
 
     # Get info about the devices with type 'execute'
     cursor.execute("select D.id, D.lastLecture, D.ipAddress, D.ipPort, D.status, D.name, D.groupName FROM devices as D where type='\execute\'")
