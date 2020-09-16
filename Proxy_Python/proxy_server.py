@@ -7,6 +7,7 @@ import time
 import logging
 import json
 import logging
+from pprint import pprint
 
 '''
 The module make a bridge between the devices and the cluster. Because of Minikube, the outside-exposed services could be reached just from the
@@ -59,15 +60,26 @@ def newDevice():
 # Route to send data to the cluster. Send to the cluster the received POST content.
 @app.route('/sendDataToCluster', methods=['POST'])
 def sendDataToCluster():
-    try:
-        response = requests.post("http://" + str(SERVICE_EXTERNAL_IP) + ":"+ str(COLLECT_DATA_PORT) +"/collectData", json=request.json, timeout=10)
-        return response.text
-    except requests.exceptions.RequestException as e:  
-       
-        # Connection error. Is the cluster down? Try searching for it...      
-        getCollectDataIP()
-        return "Not ok"
-    
+
+    if request.json['type'] != 'alert':
+
+        try:
+            response = requests.post("http://" + str(SERVICE_EXTERNAL_IP) + ":"+ str(COLLECT_DATA_PORT) +"/collectData", json=request.json, timeout=10)
+            return response.text
+        except requests.exceptions.RequestException as e:  
+            # Connection error. Is the cluster down? Try searching for it...      
+            getCollectDataIP()
+            return "Not ok"
+    else:
+
+        try:
+            response = requests.post("http://" + str(SERVICE_EXTERNAL_IP) + ":"+ str(COLLECT_DATA_PORT) +"/collectDataImage", json=request.json, timeout=10)
+            print(response.text)
+            return response.text
+        except requests.exceptions.RequestException as e:  
+            # Connection error. Is the cluster down? Try searching for it...      
+            getCollectDataIP()
+            return "Not ok"    
 
 if __name__ == '__main__':   
     readJson()

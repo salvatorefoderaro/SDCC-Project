@@ -436,6 +436,13 @@
           <li class="list-group-item">Last temperature: {{ dataToPlot['list'][i]['devicesList'][j]['temperature'] }}</li>
           <li class="list-group-item">Last humidity: {{ dataToPlot['list'][i]['devicesList'][j]['humidity'] }}</li>
           <li class="list-group-item">Last lecture: {{ dataToPlot['list'][i]['devicesList'][j]['lastLecture'] }}</li>
+
+          {% if dataToPlot['list'][i]['devicesList'][j]['alert'] != 'None' %}
+
+          <li class="list-group-item">Quality alert: {{ dataToPlot['list'][i]['devicesList'][j]['alert'] }}</li>
+          
+          {% endif %}
+
         </ul>
 
         {% set name_collapse = "name_collapse" ~ dataToPlot['list'][i]['devicesList'][j]['id'] %}

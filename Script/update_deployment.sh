@@ -12,6 +12,7 @@ kubectl delete cronjobs calculatevaluejob
 kubectl delete cronjobs uploads3job
 kubectl delete cronjobs checkstatusjob
 kubectl delete deployment sendemaildeployment
+kubectl delete deployment ssdpserverdeployment
 cp cluster_config.json dashboard/cluster_config.json
 cp cluster_config.json s3_upload_dump/cluster_config.json
 cp cluster_config.json calculate_value_aws/cluster_config.json
@@ -27,6 +28,7 @@ cd ../db_connector && docker build -t dbconnector:v1 .
 cd ../s3_upload_dump && docker build -t uploads3:v1 .
 cd ../send_email && docker build -t sendemail:v1 .
 cd ../calculate_value_aws && docker build -t calculatevalue:v1 .
+cd ../ssdp_server && docker build -t ssdpserver:v1 .
 cd ..
 rm dashboard/cluster_config.json
 rm s3_upload_dump/cluster_config.json
@@ -46,4 +48,6 @@ kubectl apply -f dep_db_connector.yaml
 kubectl apply -f cronjob_calculate_value.yaml
 kubectl apply -f cronjob_check_devices_status.yaml
 kubectl apply -f dep_send_email.yaml
+kubectl apply -f dep_ssdp_server.yaml
+kubectl apply -f ser_ssdp_server.yaml
 minikube tunnel

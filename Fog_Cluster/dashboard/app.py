@@ -94,7 +94,7 @@ def checkDevicesStatus():
         errorMessage = DEVICES_LIST_ERROR
         data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getDeviceStat").json()
 
-    except requests.exceptions.RequestException as e:
+    except (requests.exceptions.RequestException, json.decoder.JSONDecodeError) as e:
         return render_template('error_template.html', responseMessage=errorMessage)
     return render_template('template_bootstrap.html', dataToPlot=data, weather=data_meteo, ndvi=dictec2)
 
@@ -236,7 +236,7 @@ def deleteDevice():
 
         errorMessage = GROUP_LIST_ERROR
         data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getGroupsList").json()
-    except requests.exceptions.RequestException as e:
+    except (requests.exceptions.RequestException, json.decoder.JSONDecodeError) as e:
         return render_template('error_template.html', responseMessage=errorMessage)
     return render_template('template_bootstrap.html', dataToPlot=data, weather=data_meteo, ndvi=dictec2, response=True)
 
@@ -291,7 +291,7 @@ def modifyDevice():
         errorMessage = DEVICES_LIST_ERROR
         data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getDeviceStat").json()
         
-    except requests.exceptions.RequestException as e:
+    except (requests.exceptions.RequestException, json.decoder.JSONDecodeError) as e:
         return render_template('error_template.html', responseMessage=errorMessage)
 
     return render_template('template_bootstrap.html', dataToPlot=data, weather=data_meteo, ndvi=dictec2, response=True)
@@ -321,7 +321,7 @@ def indexRoute():
         errorMessage = DEVICES_LIST_ERROR
         data = requests.get("http://" + SERVICE_IP + ":" + str(SERVICE_PORT) +"/getDeviceStat", timeout=5).json()
     
-    except requests.exceptions.RequestException as e:
+    except (requests.exceptions.RequestException, json.decoder.JSONDecodeError) as e:
         return render_template('error_template.html', responseMessage=errorMessage)
     return render_template('template_bootstrap.html', dataToPlot=data, weather=data_meteo, ndvi=dictec2)
 

@@ -12,6 +12,8 @@ from threading import Thread
 from random import randint
 import fakesensor
 import logging
+import check_image
+from pprint import pprint
 
 '''
 Module for the single IoT device. Each device could be of 2 type:
@@ -42,12 +44,16 @@ CLUSTER_PORT = 0
 LECTURE_INTERVAL = 0
 WATER_SPEED = 0
 TYPE = ""
+REFERENCE_IMAGE = ""
+IMAGE_INTERVAL = ""
+CAMERA = ""
 
 # Read the .json file to get the config.
 def readJson():
-    global data, WATER_SPEED, TYPE, SEARCH_INTERVAL, CLUSTER_PORT, BCAST_IP, BCAST_PORT, PROTOCOL, MINE_IP_PORT, NETWORK_ID, MINE_IP_PORT, DATA, NAME, GROUP_NAME, MINE_ID, LECTURE_INTERVAL
+    global CAMERA, IMAGE_INTERVAL, REFERENCE_IMAGE, data, WATER_SPEED, TYPE, SEARCH_INTERVAL, CLUSTER_PORT, BCAST_IP, BCAST_PORT, PROTOCOL, MINE_IP_PORT, NETWORK_ID, MINE_IP_PORT, DATA, NAME, GROUP_NAME, MINE_ID, LECTURE_INTERVAL
     with open(sys.argv[1]) as config_file:
         data = json.load(config_file)
+        
         MINE_ID = data['id']
         NAME = data['name']
         GROUP_NAME = data['groupName']
@@ -60,8 +66,15 @@ def readJson():
         CLUSTER_PORT = data['cluster_port']
         LECTURE_INTERVAL = data['lecture_interval']
         TYPE = data['type']
+        CAMERA = data['camera'] 
+
+        if CAMERA == "Yes":
+            REFERENCE_IMAGE = data['reference_image']
+            IMAGE_INTERVAL = data['image_interval']
+
         if TYPE == 'execute':
             WATER_SPEED = data['water_speed']
+            
         config_file.close()
 
 # Get the device ip addres that need to be sent for the registration to the cluster.
@@ -142,6 +155,7 @@ def editConfig():
     return "Ok"
 
 # Function that register the device and send the lecture to the proxy.
+# Function that register the device and send the lecture to the proxy.
 def sendData():
 
     getProxyIPAddress()
@@ -202,8 +216,53 @@ def sendData():
             # Wait till the next lecture
             time.sleep(LECTURE_INTERVAL)
 
+# Function that check the quality of the field using camera
+def checkImage():
+
+    getProxyIPAddress()
+    getMineIpAddress()
+    response = ""
+        
+    # Invio ad intervallo di tempo regolari le letture di temperatura ed umidità
+    while (True):
+
+        time.sleep(IMAGE_INTERVAL)
+
+        dictToSend = check_image.disease_detection("img/003.jpeg", REFERENCE_IMAGE)
+
+        if dictToSend != {}:
+
+            dictToSend['deviceId'] = data['id']
+            dictToSend['type'] = 'alert'
+
+            pprint(dictToSend)
+
+            try:
+                # Send the request to the Proxy
+                response = requests.post('http://'+CLUSTER_IP_ADDRESS+':'+str(CLUSTER_PORT)+'/sendDataToCluster', json=dictToSend, timeout=3).text
+                logging
+                # Check the response
+                if response == "Ok":
+                    logging.info("Alert registered correctly.")    
+                elif response == "Not present":
+                    logging.warning('Device not registered.')
+                else:
+                    raise(requests.exceptions.RequestException)
+                    
+            except requests.exceptions.RequestException as e:  # This is the correct syntax
+
+                logging.warning(str(e) + " ERRORE")
+                getProxyIPAddress()
+                continue
+
 if __name__ == '__main__':
+
     readJson()
     thread = Thread(target = sendData)
+    
+    if CAMERA == "Yes":
+        thread1 = Thread(target = checkImage)
+        thread1.start()
+        
     thread.start()
     app.run(host='0.0.0.0', debug=False, port=MINE_IP_PORT) #run app in debug mode on port 5000

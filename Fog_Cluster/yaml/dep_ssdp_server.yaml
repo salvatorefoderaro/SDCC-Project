@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: ssdpserver
+  name: ssdpserverdeployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ssdpserver
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: ssdpserver
+    spec:
+      containers:
+      - image: ssdpserver:v1
+        imagePullPolicy: Never
+        name: ssdpserver
+        ports:
+        - containerPort: 10000
