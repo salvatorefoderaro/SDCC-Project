@@ -43,7 +43,7 @@
             <a class="nav-link" href="/getFileList">Dump history</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/getGroupsList">Manage groups <span class="sr-only">(current)</span></a>
+            <a class="nav-link" href="/getGroupsList">Manage fields <span class="sr-only">(current)</span></a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="/getWaterList">Manage water schedule</a>
@@ -70,31 +70,11 @@
 
   <form action="/addGroup" method="GET">
     <div class="form-group">
-      <label for="exampleInputEmail1">Group name</label>
-      <input name="groupName" type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Group name" required>
-    </div>
-    <div class="form-group">
-      <label for="exampleInputPassword1">Parameter1</label>
-      <input name="parameter1" type="number" min="0"class="form-control" id="exampleInputPassword1" placeholder="Parameter 1" required>
-    </div>
-    <div class="form-group">
-      <label for="exampleInputPassword1">Parameter2</label>
-      <input name="parameter2" type="number" min="0" class="form-control" id="exampleInputPassword1" placeholder="Parameter 2" required>
-    </div>
-    <div class="form-group">
-      <label for="exampleInputPassword1">Parameter3</label>
-      <input name="parameter3" type="number" min="0" class="form-control" id="exampleInputPassword1" placeholder="Parameter 3" required>
-    </div>
-    <div class="form-group">
-      <label for="exampleInputPassword1">Center Latitude</label>
-      <input name="latCenter" type="number" step="any" class="form-control" id="exampleInputPassword1" placeholder="Center Latitude" required>
-    </div>
-    <div class="form-group">
-      <label for="exampleInputPassword1">Center Longitude</label>
-      <input name="longCenter" type="number" step="any" class="form-control" id="exampleInputPassword1" placeholder="Center Longitude" required>
+      <label for="exampleInputEmail1">Field name</label>
+      <input name="groupName" type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Field name" required>
     </div>
     <div class="row justify-content-center">
-    <button type="submit" class="btn btn-primary">Add group</button>
+    <button type="submit" class="btn btn-primary">Add field</button>
     </div>
   </form>
 

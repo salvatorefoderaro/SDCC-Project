@@ -41,12 +41,12 @@ def instantiateDatabase():
 
         # Create and populate table.
         cursor.execute("CREATE TABLE IF NOT EXISTS statistics (dayPeriod date PRIMARY KEY, moneySaved float, waterSaved float)")
-        cursor.execute("CREATE TABLE IF NOT EXISTS devicesGroups (groupName VARCHAR(100) PRIMARY KEY, p1 float, p2 float, p3 float, latCenter DOUBLE, longCenter DOUBLE)")
-        cursor.execute("INSERT into devicesGroups (groupName, p1, p2, p3, latCenter, longCenter) values (\'default\', 0, 0, 0, 0, 0) ON DUPLICATE KEY UPDATE p1 = 0, p2 = 0, p3 = 0, latCenter = 0, longCenter = 0")
-        cursor.execute("INSERT into devicesGroups (groupName, p1, p2, p3, latCenter, longCenter) values (\'Polygon A : CORN FIELD\', 0, 0, 0, -121.82537549999999, 39.0955965) ON DUPLICATE KEY UPDATE p1 = 0, p2 = 0, p3 = 0")
-        cursor.execute("INSERT into devicesGroups (groupName, p1, p2, p3, latCenter, longCenter) values (\'Polygon B : GREEN PLANTS FIELD\', 0, 0, 0, -121.82471050000001, 39.083796) ON DUPLICATE KEY UPDATE p1 = 0, p2 = 0, p3 = 0")
-        cursor.execute("INSERT into devicesGroups (groupName, p1, p2, p3, latCenter, longCenter) values (\'Polygon C : WHEAT FIELD\', 0, 0, 0, -121.81537625, 39.0810165) ON DUPLICATE KEY UPDATE p1 = 0, p2 = 0, p3 = 0")
-        cursor.execute("INSERT into devicesGroups (groupName, p1, p2, p3, latCenter, longCenter) values (\'Polygon D : GROUND VEGETABLES FIELD\', 0, 0, 0, -121.79617174999998, 39.073426) ON DUPLICATE KEY UPDATE p1 = 0, p2 = 0, p3 = 0")
+        cursor.execute("CREATE TABLE IF NOT EXISTS devicesGroups (groupName VARCHAR(100) PRIMARY KEY)")
+        cursor.execute("INSERT IGNORE into devicesGroups (groupName) values (\'default\' )")
+        cursor.execute("INSERT IGNORE into devicesGroups (groupName) values (\'Polygon A : CORN FIELD\')")
+        cursor.execute("INSERT IGNORE into devicesGroups (groupName) values (\'Polygon B : GREEN PLANTS FIELD\')")
+        cursor.execute("INSERT IGNORE into devicesGroups (groupName) values (\'Polygon C : WHEAT FIELD\')")
+        cursor.execute("INSERT IGNORE into devicesGroups (groupName) values (\'Polygon D : GROUND VEGETABLES FIELD\')")
         cursor.execute("CREATE TABLE IF NOT EXISTS devices (id INT PRIMARY KEY, lastLecture DATETIME, ipAddress VARCHAR(30), ipPort INT, status INT, name VARCHAR(100), groupName VARCHAR(100), type VARCHAR(100), alert VARCHAR(100) DEFAULT NULL, FOREIGN KEY (groupName) REFERENCES devicesGroups(groupName))")
         cursor.execute("CREATE TABLE IF NOT EXISTS lectures (id INT, temperature float, humidity float, lastLecture DATETIME, PRIMARY KEY(id, lastLecture), FOREIGN KEY (id) REFERENCES devices(id))")
         cursor.execute("CREATE TABLE IF NOT EXISTS water_container (id INT AUTO_INCREMENT, startDate DATE, endDate DATE, currentValue double, totalValue double, PRIMARY KEY (id))")

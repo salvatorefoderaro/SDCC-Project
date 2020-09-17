@@ -65,7 +65,7 @@
             <a class="nav-link" href="/getFileList">Dump history</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/getGroupsList">Manage groups <span class="sr-only">(current)</span></a>
+            <a class="nav-link" href="/getGroupsList">Manage fields <span class="sr-only">(current)</span></a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="/getWaterList">Manage water schedule</a>
@@ -91,7 +91,7 @@
       {% endif %}
 
 <div class="row justify-content-center">
-        <p><a href="addGroupLink" type="button" class="btn btn-primary btn-lg">Add group</a></p>
+        <p><a href="addGroupLink" type="button" class="btn btn-primary btn-lg">Add field</a></p>
 </div>
 
 <div class="container-fluid">
@@ -109,14 +109,6 @@
               <i class="icon-field"></i>
             </div>
           </div>
-        <ul class="list-group list-group-flush">
-          <li class="list-group-item">Parameter 1: {{ dataToPlot['list'][i]['parameter1'] }}</li>
-          <li class="list-group-item">Parameter 2: {{ dataToPlot['list'][i]['parameter2'] }}</li>
-          <li class="list-group-item">Parameter 3: {{ dataToPlot['list'][i]['parameter3'] }}</li>
-          <li class="list-group-item">Center latitude: {{ dataToPlot['list'][i]['latCenter'] }}</li>
-          <li class="list-group-item">Center longitude: {{ dataToPlot['list'][i]['longCenter'] }}</li>
-
-        </ul>
 
         {% set link_delete = "deleteGroup?groupName=" ~ dataToPlot['list'][i]['groupName'] %}
 

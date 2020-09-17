@@ -203,7 +203,7 @@ def addGroup():
     try: 
         db = connectToDb()
         cursor = db.cursor()
-        cursor.execute("INSERT INTO devicesGroups (groupName, p1, p2, p3, latCenter, longCenter) VALUES (\'" + str(request.args.get("groupName")) + "\'," + str(request.args.get("parameter1")) + ", " + str(request.args.get("parameter2")) + ", " + str(request.args.get("parameter3")) + ", " + str(request.args.get("latCenter")) + ", " + str(request.args.get("longCenter")) + ")")
+        cursor.execute("INSERT INTO devicesGroups (groupName) VALUES (\'" + str(request.args.get("groupName")) + "\')")
         cursor.close()
         db.commit()
         return "Ok"
@@ -265,11 +265,6 @@ def getGroupsList():
     for x in queryResult:
         dict = {}
         dict['groupName'] = x[0]
-        dict['parameter1'] = x[1]
-        dict['parameter2'] = x[2]
-        dict['parameter3'] = x[3]
-        dict['latCenter'] = x[4]
-        dict['longCenter'] = x[5]
         jsonDict['list'].append(dict)
 
     json_data = json.dumps(jsonDict)
