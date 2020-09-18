@@ -26,13 +26,13 @@ APPID = ""                              # User credential to access OpenWeatherA
 
 app = Flask(__name__)                   # Create the Flask app
 
-
 # REST API to compute Daily Water Plan and get results back to the user cluster - @params: json file as in : sensor_data.json
 @app.route('/planning', methods = ['POST', 'GET'])
 def planning():
     if request.method == 'POST':
 
         POLYGONS_INFOS = []                     # List of all Polygon objects
+        POLYGONS_ID = []                        # List of Polygons IDs
         SATELLITE_IMAGES = []                   # List of Satellite_Image objects
         SEVEN_DAYS_WEATHER_FORCASTS = []        # List of WeatherForecast objects
 
@@ -139,6 +139,18 @@ def planning():
             new_elem["daily_water_unit"] = p.water_unit
             data["groups_list"].append( new_elem )            
 
+
+        # Delete useless persistent data from AgroAPI server.
+        for elem in POLYGONS_INFOS:
+            POLYGONS_ID.append(elem.id)
+
+        for identifier in POLYGONS_ID:
+            url = ("http://api.agromonitoring.com/agro/1.0/polygons/" + identifier + "?appid=" + APPID )
+            try:
+                res = requests.delete(url)
+            except requests.exceptions.RequestException as e:  
+                logging.warning('Error deleting polygon persistant infos on OpenWeatherMap Server.')
+
         return data
     
     return "You should use a POST method"
@@ -177,9 +189,11 @@ def weather_forecasts():
 
     return data
 
-@app.route('/')
-def aws_check1():
-    return "ok"
+
+@app.route("/")
+def index():
+    return "Ok"
+
 
 @app.route('/aws_check')
 def aws_check():
@@ -255,9 +269,11 @@ def retrieve_polygons( TOTAL_AREA, POLYGONS_INFOS ):
         except requests.exceptions.RequestException as e:  # This is the correct syntax
             logging.warning('Error retrieving polygons from OpenWeatherMap Server.')
 
-        p.set_id( data['id'] )
-        p.set_center(data['center'])
-        p.set_area(data['area'])
+        pprint(data)
+
+        p.set_id( data["id"] )
+        p.set_center(data["center"])
+        p.set_area(data["area"])
         TOTAL_AREA += p.area
     
     for p in POLYGONS_INFOS:
@@ -318,7 +334,6 @@ def get_satellite_img( SATELLITE_IMAGES, polygon ):
     polygon.set_satellite_image( satellite_img )
 
 
-#**
 # This function contains API call to the OpenWeatherAPI Server, to retrieve 7 days weather forecasts.
 def weather_by_geocoordinates( SEVEN_DAYS_WEATHER_FORCASTS, center ):
 
@@ -368,4 +383,4 @@ def setup():
 if __name__ == '__main__':
 
     setup()
-    app.run(host='0.0.0.0', debug=False, threaded = True, port = 80)
+    app.run(host='0.0.0.0', debug=False, threaded = True, port = 5000)

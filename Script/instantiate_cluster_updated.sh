@@ -34,7 +34,7 @@ kubectl apply -f secret.yaml
 kubectl apply -f mysql-dump.yaml
 kubectl apply -f mysql-pv.yaml
 kubectl apply -f mysql-deployment.yaml
-sleep 60
+sleep 30
 kubectl apply -f ser_collect_data.yaml
 kubectl apply -f ser_dashboard.yaml
 kubectl apply -f ser_db_connector.yaml

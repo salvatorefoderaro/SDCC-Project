@@ -46,9 +46,9 @@ def sendEmail():
         device_group = str(request.json["deviceGroup"])
         FROM = gmail_user
         TO = [EMAIL_TO]
-        SUBJECT = 'Dispositivo non funzionante - Cluster SSDC'
+        SUBJECT = 'Device not reachable - Foggy Day'
 
-        TEXT = 'Il sensore\n\nId: ' + device_id + '\n\nIndirizzo IP: ' + device_ip + '\n\nNumero di porta: ' + device_port + '\n\nNome gruppo: ' + device_group + '\n\nrisulta non raggiungibile.'
+        TEXT = 'Sensor\n\nId: ' + device_id + '\n\nIP address: ' + device_ip + '\n\nPort number: ' + device_port + '\n\nField name: ' + device_group + '\n\nis not reachable.'
 
         # Prepare the message
         message = """From: %s\nTo: %s\nSubject: %s\n\n%s
@@ -77,11 +77,11 @@ def sendEmail():
         device_ip = str(request.json["deviceIp"])
         device_port = str(request.json["devicePort"])
         device_group = str(request.json["deviceGroup"])                 
-        newMessage['Subject'] = "Avviso qualità vegetazione" 
+        newMessage['Subject'] = "Alert field quality - Foggy Day" 
         newMessage['From'] = Sender_Email                   
         newMessage['To'] = Reciever_Email  
   
-        newMessage.set_content('Il sensore\n\nId: ' + device_id + '\n\nIndirizzo IP: ' + device_ip + '\n\nNumero di porta: ' + device_port + '\n\nNome gruppo: ' + device_group + '\n\nha segnalato un avviso per la qualità della vegetazione')
+        newMessage.set_content('Sensor\n\nId: ' + device_id + '\n\nIP address: ' + device_ip + '\n\nPort number: ' + device_port + '\n\nField name: ' + device_group + '\n\nmade a warning about field quality.')
         image_data = base64.b64decode(request.json['keypoints_image'])
         image_type = "jpeg"
         image_name = "Field photo"

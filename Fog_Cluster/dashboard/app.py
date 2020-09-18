@@ -128,6 +128,7 @@ def deleteWaterContainer():
         return render_template('error_template.html', responseMessage=errorMessage)
     return render_template('template_bootstrap_groups_water_container.html', dataToPlot=data,response=True)
 
+
 # Route to delete a group
 @app.route('/deleteGroup', methods=['GET'])
 def deleteGroup():
@@ -135,7 +136,7 @@ def deleteGroup():
     groupName = str(request.args.get("groupName"))
     try:
         errorMessage = DELETE_GROUP_ERROR
-        responnse = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/deleteGroup?groupName='+groupName, timeout=5)
+        responnse = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/deleteGroup?groupName=' + groupName, timeout=5)
 
         if responnse.text != "Ok":
             raise(requests.exceptions.RequestException)
@@ -152,15 +153,10 @@ def deleteGroup():
 def addGroup():
 
     groupName = str(request.args.get("groupName"))
-    parameter1 = str(request.args.get("parameter1"))
-    parameter2 = str(request.args.get("parameter2"))
-    parameter3 = str(request.args.get("parameter3"))
-    latCenter = str(request.args.get("latCenter"))
-    longCenter = str(request.args.get("longCenter"))
 
     try:
         errorMessage = ADD_GROUP_ERROR
-        responnse = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/addGroup?groupName='+groupName+'&parameter1=' + parameter1 + '&parameter2=' + parameter2 + '&parameter3=' + parameter3 + '&longCenter=' + longCenter + '&latCenter=' + latCenter, timeout=5)
+        responnse = requests.get('http://' + SERVICE_IP + ':' + str(SERVICE_PORT) +'/addGroup?groupName='+groupName, timeout=5)
         if responnse.text != "Ok":
             raise(requests.exceptions.RequestException)        
 

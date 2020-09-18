@@ -149,7 +149,7 @@
         <a class="nav-link" href="/getFileList">Dump history</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/getGroupsList">Manage groups</a>
+        <a class="nav-link" href="/getGroupsList">Manage fields</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="/getWaterList">Manage water schedule</a>
@@ -364,7 +364,7 @@
 </div></p>
 
 {% if dataToPlot['list']|length > 0 %}
-  <h1>Groups list</h1>
+  <h1>Fields list</h1>
 {% endif %}
 
 
@@ -485,8 +485,8 @@
 
             <form action="/modifyDevice" method="GET">
               <div class="form-group">
-                <label for="exampleInputEmail1">Group</label>
-                <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="new_value" placeholder="Group name" required>
+                <label for="exampleInputEmail1">Field</label>
+                <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="new_value" placeholder="Field name" required>
                 <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="id" value={{ dataToPlot['list'][i]['devicesList'][j]['id'] }}>
                 <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="type" value="groupName">
                 <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="ip_address" value= {{ dataToPlot['list'][i]['devicesList'][j]['ipAddress'] }}>
@@ -589,8 +589,8 @@
     
                 <form action="/modifyDevice" method="GET">
                   <div class="form-group">
-                    <label for="exampleInputEmail1">Group</label>
-                    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="new_value" placeholder="Group name" required>
+                    <label for="exampleInputEmail1">Field</label>
+                    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="new_value" placeholder="Field name" required>
                     <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="id" value={{ dataToPlot['list'][i]['controlList'][j]['id'] }}>
                     <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="type" value="groupName">
                     <input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="ip_address" value= {{ dataToPlot['list'][i]['controlList'][j]['ipAddress'] }}>
