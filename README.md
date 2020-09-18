@@ -16,13 +16,13 @@ L'integrazione con i servizi **Amazon AWS** avviene tramite *S3*, per il backup 
 ## **Librerie Python utilizzate**
 
 - **Flask (https://pypi.org/project/Flask/)**
-  - Necessario per il web server della dashboard e gli endpoint per le chiamate REST
+  - Necessario per il web server della dashboard e gli endpoint per le richieste REST
 - **SSDP (https://pypi.org/project/ssdp-upnp/)**
   - Necessario come servizio per il discovery da parte del client del/dei proxy
 - **mysql-connector-python (https://pypi.org/project/mysql-connector-python/)**
   - Necessario per la comunicazione con il database
 - **requests (https://pypi.org/project/requests/)**
-  - Necessario per effettuare chiamate GET e POST
+  - Necessario per effettuare richieste GET e POST
 - **boto3 (https://pypi.org/project/boto3/)**
   - Necessario per la comunicazione con S3
 

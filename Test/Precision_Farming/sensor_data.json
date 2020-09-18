@@ -1,0 +1,62 @@
+{
+    "water_container_volume": 5000,
+    "expire": 0.0,
+    "groups_list": [{
+            "center": "[longitude,latitude]",
+            "name": "Polygon A : CORN FIELD",
+            "groupName": "Polygon A : CORN FIELD",
+            "coordinates": [
+                [
+                    [-121.828165, 39.100489],
+                    [-121.822929, 39.100822],
+                    [-121.822329, 39.090637],
+                    [-121.828079, 39.090438],
+                    [-121.828165, 39.100489]
+                ]
+            ],
+            "avgTemperatura": 21.49385959066843,
+            "avgUmidita": 56.084210632009466,
+            "p1": 0.0,
+            "p2": 0.0,
+            "p3": 0.0
+        },
+        {
+            "center": "[longitude,latitude]",
+            "name": "Polygon B : GREEN PLANTS FIELD",
+            "groupName": "Polygon B : GREEN PLANTS FIELD",
+            "coordinates": [
+                [
+                    [-121.82765, 39.077454],
+                    [-121.827822, 39.090038],
+                    [-121.822071, 39.089971],
+                    [-121.821299, 39.077721],
+                    [-121.82765, 39.077454]
+                ]
+            ],
+            "avgTemperatura": 21.49385959066843,
+            "avgUmidita": 56.084210632009466,
+            "p1": 0.0,
+            "p2": 0.0,
+            "p3": 0.0
+        },
+        {
+            "center": "[longitude,latitude]",
+            "name": "Polygon C : WHEAT FIELD",
+            "groupName": "Polygon C : WHEAT FIELD",
+            "coordinates": [
+                [
+                    [-121.821299, 39.084379],
+                    [-121.809797, 39.084512],
+                    [-121.809797, 39.077454],
+                    [-121.820612, 39.077721],
+                    [-121.821299, 39.084379]
+                ]
+            ],
+            "avgTemperatura": 21.49385959066843,
+            "avgUmidita": 56.084210632009466,
+            "p1": 0.0,
+            "p2": 0.0,
+            "p3": 0.0
+        }
+    ]
+}
