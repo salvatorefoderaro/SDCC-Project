@@ -456,7 +456,7 @@
         <div class="card-body">
           {% if dataToPlot['list'][i]['devicesList'][j]['status'] == 0 %}
           <a data-toggle="collapse" href= {{ link_name_collapse }} role="button" aria-expanded="false" aria-controls="nameCollapse" class="card-link">Edit name</a>
-          <a data-toggle="collapse" href= {{ link_group_collapse }} role="button" aria-expanded="false" aria-controls="groupCollapse" class="card-link">Edit group</a>
+          <a data-toggle="collapse" href= {{ link_group_collapse }} role="button" aria-expanded="false" aria-controls="groupCollapse" class="card-link">Edit field</a>
           <a data-toggle="collapse" href= {{ link_lecture_collapse }} role="button" aria-expanded="false" aria-controls="lectureCollapse" class="card-link">Edit lecture interval</a>
           {% endif %}
           <a href={{ link_delete }} class="card-link">Delete</a>
@@ -561,7 +561,7 @@
             <div class="card-body">
               {% if dataToPlot['list'][i]['controlList'][j]['status'] == 0 %}
               <a data-toggle="collapse" href= {{ link_name_collapse }} role="button" aria-expanded="false" aria-controls="nameCollapse" class="card-link">Edit name</a>
-              <a data-toggle="collapse" href= {{ link_group_collapse }} role="button" aria-expanded="false" aria-controls="groupCollapse" class="card-link">Edit group name</a>
+              <a data-toggle="collapse" href= {{ link_group_collapse }} role="button" aria-expanded="false" aria-controls="groupCollapse" class="card-link">Edit field</a>
               {% endif %}
               <a href={{ link_delete }} class="card-link">Delete</a>
             </div>

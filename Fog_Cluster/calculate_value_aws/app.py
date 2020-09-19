@@ -112,14 +112,12 @@ def calculateValueAWS():
 
         # Select AVG value for each group that need to be sent.
         cursor.execute("select AVG(L.temperature), AVG(L.humidity), D.groupName, G.latCenter, G.longCenter, G.p1, G.p2, G.p3 FROM lectures as L JOIN devices as D on L.id = D.id JOIN devicesGroups as G on D.groupName = G.groupName WHERE D.type=\'monitor\' GROUP BY D.groupName, G.latCenter, G.longCenter")
-
         queryResult = cursor.fetchall()
 
         for x in queryResult:
             key = str(x[2])             
             if key != 'default':
-                dictAWS['groups_list'].append({'groupName':key, 'name':key, 'avgTemperatura':x[0], 'avgUmidita':x[1], 'p1':x[5], 'p2':x[6], 'p3':x[7], 'coordinates': dict_groups[key], 'center': [x[3], x[4]] })
-        
+                dictAWS['groups_list'].append({'groupName':key, 'name':key, 'avgTemperatura':x[0], 'avgUmidita':x[1], 'p1':x[5], 'p2':x[6], 'p3':x[7], 'coordinates': dict_groups[key], 'center': [x[3], x[4]] })        
         # Dump the data to JSON.
         json_data = json.dumps(dictAWS)
 
@@ -133,8 +131,8 @@ def calculateValueAWS():
             if (os.path.exists(FILE_LOCATION) is False):
 
                 # Send the POST request.
-                result = requests.post('http://' + EC2_IP + ':' +EC2_PORT + '/planning',  json=dictAWS, timeout=5).json()
-                
+                result = requests.post('http://' + EC2_IP + ':' +EC2_PORT + '/planning',  json=dictAWS, timeout=5)
+                result = result.json()
                 # Update the statistic table needed for the plot.
                 cursor.execute("INSERT into statistics(dayPeriod, moneySaved, waterSaved) VALUES (now(), " +  str(result['saved_money']) + "," + str(result['saved_water']) + ") ON DUPLICATE KEY UPDATE moneySaved ="+ str(result['saved_money']) + ", waterSaved ="+ str(result['saved_water'])) 
                 
@@ -150,8 +148,8 @@ def calculateValueAWS():
                 os.remove(FILE_LOCATION) 
 
                 # Send the POST request.
-                result = requests.post('http://' + EC2_IP + ':' +EC2_PORT + '/planning',  json=dictAWS, timeout=5).json()
-                
+                result = requests.post('http://' + EC2_IP + ':' +EC2_PORT + '/planning',  json=dictAWS, timeout=5)
+                result = result.json()
                 # Update the statistic table needed for the plot.
                 cursor.execute("INSERT into statistics(dayPeriod, moneySaved, waterSaved) VALUES (now(), " +  str(result['saved_money']) + "," + str(result['saved_water']) + ") ON DUPLICATE KEY UPDATE moneySaved ="+ str(result['saved_money']) + ", waterSaved ="+ str(result['saved_water'])) 
                 

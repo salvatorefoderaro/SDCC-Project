@@ -235,8 +235,6 @@ def checkImage():
             dictToSend['deviceId'] = data['id']
             dictToSend['type'] = 'alert'
 
-            pprint(dictToSend)
-
             try:
                 # Send the request to the Proxy
                 response = requests.post('http://'+CLUSTER_IP_ADDRESS+':'+str(CLUSTER_PORT)+'/sendDataToCluster', json=dictToSend, timeout=3).text

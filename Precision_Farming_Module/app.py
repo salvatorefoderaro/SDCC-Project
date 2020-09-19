@@ -67,13 +67,18 @@ def planning():
             POLYGONS_INFOS.append( polygon )
 
         #RETRIEVE POLYGONS AND RELATED SATELLITE IMAGES
-        retrieve_polygons( TOTAL_AREA, POLYGONS_INFOS )
+        results = retrieve_polygons( TOTAL_AREA, POLYGONS_INFOS )
+        TOTAL_AREA = results[0]
+        POLYGONS_INFOS = results[1]
+
         for p in POLYGONS_INFOS:
-            get_satellite_img(SATELLITE_IMAGES, p)
+            results = get_satellite_img(SATELLITE_IMAGES, p)
+            SATELLITE_IMAGES = results[0]
+            p = results[1]
         
         # WEATHER FORECASTS
         center = POLYGONS_INFOS[0].center
-        weather_by_geocoordinates( SEVEN_DAYS_WEATHER_FORCASTS, center )
+        SEVEN_DAYS_WEATHER_FORCASTS = weather_by_geocoordinates( SEVEN_DAYS_WEATHER_FORCASTS, center )
 
 
         # Check if the expire date is correctly formulated.
@@ -90,12 +95,10 @@ def planning():
         # Calculate the value of today's total water amount.
         TODAY_WATER = WATER_CONTAINER/REMAINING_DAYS
     
-        for elem in group_list:
-            for polygon in POLYGONS_INFOS:
-                if elem["center"] == polygon.center:
-                    new_sensor = Sensor( polygon, elem["avgTemperatura"], elem["avgUmidita"])
-                    polygon.add_sensor(new_sensor)
-                    polygon.set_to_plan()
+        for polygon in POLYGONS_INFOS:
+            new_sensor = Sensor( polygon, elem["avgTemperatura"], elem["avgUmidita"])
+            polygon.add_sensor(new_sensor)
+            polygon.set_to_plan()
 
         # Compute the seven-days-forecast analysis and evaluate the coefficient value to be used as multiplicative factor in each polygon's.
         # water unit amount of the day.
@@ -269,8 +272,6 @@ def retrieve_polygons( TOTAL_AREA, POLYGONS_INFOS ):
         except requests.exceptions.RequestException as e:  # This is the correct syntax
             logging.warning('Error retrieving polygons from OpenWeatherMap Server.')
 
-        pprint(data)
-
         p.set_id( data["id"] )
         p.set_center(data["center"])
         p.set_area(data["area"])
@@ -278,6 +279,10 @@ def retrieve_polygons( TOTAL_AREA, POLYGONS_INFOS ):
     
     for p in POLYGONS_INFOS:
         p.set_proportion((p.area)/TOTAL_AREA)
+    
+    results = [TOTAL_AREA, POLYGONS_INFOS]
+
+    return  results
 
 
 # This function contains API call to the Agro API Server, to get all satellite's collected data about tracked polygon.
@@ -298,7 +303,6 @@ def get_satellite_img( SATELLITE_IMAGES, polygon ):
             '&clouds_max=20&polyid=' + parameters['polygon_id'] + '&appid=' + APPID )
 
     try:
-        print('Retrieving Satellite data at : ', url )
         res = requests.get(url)
         data = res.json()
 
@@ -333,6 +337,10 @@ def get_satellite_img( SATELLITE_IMAGES, polygon ):
     SATELLITE_IMAGES.append(satellite_img)
     polygon.set_satellite_image( satellite_img )
 
+    results = [SATELLITE_IMAGES, polygon]
+
+    return results
+
 
 # This function contains API call to the OpenWeatherAPI Server, to retrieve 7 days weather forecasts.
 def weather_by_geocoordinates( SEVEN_DAYS_WEATHER_FORCASTS, center ):
@@ -359,6 +367,7 @@ def weather_by_geocoordinates( SEVEN_DAYS_WEATHER_FORCASTS, center ):
         
         SEVEN_DAYS_WEATHER_FORCASTS.append(weather_forecast)
 
+    return SEVEN_DAYS_WEATHER_FORCASTS
 
 # This function is used within the planning phase, to evaluate the precise number of remaining days before the water refill.
 def evaluate_remaining_days( expire ):

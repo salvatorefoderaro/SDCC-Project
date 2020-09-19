@@ -44,7 +44,7 @@ def checkDevicesStatus():
                 cursor.execute("UPDATE devices SET status = 100 WHERE id ="+str(x[0])+"")
 
                 dictToSend = {'deviceId': str(x[0]), 'deviceIp': str(x[1]), 'devicePort': str(x[2]), 'deviceGroup':str(x[3]), 'type':'error'}
-                res = requests.get('http://sendemailservice:8081/sendEmail', json = dictToSend, timeout=5)
+                res = requests.get('http://sendemailservice:8081/sendEmail', json = dictToSend, timeout=10)
                     
         cursor.close()
         db.commit()

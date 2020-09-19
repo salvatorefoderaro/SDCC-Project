@@ -12,5 +12,5 @@
         "type" : "monitor",
          "lecture_interval": 20,
         "reference_image": "img/002.jpeg",
-        "image_interval" : 10,
+        "image_interval" : 60,
         "camera": "Yes"}
