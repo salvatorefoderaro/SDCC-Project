@@ -1,23 +1,20 @@
 import cv2
-import glob
 import copy
 import numpy as np
 import PIL.Image as Image
-from array import array
-from flask import Flask, request
 import os
 import base64
 from pprint import pprint
 
 # Global Variables
 
-reference_image = cv2.imread("img/002.jpeg") # Reference image
+reference_image = cv2.imread("img/002.jpeg")  # Reference image
 dir = 'resources/images/0*.jpeg'
 
 KEYPOINT_TOTAL_AREA = 0
 IMAGE_TOTAL_AREA = 0
 
-# Overall filter values to isolate for sick leaves + FPs
+# Overall filter values to isolate for sick leaves
 LABmin = np.array([68, 110, 138], np.uint8)
 LABmax = np.array([255, 162, 255], np.uint8)
 
@@ -32,20 +29,6 @@ LABmax_terrain = np.array([255, 255, 148], np.uint8)
 # Range filter values for yellow leaves and tags (FPs)
 HSVmin_yellow = np.array([14, 70, 154], np.uint8)
 HSVmax_yellow = np.array([33, 255, 255], np.uint8)
-
-app = Flask(__name__)                   # Create the Flask app
-
-
-def stackingWindows():
-    """
-    Stacks the 4 panels that represent the keypoints of
-    the filtering pipeline
-    """
-    space = 50
-    offset = 70
-    cv2.moveWindow("Original image", space, space)
-    cv2.moveWindow("Keypoints original", space, hsize + space + offset)
-    cv2.moveWindow("Keypoints Dark", wsize + space, hsize + space + offset)
 
 
 def filterNotInRange(frame, min, max, colorMode):
@@ -126,10 +109,10 @@ def blob_detector(filtered_frame, original_frame):
 
     detector = cv2.SimpleBlobDetector_create(params)
     keypoints = detector.detect(thresholded)
-    
+
     for keyPoint in keypoints:
         ray = keyPoint.size
-        keypoint_area = int(3.14*ray*ray)
+        keypoint_area = int(3.14 * ray * ray)
         KEYPOINT_TOTAL_AREA = KEYPOINT_TOTAL_AREA + keypoint_area
 
     IMAGE_TOTAL_AREA = original_frame.shape[0] * original_frame.shape[1]
@@ -239,19 +222,14 @@ def _scale_array(arr, clip=True):
 
     return scaled
 
+
 def convert_image_to_bytearray(path):
     with open(path, "rb") as image:
         encoded_string = base64.b64encode(image.read())
     return encoded_string
 
-def convert_bytearray_to_image(path, array):
-    with open(path, "wb") as fh:
-        fh.write(array.decode('base64'))
-        fh.close()
-    return fh
 
-
-# REST API for disease detection of leaf
+# Main function to find disease of plants
 def disease_detection(image_path, reference_image_path):
     """
     Execute the disease detection method
@@ -260,7 +238,7 @@ def disease_detection(image_path, reference_image_path):
     imageScaleFactor = 45
     KEYPOINT_TOTAL_AREA = 0
     IMAGE_TOTAL_AREA = 0
-    THRESHOLD_VALUE = 1 # Needs to be less or equal then 20
+    THRESHOLD_VALUE = 1  # Needs to be less or equal then 20
 
     original = cv2.imread(image_path)
 
@@ -287,34 +265,10 @@ def disease_detection(image_path, reference_image_path):
     elif 21 <= perc <= 100:
         data["keypoints_image"] = convert_image_to_bytearray("keypoint_image.jpeg")
         data["message"] = "Attention, high level of risk"
-    
+
     os.remove("keypoint_image.jpeg", dir_fd=None)
     return data
 
-@app.route('/set_comparison_image', methods = ['POST', 'GET'])
-def set_comparison_image():
-    """
-    Set a comparison image to compare it with the image that present disease
-    """
-    if request.method == 'POST':
-        args = request.get_json()
-        try:
-            ref_image = args.get("ref_image")
-        except Exception:
-            ref_image = None
-            print("Reference image is missing")
-        
-        data = {"success": False}
-        if ref_image:
-            try:
-                f = open('/resources/images/ref_image.jpeg', 'wb')
-                f.write(bytearray(ref_image))
-                f.close()
-                data["success"] = True
-            except Exception as e:
-                print(e)
-        return data
-    return "You should use a POST method"
 
 if __name__ == "__main__":
     pprint(disease_detection("img/003.jpeg"))
